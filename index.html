@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>YSWS 3AM — Hack Club</title>
+<title>THE 3AM YSWS</title>
 <meta name="description" content="You Ship, We Ship. Build something real in the quiet hours and earn great rewards. A Hack Club YSWS event for teens." />
 <meta property="og:title" content="YSWS 3AM — Hack Club" />
 <meta property="og:description" content="Build something real after dark. Ship it. Claim your reward." />
@@ -417,7 +417,20 @@
   }
   .cta-box h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.8rem, 4vw, 2.7rem); color: #fff; margin-bottom: 0.9rem; letter-spacing: -0.5px; }
   .cta-box p { color: var(--dim); font-size: 1.03rem; line-height: 1.7; max-width: 480px; margin: 0 auto 2rem; }
+.reward-media {
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
 
+.reward-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
   /* ===== FOOTER ===== */
   footer { border-top: 1px solid var(--border); padding: 2.5rem 2rem; text-align: center; }
   .footer-inner { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
@@ -548,24 +561,18 @@
   <div class="fog-layer" id="fogLayer"></div>
 
   <div class="hero-content">
-    <div class="eyebrow"><svg class="icon"><use href="#i-spark"/></svg> Hack Club YSWS · 2025 Edition</div>
+    <div class="eyebrow"><svg class="icon"><use href="#i-spark"/></svg> Ready to burn the Midnight Oil?</div>
     <h1 class="hero-title">YSWS <span>3AM</span></h1>
     <p class="hero-sub" id="heroSub"></p>
     <p class="hero-desc">
-      Build something <span>genuinely cool</span> in the quiet hours — a site, a tool, a game, whatever's in your head.
-      Ship it before sunrise. Claim a <span>real reward</span> for your effort.
+      Build something <span> cool</span> that is Dark themed could be a site, a tool, a game, your wish,
+       <span>real reward</span> for your effort.
     </p>
     <div class="btns">
       <button class="btn btn-primary" onclick="scrollTo('submit')"><svg class="icon"><use href="#i-arrow"/></svg>Submit your project</button>
       <button class="btn btn-ghost" onclick="scrollTo('rules')"><svg class="icon"><use href="#i-book"/></svg>Read the rules</button>
     </div>
-    <div class="hero-stats">
-      <div class="stat"><div class="stat-num accent">3AM</div><div class="stat-label">Prime hours</div></div>
-      <div class="stat"><div class="stat-num">$500+</div><div class="stat-label">In rewards</div></div>
-      <div class="stat"><div class="stat-num">1 hr</div><div class="stat-label">Min. track time</div></div>
-      <div class="stat"><div class="stat-num">13–18</div><div class="stat-label">Open ages</div></div>
-    </div>
-  </div>
+   
 
   <!-- Skyline -->
   <div class="land-wrap">
@@ -636,56 +643,129 @@
       </div>
     </div>
 
-    <!-- Session timer feature -->
-    <div style="margin-top:2.75rem">
-      <div class="s-tag"><svg class="icon"><use href="#i-clock"/></svg> Try it now</div>
-      <h3 style="font-family:var(--font-display);font-weight:700;font-size:1.6rem;color:#fff;margin-bottom:0.4rem;">Your session timer</h3>
-      <p style="color:var(--dim);font-size:0.93rem;margin-bottom:1.5rem;max-width:560px;">Start it when you sit down to code, and watch which rewards you're within reach of. This resets when you leave the page — Hackatime is what actually counts toward your submission.</p>
-      <div class="timer-box">
-        <div class="timer-display">
-          <div class="timer-clock" id="timerClock">00<span>:</span>00<span>:</span>00</div>
-          <div class="timer-note">Elapsed session time</div>
-          <div class="timer-controls">
-            <button class="timer-btn primary" id="timerStart"><svg class="icon"><use href="#i-play"/></svg>Start</button>
-            <button class="timer-btn" id="timerReset"><svg class="icon"><use href="#i-reset"/></svg>Reset</button>
-          </div>
-        </div>
-        <div class="slider-wrap">
-          <label>Or drag to preview your hours: <strong id="hoursLabel">0 hrs</strong></label>
-          <input type="range" id="hoursSlider" min="0" max="12" step="0.5" value="0" />
-          <div class="slider-ticks"><span>0</span><span>3</span><span>6</span><span>9</span><span>12</span></div>
-          <div class="unlocked-msg"><svg class="icon"><use href="#i-check"/></svg><span id="unlockedMsg">Jump to the rewards section to see what unlocks.</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
+  
 <div class="wave-divider" style="transform:scaleY(-1)">
   <svg viewBox="0 0 1440 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M0 20 Q360 0 720 20 T1440 20 V40 H0 Z" fill="#090c14"/>
   </svg>
 </div>
 
-<!-- ===== REWARDS ===== -->
 <div class="full-bleed" id="rewards" style="background:var(--bg)">
   <div class="inner">
     <div class="s-tag"><svg class="icon"><use href="#i-trophy"/></svg> Prizes</div>
     <h2 class="s-title">Claim your reward</h2>
     <p class="s-desc">Ship something you're proud of and choose from a shelf of great rewards. The more hours you log, the more you can pick from — try the slider above to preview it.</p>
+    
     <div class="rewards-grid" id="rewardsGrid">
-      <div class="reward-card" data-hours="1"><span class="reward-icon"><svg class="icon" style="width:1em;height:1em"><use href="#i-controller"/></svg></span><div class="reward-name">Steam gift card</div><div class="reward-desc">$25 Steam credit — fuel your next gaming session.</div><span class="reward-hours">1 hr+</span></div>
-      <div class="reward-card" data-hours="1"><span class="reward-icon"><svg class="icon"><use href="#i-spark"/></svg></span><div class="reward-name">3AM sticker pack</div><div class="reward-desc">Exclusive Hack Club sticker set for your laptop.</div><span class="reward-hours">1 hr+</span></div>
-      <div class="reward-card" data-hours="5"><span class="reward-icon"><svg class="icon"><use href="#i-headphones"/></svg></span><div class="reward-name">Gaming headset</div><div class="reward-desc">Comfortable headset for long late-night sessions.</div><span class="reward-hours">5 hrs+</span></div>
-      <div class="reward-card" data-hours="5"><span class="reward-icon"><svg class="icon"><use href="#i-keyboard"/></svg></span><div class="reward-name">Mechanical keyboard</div><div class="reward-desc">Clicky keys, satisfying feedback, built to last.</div><span class="reward-hours">5 hrs+</span></div>
-      <div class="reward-card" data-hours="4"><span class="reward-icon"><svg class="icon"><use href="#i-mouse"/></svg></span><div class="reward-name">Gaming mouse</div><div class="reward-desc">High-DPI mouse for precision when it matters.</div><span class="reward-hours">4 hrs+</span></div>
-      <div class="reward-card" data-hours="3"><span class="reward-icon"><svg class="icon"><use href="#i-shirt"/></svg></span><div class="reward-name">Hack Club hoodie</div><div class="reward-desc">Limited edition hoodie, made for teen hackers.</div><span class="reward-hours">3 hrs+</span></div>
-      <div class="reward-card" data-hours="2"><span class="reward-icon"><svg class="icon"><use href="#i-terminal"/></svg></span><div class="reward-name">GitHub Pro (1 yr)</div><div class="reward-desc">Unlimited private repos for your next project.</div><span class="reward-hours">2 hrs+</span></div>
-      <div class="reward-card" data-hours="2"><span class="reward-icon"><svg class="icon"><use href="#i-link"/></svg></span><div class="reward-name">Domain name</div><div class="reward-desc">One free domain for a year. Stake your claim.</div><span class="reward-hours">2 hrs+</span></div>
-      <div class="reward-card" data-hours="3"><span class="reward-icon"><svg class="icon"><use href="#i-phone"/></svg></span><div class="reward-name">Replit Hacker plan</div><div class="reward-desc">3-month Replit Hacker plan — code from anywhere.</div><span class="reward-hours">3 hrs+</span></div>
-      <div class="reward-card" data-hours="1"><span class="reward-icon"><svg class="icon"><use href="#i-coffee"/></svg></span><div class="reward-name">Coffee shop card</div><div class="reward-desc">$20 gift card for the fuel behind the late nights.</div><span class="reward-hours">1 hr+</span></div>
-      <div class="reward-card" data-hours="2"><span class="reward-icon"><svg class="icon"><use href="#i-heart"/></svg></span><div class="reward-name">Orpheus plushie</div><div class="reward-desc">Official Hack Club Orpheus plushie companion.</div><span class="reward-hours">2 hrs+</span></div>
-      <div class="reward-card" data-hours="10"><span class="reward-icon"><svg class="icon"><use href="#i-trophy"/></svg></span><div class="reward-name">$100 Amazon card</div><div class="reward-desc">The top-tier reward for the most dedicated builds.</div><span class="reward-hours">10 hrs+</span></div>
+      
+      <div class="reward-card" data-hours="1">
+        <div class="reward-img-wrapper">
+          <img class="reward-img" src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?auto=format&fit=crop&w=400&q=80" alt="Steam gift card" />
+        </div>
+        <div class="reward-name">Steam gift card</div>
+        <div class="reward-desc">$25 Steam credit — fuel your next gaming session.</div>
+        <span class="reward-hours">1 hr+</span>
+      </div>
+
+      <div class="reward-card" data-hours="1">
+        <div class="reward-img-wrapper">
+          <img class="reward-img" src="https://images.unsplash.com/photo-1572375992501-4b0892d50c69?auto=format&fit=crop&w=400&q=80" alt="Sticker pack" />
+        </div>
+        <div class="reward-name">3AM sticker pack</div>
+        <div class="reward-desc">Exclusive Hack Club sticker set for your laptop.</div>
+        <span class="reward-hours">1 hr+</span>
+      </div>
+
+      <div class="reward-card" data-hours="5">
+        <div class="reward-img-wrapper">
+          <img class="reward-img" src="https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=400&q=80" alt="Gaming headset" />
+        </div>
+        <div class="reward-name">Gaming headset</div>
+        <div class="reward-desc">Comfortable headset for long late-night sessions.</div>
+        <span class="reward-hours">5 hrs+</span>
+      </div>
+
+      <div class="reward-card" data-hours="5">
+        <div class="reward-img-wrapper">
+          <img class="reward-img" src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=400&q=80" alt="Mechanical keyboard" />
+        </div>
+        <div class="reward-name">Mechanical keyboard</div>
+        <div class="reward-desc">Clicky keys, satisfying feedback, built to last.</div>
+        <span class="reward-hours">5 hrs+</span>
+      </div>
+
+      <div class="reward-card" data-hours="4">
+        <div class="reward-img-wrapper">
+          <img class="reward-img" src="https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=400&q=80" alt="Gaming mouse" />
+        </div>
+        <div class="reward-name">Gaming mouse</div>
+        <div class="reward-desc">High-DPI mouse for precision when it matters.</div>
+        <span class="reward-hours">4 hrs+</span>
+      </div>
+
+      <div class="reward-card" data-hours="3">
+        <div class="reward-img-wrapper">
+          <img class="reward-img" src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=400&q=80" alt="Hack Club hoodie" />
+        </div>
+        <div class="reward-name">Hack Club hoodie</div>
+        <div class="reward-desc">Limited edition hoodie, made for teen hackers.</div>
+        <span class="reward-hours">3 hrs+</span>
+      </div>
+
+      <div class="reward-card" data-hours="2">
+        <div class="reward-img-wrapper">
+          <img class="reward-img" src="https://images.unsplash.com/photo-1618401471353-b98aedd04e11?auto=format&fit=crop&w=400&q=80" alt="GitHub Pro" />
+        </div>
+        <div class="reward-name">GitHub Pro (1 yr)</div>
+        <div class="reward-desc">Unlimited private repos for your next project.</div>
+        <span class="reward-hours">2 hrs+</span>
+      </div>
+
+      <div class="reward-card" data-hours="2">
+        <div class="reward-img-wrapper">
+          <img class="reward-img" src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80" alt="Domain name" />
+        </div>
+        <div class="reward-name">Domain name</div>
+        <div class="reward-desc">One free domain for a year. Stake your claim.</div>
+        <span class="reward-hours">2 hrs+</span>
+      </div>
+
+      <div class="reward-card" data-hours="3">
+        <div class="reward-img-wrapper">
+          <img class="reward-img" src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=400&q=80" alt="Replit Hacker plan" />
+        </div>
+        <div class="reward-name">Replit Hacker plan</div>
+        <div class="reward-desc">3-month Replit Hacker plan — code from anywhere.</div>
+        <span class="reward-hours">3 hrs+</span>
+      </div>
+
+      <div class="reward-card" data-hours="1">
+        <div class="reward-img-wrapper">
+          <img class="reward-img" src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=400&q=80" alt="Coffee shop card" />
+        </div>
+        <div class="reward-name">Coffee shop card</div>
+        <div class="reward-desc">$20 gift card for the fuel behind the late nights.</div>
+        <span class="reward-hours">1 hr+</span>
+      </div>
+
+      <div class="reward-card" data-hours="2">
+        <div class="reward-img-wrapper">
+          <img class="reward-img" src="https://images.unsplash.com/photo-1559454403-b8fb88521f11?auto=format&fit=crop&w=400&q=80" alt="Orpheus plushie" />
+        </div>
+        <div class="reward-name">Orpheus plushie</div>
+        <div class="reward-desc">Official Hack Club Orpheus plushie companion.</div>
+        <span class="reward-hours">2 hrs+</span>
+      </div>
+
+      <div class="reward-card" data-hours="10">
+        <div class="reward-img-wrapper">
+          <img class="reward-img" src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=400&q=80" alt="$100 Amazon card" />
+        </div>
+        <div class="reward-name">$100 Amazon card</div>
+        <div class="reward-desc">The top-tier reward for the most dedicated builds.</div>
+        <span class="reward-hours">10 hrs+</span>
+      </div>
+
     </div>
   </div>
 </div>
@@ -746,7 +826,7 @@
     <div class="cta-box">
       <div class="s-tag" style="justify-content:center;margin-bottom:1rem"><svg class="icon"><use href="#i-rocket"/></svg> Ready?</div>
       <h2>Ship it before sunrise</h2>
-      <p>You've built something you're proud of. Send it in and claim what's yours — the night's almost over.</p>
+      <p>You've built something you're proud of. Send it in and claim what's yours the night's almost over.</p>
       <div class="btns">
         <button class="btn btn-primary" style="font-size:1rem;padding:0.95rem 2.25rem"><svg class="icon"><use href="#i-arrow"/></svg>Submit your project</button>
         <a href="https://hackclub.slack.com" target="_blank" class="btn btn-ghost"><svg class="icon"><use href="#i-slack"/></svg>Join Hack Club Slack</a>
@@ -758,7 +838,7 @@
 <!-- ===== FOOTER ===== -->
 <footer>
   <div class="footer-inner">
-    <img src="https://cdn.hackclub.com/019de4a9-41f7-7f6d-b4c7-8c549bfb001d/flag-orpheus-left.svg" alt="Hack Club" />
+    <img src="https://cdn.hackclub.com/019d730b-a931-785f-a435-c0b3eba933ce/puQ5T1DQN2FkLKxkse1UyxSH_MfbowlTpN71hRGDrvo" />
     <ul class="footer-links">
       <li><a href="https://hackclub.com" target="_blank">Hack Club</a></li>
       <li><a href="https://hackclub.com/slack" target="_blank">Slack</a></li>
