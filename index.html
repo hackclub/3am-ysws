@@ -8,7 +8,7 @@
 <meta property="og:title" content="YSWS 3AM — Hack Club" />
 <meta property="og:description" content="Build something real after dark. Ship it. Claim your reward." />
 <meta property="og:type" content="website" />
-<link rel="icon" href="https://cdn.hackclub.com/019de4a9-41f7-7f6d-b4c7-8c549bfb001d/flag-orpheus-left.svg" />
+<link rel="icon" href="https://hackclub.com/_next/image?url=%2Fassets%2Fhero_sticker2.webp&w=48&q=85&dpl=dpl_4BmwEEPBDqnBKceTthzmnpWdAwpu" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -431,6 +431,36 @@
   object-fit: cover;
   display: block;
 }
+
+.rewards-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:1.5rem;
+}
+.reward-media{
+    width:100%;
+    height:180px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(255,255,255,.03);
+    border-radius:10px;
+    margin-bottom:1rem;
+    overflow:hidden;
+}
+
+
+
+.reward-img{
+    max-width:85%;
+    max-height:85%;
+    object-fit:contain;
+    transition:.25s ease;
+}
+
+.reward-card:hover .reward-img{
+    transform:scale(1.05);
+}
   /* ===== FOOTER ===== */
   footer { border-top: 1px solid var(--border); padding: 2.5rem 2rem; text-align: center; }
   .footer-inner { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
@@ -467,10 +497,48 @@
     .proj-grid { grid-template-columns: 1fr; }
     .rewards-grid { grid-template-columns: 1fr; }
   }
+.hero-flag{
+    position: absolute;
+    top: 28px;
+    left: 32px;
+    width: 140px;
+    height: auto;
+    z-index: 15;
 
+    filter:
+        drop-shadow(0 8px 20px rgba(0,0,0,.35))
+        drop-shadow(0 0 18px rgba(255,180,84,.2));
+
+    animation: flagFloat 4s ease-in-out infinite;
+    user-select: none;
+    pointer-events: none;
+}
+
+
+
+@keyframes flagFloat{
+    0%,100%{
+        transform: translateY(0);
+    }
+    50%{
+        transform: translateY(-6px);
+    }
+}
+
+@media (max-width:768px){
+    .hero-flag{
+        width:90px;
+        top:18px;
+        left:18px;
+    }
+}
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
   }
+
+
+
+
 </style>
 </head>
 <body>
@@ -510,27 +578,17 @@
   </defs>
 </svg>
 
-<!-- ===== NAV ===== -->
-<nav>
-  <a href="#" class="nav-brand">
-    <img src="https://cdn.hackclub.com/019de4a9-41f7-7f6d-b4c7-8c549bfb001d/flag-orpheus-left.svg" alt="Hack Club" />
-    <span class="nav-brand-text">YSWS <span>3AM</span></span>
-  </a>
-  <ul class="nav-links" id="navLinks">
-    <li><a href="#rules">Rules</a></li>
-    <li><a href="#rewards">Rewards</a></li>
-    <li><a href="#projects">Projects</a></li>
-    <li><a href="#faq">FAQ</a></li>
-    <li><a href="#submit" class="nav-cta"><svg class="icon"><use href="#i-arrow"/></svg>Submit</a></li>
-  </ul>
-  <button class="hamburger" id="hamburger" aria-label="Open menu">
-    <span></span><span></span><span></span>
-  </button>
-</nav>
 
 <!-- ===== HERO ===== -->
+
 <section class="hero">
-  <div class="hero-sky"></div>
+  <img
+  class="hero-flag"
+  src="https://cdn.hackclub.com/019de4a9-41f7-7f6d-b4c7-8c549bfb001d/flag-orpheus-left.svg"
+  alt="Hack Club"
+/>
+  
+ <div class="hero-sky"></div>
   <canvas id="starCanvas"></canvas>
 
   <!-- Moon -->
@@ -616,33 +674,6 @@
   </svg>
 </div>
 
-<!-- ===== RULES ===== -->
-<div class="full-bleed" id="rules" style="background:var(--bg2)">
-  <div class="inner">
-    <div class="s-tag"><svg class="icon"><use href="#i-book"/></svg> Requirements</div>
-    <h2 class="s-title">Know the rules</h2>
-    <p class="s-desc">Before you dive into the late-night build, make sure you check these boxes.</p>
-    <div class="grid-2">
-      <div class="card"><div class="card-icon"><svg class="icon" style="width:1.6em;height:1.6em"><use href="#i-shield"/></svg></div><div class="card-title">Age requirement</div><div class="card-text">You must be <strong>13–18 years old</strong> to participate. No exceptions.</div></div>
-      <div class="card"><div class="card-icon"><svg class="icon" style="width:1.6em;height:1.6em"><use href="#i-clock"/></svg></div><div class="card-title">Track your time</div><div class="card-text">Log <strong>at least 1 hour</strong> of coding with Hackatime. It's how we verify your work.</div></div>
-      <div class="card"><div class="card-icon"><svg class="icon" style="width:1.6em;height:1.6em"><use href="#i-check"/></svg></div><div class="card-title">Good standing</div><div class="card-text">You must <strong>not be banned from Hackatime</strong> or a past Hack Club event.</div></div>
-      <div class="card"><div class="card-icon"><svg class="icon" style="width:1.6em;height:1.6em"><use href="#i-code"/></svg></div><div class="card-title">Your own work</div><div class="card-text">Submission must be <strong>your own creation</strong>. AI-assisted is fine, AI-generated isn't.</div></div>
-      <div class="card"><div class="card-icon"><svg class="icon" style="width:1.6em;height:1.6em"><use href="#i-square"/></svg></div><div class="card-title">One submission</div><div class="card-text">Only <strong>one submission per participant</strong>. Make it count.</div></div>
-      <div class="card"><div class="card-icon"><svg class="icon" style="width:1.6em;height:1.6em"><use href="#i-globe"/></svg></div><div class="card-title">Must be hosted</div><div class="card-text">Your project must be <strong>live and accessible online</strong>. Dead links can't be judged.</div></div>
-    </div>
-
-    <div style="margin-top:2.75rem">
-      <div class="s-tag"><svg class="icon"><use href="#i-check"/></svg> Submission checklist</div>
-      <h3 style="font-family:var(--font-display);font-weight:700;font-size:1.6rem;color:#fff;margin-bottom:1.35rem;">Before you submit</h3>
-      <div class="checklist">
-        <div class="check-row"><div class="check-num">1</div><div class="check-text"><strong>Join the Hack Club Slack</strong> — connect with thousands of teen hackers building things 24/7.</div></div>
-        <div class="check-row"><div class="check-num">2</div><div class="check-text"><strong>Verify with Hack Club Auth</strong> — confirm your identity and age eligibility.</div></div>
-        <div class="check-row"><div class="check-num">3</div><div class="check-text"><strong>Track time on Hackatime</strong> — install the extension and log at least 1 hour of coding.</div></div>
-        <div class="check-row"><div class="check-num">4</div><div class="check-text"><strong>Host your project online</strong> — GitHub Pages, Vercel, Netlify all work great.</div></div>
-        <div class="check-row"><div class="check-num">5</div><div class="check-text"><strong>Submit a working project</strong> — fill out the form with your live link and Hackatime screenshot.</div></div>
-      </div>
-    </div>
-
   
 <div class="wave-divider" style="transform:scaleY(-1)">
   <svg viewBox="0 0 1440 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
@@ -650,153 +681,109 @@
   </svg>
 </div>
 
+<!-- ===== REWARDS ===== -->
 <div class="full-bleed" id="rewards" style="background:var(--bg)">
   <div class="inner">
-    <div class="s-tag"><svg class="icon"><use href="#i-trophy"/></svg> Prizes</div>
-    <h2 class="s-title">Claim your reward</h2>
-    <p class="s-desc">Ship something you're proud of and choose from a shelf of great rewards. The more hours you log, the more you can pick from — try the slider above to preview it.</p>
-    
+    <div class="s-tag">
+      <svg class="icon"><use href="#i-trophy"/></svg>
+      Rewards
+    </div>
+
+    <h2 class="s-title">Build. Ship. Get rewarded.</h2>
+
+    <p class="s-desc">
+      Forget fake trophies. Build something you're genuinely proud of and pick a reward you'll actually use.
+      Whether it's late-night coffee, a new Kindle, Minecraft, or a pair of noise-canceling headphones,
+      every reward is here to help you keep building long after <strong>3 AM</strong> is over.
+    </p>
+
     <div class="rewards-grid" id="rewardsGrid">
-      
-      <div class="reward-card" data-hours="1">
-        <div class="reward-img-wrapper">
-          <img class="reward-img" src="https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?auto=format&fit=crop&w=400&q=80" alt="Steam gift card" />
-        </div>
-        <div class="reward-name">Steam gift card</div>
-        <div class="reward-desc">$25 Steam credit — fuel your next gaming session.</div>
-        <span class="reward-hours">1 hr+</span>
-      </div>
 
-      <div class="reward-card" data-hours="1">
-        <div class="reward-img-wrapper">
-          <img class="reward-img" src="https://images.unsplash.com/photo-1572375992501-4b0892d50c69?auto=format&fit=crop&w=400&q=80" alt="Sticker pack" />
-        </div>
-        <div class="reward-name">3AM sticker pack</div>
-        <div class="reward-desc">Exclusive Hack Club sticker set for your laptop.</div>
-        <span class="reward-hours">1 hr+</span>
-      </div>
-
-      <div class="reward-card" data-hours="5">
-        <div class="reward-img-wrapper">
-          <img class="reward-img" src="https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=400&q=80" alt="Gaming headset" />
-        </div>
-        <div class="reward-name">Gaming headset</div>
-        <div class="reward-desc">Comfortable headset for long late-night sessions.</div>
-        <span class="reward-hours">5 hrs+</span>
-      </div>
-
-      <div class="reward-card" data-hours="5">
-        <div class="reward-img-wrapper">
-          <img class="reward-img" src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=400&q=80" alt="Mechanical keyboard" />
-        </div>
-        <div class="reward-name">Mechanical keyboard</div>
-        <div class="reward-desc">Clicky keys, satisfying feedback, built to last.</div>
-        <span class="reward-hours">5 hrs+</span>
-      </div>
-
-      <div class="reward-card" data-hours="4">
-        <div class="reward-img-wrapper">
-          <img class="reward-img" src="https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=400&q=80" alt="Gaming mouse" />
-        </div>
-        <div class="reward-name">Gaming mouse</div>
-        <div class="reward-desc">High-DPI mouse for precision when it matters.</div>
-        <span class="reward-hours">4 hrs+</span>
-      </div>
-
-      <div class="reward-card" data-hours="3">
-        <div class="reward-img-wrapper">
-          <img class="reward-img" src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=400&q=80" alt="Hack Club hoodie" />
-        </div>
-        <div class="reward-name">Hack Club hoodie</div>
-        <div class="reward-desc">Limited edition hoodie, made for teen hackers.</div>
-        <span class="reward-hours">3 hrs+</span>
-      </div>
-
+      <!-- Coffee -->
       <div class="reward-card" data-hours="2">
-        <div class="reward-img-wrapper">
-          <img class="reward-img" src="https://images.unsplash.com/photo-1618401471353-b98aedd04e11?auto=format&fit=crop&w=400&q=80" alt="GitHub Pro" />
+        <div class="reward-media">
+          <img class="reward-img"
+            src="https://cdn.hackclub.com/019fa456-b4dd-7a73-b639-80828e63b63c/image.png"
+            alt="Coffee Gift Card">
         </div>
-        <div class="reward-name">GitHub Pro (1 yr)</div>
-        <div class="reward-desc">Unlimited private repos for your next project.</div>
+
+        <div class="reward-name">$10 Coffee / Energy Drink Card</div>
+
+        <div class="reward-desc">
+          Fuel your next late-night coding session with your favorite coffee or energy drink.
+        </div>
+
         <span class="reward-hours">2 hrs+</span>
       </div>
 
-      <div class="reward-card" data-hours="2">
-        <div class="reward-img-wrapper">
-          <img class="reward-img" src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80" alt="Domain name" />
+      <!-- Glasses -->
+      <div class="reward-card" data-hours="6">
+        <div class="reward-media">
+          <img class="reward-img"
+            src="https://cdn.hackclub.com/019fa458-4a5e-7024-941f-dc038a93780b/image.png"
+            alt="Blue Light Glasses">
         </div>
-        <div class="reward-name">Domain name</div>
-        <div class="reward-desc">One free domain for a year. Stake your claim.</div>
-        <span class="reward-hours">2 hrs+</span>
-      </div>
 
-      <div class="reward-card" data-hours="3">
-        <div class="reward-img-wrapper">
-          <img class="reward-img" src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=400&q=80" alt="Replit Hacker plan" />
+        <div class="reward-name">Blue Light Glasses</div>
+
+        <div class="reward-desc">
+          Protect your eyes during those long nights of coding without sacrificing comfort.
         </div>
-        <div class="reward-name">Replit Hacker plan</div>
-        <div class="reward-desc">3-month Replit Hacker plan — code from anywhere.</div>
-        <span class="reward-hours">3 hrs+</span>
+
+        <span class="reward-hours">6 hrs+</span>
       </div>
 
-      <div class="reward-card" data-hours="1">
-        <div class="reward-img-wrapper">
-          <img class="reward-img" src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=400&q=80" alt="Coffee shop card" />
+      <!-- Minecraft -->
+      <div class="reward-card" data-hours="8">
+        <div class="reward-media">
+          <img class="reward-img"
+            src="https://hackyeah.hackclub.com/minecraft.png"
+            alt="Minecraft">
         </div>
-        <div class="reward-name">Coffee shop card</div>
-        <div class="reward-desc">$20 gift card for the fuel behind the late nights.</div>
-        <span class="reward-hours">1 hr+</span>
-      </div>
 
-      <div class="reward-card" data-hours="2">
-        <div class="reward-img-wrapper">
-          <img class="reward-img" src="https://images.unsplash.com/photo-1559454403-b8fb88521f11?auto=format&fit=crop&w=400&q=80" alt="Orpheus plushie" />
+        <div class="reward-name">Minecraft</div>
+
+        <div class="reward-desc">
+          One of the greatest games ever made. Build in code, then build in blocks.
         </div>
-        <div class="reward-name">Orpheus plushie</div>
-        <div class="reward-desc">Official Hack Club Orpheus plushie companion.</div>
-        <span class="reward-hours">2 hrs+</span>
+
+        <span class="reward-hours">8 hrs+</span>
       </div>
 
-      <div class="reward-card" data-hours="10">
-        <div class="reward-img-wrapper">
-          <img class="reward-img" src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=400&q=80" alt="$100 Amazon card" />
+      <!-- Kindle -->
+      <div class="reward-card" data-hours="15">
+        <div class="reward-media">
+          <img class="reward-img"
+            src="https://cdn.hackclub.com/019fa458-6eee-713f-8837-ca7c41c3f4ad/image.png"
+            alt="Amazon Kindle">
         </div>
-        <div class="reward-name">$100 Amazon card</div>
-        <div class="reward-desc">The top-tier reward for the most dedicated builds.</div>
-        <span class="reward-hours">10 hrs+</span>
+
+        <div class="reward-name">Amazon Kindle</div>
+
+        <div class="reward-desc">
+          Read books without distractions. Perfect for learning new tech, startups, and everything in between.
+        </div>
+
+        <span class="reward-hours">15 hrs+</span>
       </div>
 
-    </div>
-  </div>
-</div>
+      <!-- Headphones -->
+      <div class="reward-card" data-hours="30">
+        <div class="reward-media">
+          <img class="reward-img"
+            src="https://hackyeah.hackclub.com/headphones.webp"
+            alt="Sony WH-CH720N">
+        </div>
 
-<!-- ===== PROJECTS & GUIDES ===== -->
-<div class="full-bleed" id="projects" style="background:var(--bg2)">
-  <div class="inner">
-    <div class="s-tag"><svg class="icon"><use href="#i-spark"/></svg> Inspiration</div>
-    <h2 class="s-title">Example projects</h2>
-    <p class="s-desc">Need a starting point? Here are real projects past 3AM hackers have shipped.</p>
-    <div class="proj-grid">
-      <div class="proj-card"><div class="proj-thumb bg-a"><svg class="icon" style="width:1.4em;height:1.4em"><use href="#i-controller"/></svg></div><div class="proj-body"><div class="proj-type">Game</div><div class="proj-name">Browser maze game</div><div class="proj-desc">Procedurally generated maze with fog-of-war and a live timer.</div><div class="proj-tags"><span class="tag">Canvas API</span><span class="tag">JavaScript</span></div></div></div>
-      <div class="proj-card"><div class="proj-thumb bg-b"><svg class="icon" style="width:1.4em;height:1.4em"><use href="#i-chip"/></svg></div><div class="proj-body"><div class="proj-type">Web app</div><div class="proj-name">AI story generator</div><div class="proj-desc">Type a prompt, get a short story back instantly via an AI API.</div><div class="proj-tags"><span class="tag">API</span><span class="tag">React</span><span class="tag">AI</span></div></div></div>
-      <div class="proj-card"><div class="proj-thumb bg-c"><svg class="icon" style="width:1.4em;height:1.4em"><use href="#i-headphones"/></svg></div><div class="proj-body"><div class="proj-type">Tool</div><div class="proj-name">Ambient sound mixer</div><div class="proj-desc">Mix rain, wind, and night sounds in your browser with the Web Audio API.</div><div class="proj-tags"><span class="tag">Web Audio</span><span class="tag">Vanilla JS</span></div></div></div>
-      <div class="proj-card"><div class="proj-thumb bg-d"><svg class="icon" style="width:1.4em;height:1.4em"><use href="#i-book"/></svg></div><div class="proj-body"><div class="proj-type">Game</div><div class="proj-name">Text adventure RPG</div><div class="proj-desc">Branching story with inventory, choices, and multiple endings.</div><div class="proj-tags"><span class="tag">HTML</span><span class="tag">JavaScript</span></div></div></div>
-      <div class="proj-card"><div class="proj-thumb bg-e"><svg class="icon" style="width:1.4em;height:1.4em"><use href="#i-spark"/></svg></div><div class="proj-body"><div class="proj-type">Visualization</div><div class="proj-name">Particle constellation art</div><div class="proj-desc">Interactive canvas art where particles form shapes on hover.</div><div class="proj-tags"><span class="tag">p5.js</span><span class="tag">Canvas</span></div></div></div>
-      <div class="proj-card"><div class="proj-thumb bg-f"><svg class="icon" style="width:1.4em;height:1.4em"><use href="#i-palette"/></svg></div><div class="proj-body"><div class="proj-type">Portfolio</div><div class="proj-name">Night-sky portfolio site</div><div class="proj-desc">Personal site with an animated starfield background and terminal bio.</div><div class="proj-tags"><span class="tag">HTML/CSS</span><span class="tag">GSAP</span></div></div></div>
-    </div>
+        <div class="reward-name">Sony WH-CH720N</div>
 
-    <div style="margin-top:3.5rem">
-      <div class="s-tag"><svg class="icon"><use href="#i-book"/></svg> Guides</div>
-      <h3 style="font-family:var(--font-display);font-weight:700;font-size:1.6rem;color:#fff;margin-bottom:0.5rem;">Get started fast</h3>
-      <p style="color:var(--dim);font-size:0.93rem;margin-bottom:0">From zero to shipped before the sun comes up.</p>
-      <div class="guides">
-        <a href="https://hackclub.com" target="_blank" rel="noopener" class="guide-row"><div class="guide-icon"><svg class="icon"><use href="#i-rocket"/></svg></div><div class="guide-info"><div class="guide-title">Setting up Hackatime in 5 minutes</div><div class="guide-meta">Track every minute of your build · Beginner</div></div><div class="guide-arrow"><svg class="icon"><use href="#i-arrow"/></svg></div></a>
-        <a href="https://hackclub.com" target="_blank" rel="noopener" class="guide-row"><div class="guide-icon"><svg class="icon"><use href="#i-globe"/></svg></div><div class="guide-info"><div class="guide-title">Deploy your site in under 10 minutes</div><div class="guide-meta">GitHub Pages, Vercel, Netlify — pick your host · Beginner</div></div><div class="guide-arrow"><svg class="icon"><use href="#i-arrow"/></svg></div></a>
-        <a href="https://hackclub.com" target="_blank" rel="noopener" class="guide-row"><div class="guide-icon"><svg class="icon"><use href="#i-palette"/></svg></div><div class="guide-info"><div class="guide-title">Build a night-themed landing page from scratch</div><div class="guide-meta">HTML, CSS animation, atmosphere · Intermediate</div></div><div class="guide-arrow"><svg class="icon"><use href="#i-arrow"/></svg></div></a>
-        <a href="https://hackclub.com" target="_blank" rel="noopener" class="guide-row"><div class="guide-icon"><svg class="icon"><use href="#i-chip"/></svg></div><div class="guide-info"><div class="guide-title">Connecting an AI API to your project</div><div class="guide-meta">OpenAI, Gemini, Claude — make your app think · Intermediate</div></div><div class="guide-arrow"><svg class="icon"><use href="#i-arrow"/></svg></div></a>
-        <a href="https://hackclub.com" target="_blank" rel="noopener" class="guide-row"><div class="guide-icon"><svg class="icon"><use href="#i-controller"/></svg></div><div class="guide-info"><div class="guide-title">Build a browser game with the Canvas API</div><div class="guide-meta">Physics, sprites, collisions, game loops · Advanced</div></div><div class="guide-arrow"><svg class="icon"><use href="#i-arrow"/></svg></div></a>
-        <a href="https://hackclub.com" target="_blank" rel="noopener" class="guide-row"><div class="guide-icon"><svg class="icon"><use href="#i-shield"/></svg></div><div class="guide-info"><div class="guide-title">Hack Club Auth — verify your identity</div><div class="guide-meta">Step-by-step verification guide · Required</div></div><div class="guide-arrow"><svg class="icon"><use href="#i-arrow"/></svg></div></a>
+        <div class="reward-desc">
+          Noise-canceling headphones for deep focus. Comfortable enough for marathon coding sessions.
+        </div>
+
+        <span class="reward-hours">30 hrs+</span>
       </div>
+
     </div>
   </div>
 </div>
@@ -840,14 +827,51 @@
   <div class="footer-inner">
     <img src="https://cdn.hackclub.com/019d730b-a931-785f-a435-c0b3eba933ce/puQ5T1DQN2FkLKxkse1UyxSH_MfbowlTpN71hRGDrvo" />
     <ul class="footer-links">
+      <li>
+  <a href="https://hackclub.com/privacy-and-terms#hack-club-standard-terms-and-conditions"
+     target="_blank"
+     rel="noopener noreferrer">
+    Terms & Conditions
+  </a>
+</li>
+
+<li>
+  <a href="https://hackclub.com/privacy-and-terms#hack-club-privacy-notice"
+     target="_blank"
+     rel="noopener noreferrer">
+    Privacy Policy
+  </a>
+</li>
+
+<li>
+  <a href="https://forms.hackclub.com/bounty"
+     target="_blank"
+     rel="noopener noreferrer">
+    Fulfillment Bounty
+  </a>
+</li>
       <li><a href="https://hackclub.com" target="_blank">Hack Club</a></li>
       <li><a href="https://hackclub.com/slack" target="_blank">Slack</a></li>
       <li><a href="https://hackatime.hackclub.com" target="_blank">Hackatime</a></li>
       <li><a href="https://github.com/hackclub" target="_blank">GitHub</a></li>
       <li><a href="#faq">FAQ</a></li>
     </ul>
-    <p class="footer-copy">Made with <span>♥</span> by Hack Club teens &nbsp;·&nbsp; <a href="https://hackclub.com" target="_blank" style="color:var(--teal);text-decoration:none">hackclub.com</a></p>
-  </div>
+<p class="footer-copy">
+  Made with <span>♥</span> by
+  <a href="https://hridhaan.me"
+     target="_blank"
+     rel="noopener noreferrer"
+     class="footer-author">
+    Hridhaan Sahay
+  </a>
+  for
+  <a href="https://hackclub.com"
+     target="_blank"
+     rel="noopener noreferrer"
+     style="color:var(--teal);text-decoration:none;">
+    Hack Club
+  </a>
+</p>  </div>
 </footer>
 
 <!-- Bat template -->
