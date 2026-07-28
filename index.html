@@ -4,17 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>THE 3AM YSWS</title>
-  <meta name="description" content="You Ship, We Ship. Build something real in the quiet hours and earn great rewards. A Hack Club YSWS event for teens." />
+  <meta name="description" content="You Ship, We Ship. Stay up late, build something real, and get rewarded for it. A Hack Club YSWS event for teens." />
   <meta property="og:title" content="YSWS 3AM — Hack Club" />
-  <meta property="og:description" content="Build something real after dark. Ship it. Claim your reward." />
+  <meta property="og:description" content="Stay up late, build something real, and ship it before sunrise." />
   <meta property="og:type" content="website" />
   <link rel="icon" href="https://hackclub.com/_next/image?url=%2Fassets%2Fhero_sticker2.webp&w=48&q=85&dpl=dpl_4BmwEEPBDqnBKceTthzmnpWdAwpu" />
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
@@ -33,6 +33,24 @@
       <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
     </defs>
   </svg>
+
+  <nav style="display:none;">
+    <a href="#" class="nav-brand">
+      <img src="https://hackclub.com/_next/image?url=%2Fassets%2Fhero_sticker2.webp&w=48&q=85&dpl=dpl_4BmwEEPBDqnBKceTthzmnpWdAwpu" alt="Hack Club Logo" />
+      <span class="nav-brand-text">YSWS <span>3AM</span></span>
+    </a>
+    <button class="hamburger" id="hamburger" aria-label="Toggle navigation">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#timer">Timer</a></li>
+      <li><a href="#rewards">Rewards</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="https://forms.hackclub.com/3am" target="_blank" rel="noopener noreferrer" class="nav-cta">Submit Project</a></li>
+    </ul>
+  </nav>
 
   <section class="hero">
     <img class="hero-flag" src="https://cdn.hackclub.com/019de4a9-41f7-7f6d-b4c7-8c549bfb001d/flag-orpheus-left.svg" alt="Hack Club Flag" />
@@ -66,12 +84,12 @@
       <h1 class="hero-title">YSWS <span>3AM</span></h1>
       <p class="hero-sub" id="heroSub"></p>
       <p class="hero-desc">
-        Build something <span>cool</span> with a dark theme—a site, a tool, or a game—and earn <span>real rewards</span> for your effort.
+        Pick something dark-themed to build — a site, a tool, a game, whatever — and get <span>real rewards</span> for actually finishing it.
       </p>
       <div class="btns">
-        <button class="btn btn-primary" onclick="scrollToSection('submit')">
+        <a class="btn btn-primary" href="https://forms.hackclub.com/3am" target="_blank" rel="noopener noreferrer">
           <svg class="icon"><use href="#i-arrow"/></svg> Submit your project
-        </button>
+        </a>
         <button class="btn btn-ghost" onclick="scrollToSection('faq')">
           <svg class="icon"><use href="#i-book"/></svg> Read the rules
         </button>
@@ -120,106 +138,106 @@
       <div class="s-tag"><svg class="icon"><use href="#i-trophy"/></svg> Rewards</div>
       <h2 class="s-title">Build. Ship. Get rewarded.</h2>
       <p class="s-desc">
-        Build something you're genuinely proud of and pick a reward you'll actually use to keep building long after <strong>3 AM</strong> is over.
+        Build something you'd actually want to show people, then grab a reward you'll still be using long after <strong>3 AM</strong> is over.
       </p>
 
       <div class="rewards-grid" id="rewardsGrid">
         <div class="reward-card" data-hours="2">
           <div class="reward-media">
-            <img class="reward-img" src="https://cdn.hackclub.com/019fa456-b4dd-7a73-b639-80828e63b63c/image.png" alt="Coffee Gift Card">
+            <img class="reward-img" src="https://cdn.hackclub.com/019fa456-b4dd-7a73-b639-80828e63b63c/image.png" alt="Coffee Gift Card" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'reward-img',textContent:'🎁',style:'display:flex;align-items:center;justify-content:center;font-size:2.5rem;height:100%;'}))">
           </div>
           <div class="reward-name">$10 Coffee Card</div>
-          <div class="reward-desc">Fuel your next late-night coding session with your favorite brew.</div>
+          <div class="reward-desc">For the next 3 AM session, whenever it is.</div>
           <span class="reward-hours">2 hrs</span>
         </div>
 
         <div class="reward-card" data-hours="6">
           <div class="reward-media">
-            <img class="reward-img" src="https://cdn.hackclub.com/019fa458-4a5e-7024-941f-dc038a93780b/image.png" alt="Blue Light Glasses">
+            <img class="reward-img" src="https://cdn.hackclub.com/019fa458-4a5e-7024-941f-dc038a93780b/image.png" alt="Blue Light Glasses" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'reward-img',textContent:'🎁',style:'display:flex;align-items:center;justify-content:center;font-size:2.5rem;height:100%;'}))">
           </div>
           <div class="reward-name">Blue Light Glasses</div>
-          <div class="reward-desc">Protect your eyes during long late-night sessions.</div>
+          <div class="reward-desc">Your eyes will thank you around hour 4.</div>
           <span class="reward-hours">6 hrs</span>
         </div>
 
         <div class="reward-card" data-hours="8">
           <div class="reward-media">
-            <img class="reward-img" src="https://hackyeah.hackclub.com/minecraft.png" alt="Minecraft">
+            <img class="reward-img" src="https://hackyeah.hackclub.com/minecraft.png" alt="Minecraft" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'reward-img',textContent:'🎁',style:'display:flex;align-items:center;justify-content:center;font-size:2.5rem;height:100%;'}))">
           </div>
           <div class="reward-name">Minecraft</div>
-          <div class="reward-desc">Build in code, then relax and build in blocks.</div>
+          <div class="reward-desc">Because sometimes you want to build without a compiler yelling at you.</div>
           <span class="reward-hours">8 hrs</span>
         </div>
 
         <div class="reward-card" data-hours="15">
           <div class="reward-media">
-            <img class="reward-img" src="https://cdn.hackclub.com/019fa458-6eee-713f-8837-ca7c41c3f4ad/image.png" alt="Amazon Kindle">
+            <img class="reward-img" src="https://cdn.hackclub.com/019fa458-6eee-713f-8837-ca7c41c3f4ad/image.png" alt="Amazon Kindle" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'reward-img',textContent:'🎁',style:'display:flex;align-items:center;justify-content:center;font-size:2.5rem;height:100%;'}))">
           </div>
           <div class="reward-name">Amazon Kindle</div>
-          <div class="reward-desc">Read technical documentation or books without distractions.</div>
+          <div class="reward-desc">For docs, books, or whatever you'd rather read than another Stack Overflow tab.</div>
           <span class="reward-hours">15 hrs</span>
         </div>
 
         <div class="reward-card" data-hours="30">
           <div class="reward-media">
-            <img class="reward-img" src="https://hackyeah.hackclub.com/headphones.webp" alt="Sony WH-CH720N">
+            <img class="reward-img" src="https://hackyeah.hackclub.com/headphones.webp" alt="Sony WH-CH720N" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'reward-img',textContent:'🎁',style:'display:flex;align-items:center;justify-content:center;font-size:2.5rem;height:100%;'}))">
           </div>
           <div class="reward-name">Sony WH-CH720N</div>
-          <div class="reward-desc">Active noise-canceling headphones for ultimate concentration.</div>
+          <div class="reward-desc">Noise-canceling, for when the house isn't as quiet as 3 AM should be.</div>
           <span class="reward-hours">30 hrs</span>
         </div>
 
         <div class="reward-card" data-hours="20">
           <div class="reward-media">
-            <img class="reward-img" src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQSHergPPhI3EYYWRS6FwpbH-wSfz1POogGOgIgTpYIigBAYwfWOkTTAF1PGU7h28FY9hsLWYcXp4aN93A4qt5VnOmFWRRfwX_0uX6Rz-a_Ag6qfa2UUetY7Q" alt="Laptop Grant">
+            <img class="reward-img" src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQSHergPPhI3EYYWRS6FwpbH-wSfz1POogGOgIgTpYIigBAYwfWOkTTAF1PGU7h28FY9hsLWYcXp4aN93A4qt5VnOmFWRRfwX_0uX6Rz-a_Ag6qfa2UUetY7Q" alt="Laptop Grant" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'reward-img',textContent:'🎁',style:'display:flex;align-items:center;justify-content:center;font-size:2.5rem;height:100%;'}))">
           </div>
           <div class="reward-name">Laptop Grant</div>
-          <div class="reward-desc">Stackable $100 grant toward a new laptop, earned for every 20 hours you code.</div>
+          <div class="reward-desc">$100 toward a new laptop. Stacks every 20 hours, so keep going.</div>
           <span class="reward-hours">20 hrs (stackable)</span>
         </div>
 
         <div class="reward-card" data-hours="1">
           <div class="reward-media">
-            <img class="reward-img" src="https://www.worthing.in/cdn/shop/products/IMG_20210820_170902.jpg?v=1629459850" alt="Book Grant">
+            <img class="reward-img" src="https://www.worthing.in/cdn/shop/products/IMG_20210820_170902.jpg?v=1629459850" alt="Book Grant" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'reward-img',textContent:'🎁',style:'display:flex;align-items:center;justify-content:center;font-size:2.5rem;height:100%;'}))">
           </div>
           <div class="reward-name">Book Grant</div>
-          <div class="reward-desc">$5 grant for every hour you code, redeemable for books.</div>
+          <div class="reward-desc">$5 per hour coded, toward whatever books you're into.</div>
           <span class="reward-hours">1 hr (stackable)</span>
         </div>
 
         <div class="reward-card" data-hours="65">
           <div class="reward-media">
-            <img class="reward-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQo9va3cCWu3j-TtW7XKGbor2KuhKfez3-DRzWlcNOZrQ&s=10" alt="iPad 10th Gen">
+            <img class="reward-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQo9va3cCWu3j-TtW7XKGbor2KuhKfez3-DRzWlcNOZrQ&s=10" alt="iPad 10th Gen" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'reward-img',textContent:'🎁',style:'display:flex;align-items:center;justify-content:center;font-size:2.5rem;height:100%;'}))">
           </div>
           <div class="reward-name">iPad (10th Gen)</div>
-          <div class="reward-desc">Sketch, take notes, and code on the go with a full-size iPad.</div>
+          <div class="reward-desc">For sketching, notes, or coding from the couch instead of your desk.</div>
           <span class="reward-hours">65 hrs</span>
         </div>
 
         <div class="reward-card" data-hours="31">
           <div class="reward-media">
-            <img class="reward-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIdPoIO0vVg-60XUh_XWz15aRIMLN1WKbOdAGD2wWGLA&s=10" alt="Standard Edition">
+            <img class="reward-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIdPoIO0vVg-60XUh_XWz15aRIMLN1WKbOdAGD2wWGLA&s=10" alt="Standard Edition" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'reward-img',textContent:'🎁',style:'display:flex;align-items:center;justify-content:center;font-size:2.5rem;height:100%;'}))">
           </div>
-          <div class="reward-name">Standard Edition ($79.99)</div>
-          <div class="reward-desc">The ultimate edition reward for dedicated night owls.</div>
+          <div class="reward-name">GTA VI</div>
+          <div class="reward-desc">For everyone who stayed up way past 3 AM to earn this one.</div>
           <span class="reward-hours">31 hrs</span>
         </div>
 
         <div class="reward-card" data-hours="20">
           <div class="reward-media">
-            <div class="reward-img" style="display:flex;align-items:center;justify-content:center;font-size:2.5rem;background:rgba(255,255,255,0.04);height:100%;">📱</div>
+            <img class="reward-img" src="https://rukminim2.flixcart.com/image/480/640/xif0q/mobile/a/c/k/-original-imagtc5fuzkvczr7.jpeg?q=90" alt="Hosting & Domain Grant" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'reward-img',textContent:'🎁',style:'display:flex;align-items:center;justify-content:center;font-size:2.5rem;height:100%;'}))">
           </div>
           <div class="reward-name">Phone Grant</div>
-          <div class="reward-desc">Stackable $100 grant toward a new phone, earned for every 20 hours you code.</div>
+          <div class="reward-desc">$100 toward a new phone. Also stacks every 20 hours.</div>
           <span class="reward-hours">20 hrs (stackable)</span>
         </div>
 
         <div class="reward-card" data-hours="10">
           <div class="reward-media">
-            <img class="reward-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8YgHI-eO8T_VSS-6tA50IaVhsPWlC6CtM-WS7HRzEkA&s=10" alt="Hosting & Domain Grant">
+            <img class="reward-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8YgHI-eO8T_VSS-6tA50IaVhsPWlC6CtM-WS7HRzEkA&s=10" alt="Hosting & Domain Grant" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'reward-img',textContent:'🎁',style:'display:flex;align-items:center;justify-content:center;font-size:2.5rem;height:100%;'}))">
           </div>
           <div class="reward-name">Hosting &amp; Domain Grant</div>
-          <div class="reward-desc">Stackable $10 grant toward hosting and domain costs for your project.</div>
+          <div class="reward-desc">$10 toward keeping your project actually live on the internet.</div>
           <span class="reward-hours">10 hrs (stackable)</span>
         </div>
       </div>
@@ -230,24 +248,24 @@
     <div class="inner faq-container">
       <div class="s-tag"><svg class="icon"><use href="#i-chat"/></svg> Questions</div>
       <h2 class="s-title">Frequently asked</h2>
-      <p class="s-desc">Everything you need to know before you start building.</p>
+      <p class="s-desc">Stuff people usually ask before jumping in.</p>
 
       <div class="faq-list">
         <div class="faq-item">
           <button class="faq-q" data-faq>Is this free?<div class="faq-chevron">▾</div></button>
-          <div class="faq-a"><div class="faq-a-inner">Yes — YSWS 3AM is 100% free, like every Hack Club event.</div></div>
+          <div class="faq-a"><div class="faq-a-inner">Yep, totally free — same as every other Hack Club event.</div></div>
         </div>
         <div class="faq-item">
           <button class="faq-q" data-faq>What can I ship?<div class="faq-chevron">▾</div></button>
-          <div class="faq-a"><div class="faq-a-inner">Any web-accessible project you've worked on during the event—websites, games, or digital tools.</div></div>
+          <div class="faq-a"><div class="faq-a-inner">Anything web-accessible that you built during the event — a website, a game, a tool, whatever you've got.</div></div>
         </div>
         <div class="faq-item">
           <button class="faq-q" data-faq>Am I eligible?<div class="faq-chevron">▾</div></button>
-          <div class="faq-a"><div class="faq-a-inner">Anyone aged 13–18, anywhere in the world, can participate.</div></div>
+          <div class="faq-a"><div class="faq-a-inner">If you're 13–18, you're in, no matter where you live.</div></div>
         </div>
         <div class="faq-item">
           <button class="faq-q" data-faq>Do I have to code at exactly 3 AM?<div class="faq-chevron">▾</div></button>
-          <div class="faq-a"><div class="faq-a-inner">"3 AM" represents the focused night-owl vibe. Code whenever fits your routine during the event.</div></div>
+          <div class="faq-a"><div class="faq-a-inner">Nah, "3 AM" is more of a vibe than a schedule. Code whenever works for you during the event.</div></div>
         </div>
       </div>
     </div>
@@ -258,10 +276,10 @@
       <div class="cta-box">
         <div class="s-tag cta-tag"><svg class="icon"><use href="#i-rocket"/></svg> Ready?</div>
         <h2>Ship it before sunrise</h2>
-        <p>Send your project in and claim what's yours before the night is over.</p>
+        <p>Submit your project and grab your reward before the night's over.</p>
         <div class="btns">
-          <button class="btn btn-primary cta-btn"><svg class="icon"><use href="#i-arrow"/></svg>Submit your project</button>
-          <a href="https://hackclub.slack.com" target="_blank" class="btn btn-ghost"><svg class="icon"><use href="#i-slack"/></svg>Join Hack Club Slack</a>
+          <a href="https://forms.hackclub.com/3am" target="_blank" rel="noopener noreferrer" class="btn btn-primary cta-btn"><svg class="icon"><use href="#i-arrow"/></svg>Submit your project</a>
+          <a href="https://hackclub.slack.com/app_redirect?channel=3am" target="_blank" rel="noopener noreferrer" class="btn btn-ghost"><svg class="icon"><use href="#i-slack"/></svg>Join #3am on Slack</a>
         </div>
       </div>
     </div>
@@ -273,7 +291,7 @@
       <ul class="footer-links">
         <li><a href="https://hackclub.com/privacy-and-terms" target="_blank" rel="noopener noreferrer">Terms & Privacy</a></li>
         <li><a href="https://hackclub.com" target="_blank">Hack Club</a></li>
-        <li><a href="https://hackclub.com/slack" target="_blank">Slack</a></li>
+        <li><a href="https://hackclub.slack.com/app_redirect?channel=3am" target="_blank" rel="noopener noreferrer">Slack</a></li>
         <li><a href="https://hackatime.hackclub.com" target="_blank">Hackatime</a></li>
       </ul>
       <p class="footer-copy">
