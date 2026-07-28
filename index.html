@@ -1,1130 +1,264 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>THE 3AM YSWS</title>
-<meta name="description" content="You Ship, We Ship. Build something real in the quiet hours and earn great rewards. A Hack Club YSWS event for teens." />
-<meta property="og:title" content="YSWS 3AM — Hack Club" />
-<meta property="og:description" content="Build something real after dark. Ship it. Claim your reward." />
-<meta property="og:type" content="website" />
-<link rel="icon" href="https://hackclub.com/_next/image?url=%2Fassets%2Fhero_sticker2.webp&w=48&q=85&dpl=dpl_4BmwEEPBDqnBKceTthzmnpWdAwpu" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>THE 3AM YSWS</title>
+  <meta name="description" content="You Ship, We Ship. Build something real in the quiet hours and earn great rewards. A Hack Club YSWS event for teens." />
+  <meta property="og:title" content="YSWS 3AM — Hack Club" />
+  <meta property="og:description" content="Build something real after dark. Ship it. Claim your reward." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="https://hackclub.com/_next/image?url=%2Fassets%2Fhero_sticker2.webp&w=48&q=85&dpl=dpl_4BmwEEPBDqnBKceTthzmnpWdAwpu" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  :root {
-    --bg:      #090c14;
-    --bg2:     #0c1019;
-    --bg3:     #10152280;
-    --card:    #10142090;
-    --border:  #202a3d;
-    --moon:    #d7dbe2;
-    --moon-dim:#9199a8;
-    --amber:   #ffb454;
-    --amber2:  #ff9d3d;
-    --violet:  #8b7cf6;
-    --teal:    #6ee7d0;
-    --muted:   #5b6478;
-    --text:    #e8ecf5;
-    --dim:     #929bb0;
-    --font-display: 'Space Grotesk', sans-serif;
-    --font-body:    'Inter', sans-serif;
-    --font-mono:    'JetBrains Mono', monospace;
-  }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-body);
-    overflow-x: hidden;
-    min-height: 100vh;
-    position: relative;
-  }
-
-  body::before {
-    content: '';
-    position: fixed; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent, var(--violet), var(--teal), transparent);
-    z-index: 9999; opacity: 0.55;
-  }
-
-  ::-webkit-scrollbar { width: 5px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: #2a3350; border-radius: 3px; }
-
-  svg.icon { width: 1em; height: 1em; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; vertical-align: -0.15em; }
-
-  a { color: inherit; }
-
-  /* ===== NAV ===== */
-  nav {
-    position: fixed; top: 4px; left: 0; right: 0; z-index: 1000;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0.85rem 2rem;
-    background: rgba(6,8,14,0.86);
-    backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(32,42,61,0.7);
-  }
-  .nav-brand { display: flex; align-items: center; gap: 0.65rem; text-decoration: none; }
-  .nav-brand img { height: 34px; }
-  .nav-brand-text {
-    font-family: var(--font-display); font-weight: 700; font-size: 1.2rem;
-    color: var(--text); letter-spacing: 0.5px;
-  }
-  .nav-brand-text span { color: var(--amber); }
-  .nav-links { display: flex; gap: 1.75rem; list-style: none; align-items: center; }
-  .nav-links a {
-    color: var(--dim); text-decoration: none;
-    font-size: 0.875rem; font-weight: 500; transition: color 0.2s;
-  }
-  .nav-links a:hover { color: var(--teal); }
-  .nav-cta {
-    display: inline-flex; align-items: center; gap: 0.4rem;
-    background: linear-gradient(135deg, var(--amber), var(--amber2)) !important;
-    color: #14100a !important; font-weight: 700 !important; padding: 0.5rem 1.15rem;
-    border-radius: 8px; box-shadow: 0 0 16px rgba(255,180,84,0.25); transition: all 0.2s;
-  }
-  .nav-cta:hover { box-shadow: 0 0 26px rgba(255,180,84,0.45); transform: translateY(-1px); }
-  .hamburger {
-    display: none; flex-direction: column; gap: 5px;
-    background: none; border: none; cursor: pointer; padding: 4px;
-  }
-  .hamburger span { display: block; width: 22px; height: 2px; background: var(--teal); border-radius: 2px; }
-
-  /* ===== HERO ===== */
-  .hero {
-    min-height: 100vh; position: relative; overflow: hidden;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; padding: 9rem 2rem 0;
-  }
-
-  .hero-sky {
-    position: absolute; inset: 0;
-    background:
-      radial-gradient(ellipse at 74% 16%, rgba(150,160,190,0.10) 0%, transparent 42%),
-      radial-gradient(ellipse at 50% 60%, rgba(139,124,246,0.08) 0%, transparent 55%),
-      linear-gradient(to bottom, #05060c 0%, #080a14 40%, #0a0d18 70%, #0b0e1a 100%);
-  }
-
-  #starCanvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-
-  /* ===== MOON ===== */
-  .moon-wrap {
-    position: absolute; top: 9%; right: 8%; width: 160px; height: 160px;
-    pointer-events: none; animation: moonFloat 8s ease-in-out infinite;
-  }
-  @keyframes moonFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-  .moon-glow-3 { position: absolute; inset: -55px; border-radius: 50%; background: radial-gradient(circle, transparent 35%, rgba(200,210,230,0.05) 55%, transparent 75%); }
-  .moon-glow-2 { position: absolute; inset: -28px; border-radius: 50%; background: radial-gradient(circle, transparent 38%, rgba(200,210,230,0.09) 58%, transparent 78%); }
-  .moon-glow-1 { position: absolute; inset: -10px; border-radius: 50%; background: radial-gradient(circle, transparent 42%, rgba(215,224,240,0.18) 60%, transparent 80%); animation: moonGlowPulse 4.5s ease-in-out infinite; }
-  @keyframes moonGlowPulse { 0%,100% { opacity: 0.75; } 50% { opacity: 1; } }
-
-  .moon-disk {
-    position: absolute; inset: 0; border-radius: 50%; overflow: hidden;
-    background: radial-gradient(circle at 35% 30%, #f2f4f7 0%, #dfe3e9 28%, #c3c9d3 55%, #9aa1af 82%, #767d8c 100%);
-    box-shadow:
-      inset -14px -10px 26px rgba(0,0,0,0.35),
-      inset 5px 5px 14px rgba(255,255,255,0.35),
-      0 0 36px rgba(200,210,230,0.35),
-      0 0 70px rgba(150,160,190,0.18);
-  }
-  .moon-shadow {
-    position: absolute; inset: 0; border-radius: 50%;
-    background: radial-gradient(circle at 65% 45%, #05060c 55%, #05060c 100%);
-    transform: translateX(10%);
-    transition: transform 0.15s linear;
-  }
-
-  /* ===== SKY CLOUDS ===== */
-  .fog-layer { position: absolute; pointer-events: none; overflow: hidden; left: 0; right: 0; bottom: 0; height: 42%; }
-  .fog-cloud {
-    position: absolute; bottom: 0; border-radius: 50%;
-    background: radial-gradient(ellipse at center, rgba(30,38,60,0.45) 0%, transparent 70%);
-    filter: blur(18px);
-    animation: fogDrift var(--fd, 24s) ease-in-out infinite var(--fdelay, 0s);
-  }
-  @keyframes fogDrift {
-    0%,100% { transform: translateX(0) scaleX(1); opacity: var(--fo, 0.55); }
-    50%      { transform: translateX(var(--fx, 60px)) scaleX(1.08); opacity: calc(var(--fo, 0.55) * 1.2); }
-  }
-
-  /* ===== SKYLINE ===== */
-  .land-wrap { position: absolute; bottom: 0; left: 0; right: 0; pointer-events: none; line-height: 0; }
-  .land-wrap svg { width: 100%; display: block; }
-
-  /* ===== HERO CONTENT ===== */
-  .hero-content { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; padding-bottom: 15rem; }
-
-  .eyebrow {
-    display: inline-flex; align-items: center; gap: 0.5rem;
-    background: rgba(139,124,246,0.10); border: 1px solid rgba(139,124,246,0.28);
-    border-radius: 100px; padding: 0.35rem 1rem;
-    font-size: 0.72rem; font-weight: 700; letter-spacing: 2.5px;
-    text-transform: uppercase; color: var(--violet); margin-bottom: 1.5rem;
-  }
-
-  .hero-title {
-    font-family: var(--font-display); font-weight: 700;
-    font-size: clamp(3rem, 10vw, 7.5rem); line-height: 1; letter-spacing: -1px;
-    color: #fff;
-    text-shadow: 0 0 30px rgba(139,124,246,0.35), 0 0 70px rgba(110,231,208,0.12);
-    margin-bottom: 0.6rem;
-  }
-  .hero-title span { color: var(--amber); }
-
-  .hero-sub {
-    font-family: var(--font-mono); font-weight: 500;
-    font-size: clamp(1rem, 2vw, 1.3rem);
-    color: var(--teal); letter-spacing: 0.5px;
-    margin-bottom: 1.4rem; min-height: 1.8rem;
-  }
-  .hero-sub::after { content: '|'; margin-left: 2px; animation: caretBlink 1s step-end infinite; color: var(--amber); }
-  @keyframes caretBlink { 50% { opacity: 0; } }
-
-  .hero-desc {
-    max-width: 580px; font-size: 1.05rem; line-height: 1.75;
-    color: var(--dim); margin-bottom: 2.5rem;
-  }
-  .hero-desc span { color: var(--teal); font-weight: 600; }
-
-  .btns { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
-
-  .btn {
-    display: inline-flex; align-items: center; gap: 0.55rem;
-    padding: 0.85rem 1.9rem; border-radius: 8px;
-    font-size: 0.975rem; font-weight: 600;
-    cursor: pointer; border: none; text-decoration: none;
-    transition: all 0.2s; letter-spacing: 0.2px; font-family: var(--font-body);
-  }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--amber), var(--amber2));
-    color: #14100a; box-shadow: 0 0 18px rgba(255,180,84,0.3), 0 4px 14px rgba(0,0,0,0.4);
-  }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(255,180,84,0.45), 0 8px 24px rgba(0,0,0,0.4); }
-  .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
-  .btn-ghost:hover { border-color: var(--teal); color: var(--teal); transform: translateY(-2px); }
-
-  .hero-stats { display: flex; gap: 3rem; justify-content: center; margin-top: 3.5rem; flex-wrap: wrap; }
-  .stat-num { font-family: var(--font-display); font-weight: 700; font-size: 2.1rem; color: var(--text); line-height: 1; }
-  .stat-num.accent { color: var(--amber); }
-  .stat-label { font-size: 0.68rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 0.3rem; }
-
-  .scroll-hint {
-    position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
-    display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
-    color: var(--muted); font-size: 0.68rem; letter-spacing: 2px; text-transform: uppercase;
-    animation: scrollBob 2.2s ease-in-out infinite; z-index: 10;
-  }
-  @keyframes scrollBob { 0%,100% { transform: translateX(-50%) translateY(0); opacity:0.5; } 50% { transform: translateX(-50%) translateY(7px); opacity:1; } }
-
-  /* ===== WAVE DIVIDER ===== */
-  .wave-divider { position: relative; width: 100%; line-height: 0; z-index: 5; }
-  .wave-divider svg { width: 100%; display: block; }
-
-  /* ===== BAT ===== */
-  .bat { position: fixed; pointer-events: none; z-index: 9500; width: 56px; height: 38px; top: -80px; opacity: 0.85; }
-  .bat svg { width: 100%; height: 100%; filter: drop-shadow(0 0 4px rgba(139,124,246,0.15)); }
-  @keyframes batRight {
-    0%   { transform: translateX(-90px) translateY(0);   opacity:0; }
-    5%   { opacity:0.85; }
-    40%  { transform: translateX(38vw)  translateY(-55px); }
-    60%  { transform: translateX(63vw)  translateY(-22px); }
-    95%  { opacity:0.85; }
-    100% { transform: translateX(calc(100vw+90px)) translateY(10px); opacity:0; }
-  }
-  @keyframes batLeft {
-    0%   { transform: translateX(calc(100vw+90px)) translateY(0) scaleX(-1);  opacity:0; }
-    5%   { opacity:0.85; }
-    40%  { transform: translateX(60vw)  translateY(-45px) scaleX(-1); }
-    60%  { transform: translateX(35vw)  translateY(-15px) scaleX(-1); }
-    95%  { opacity:0.85; }
-    100% { transform: translateX(-90px) translateY(5px)  scaleX(-1); opacity:0; }
-  }
-
-  /* ===== SPARK TRAIL (cursor) ===== */
-  .trail-dot { position: fixed; border-radius: 50%; width: 4px; height: 4px; background: rgba(110,231,208,0.55); pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); }
-
-  /* ===== SECTION ===== */
-  .section { padding: 5.5rem 2rem; max-width: 1080px; margin: 0 auto; }
-  .full-bleed { width: 100%; max-width: 100%; }
-  .full-bleed .inner { max-width: 1080px; margin: 0 auto; padding: 5.5rem 2rem; }
-
-  .s-tag { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.68rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--teal); margin-bottom: 0.9rem; }
-  .s-title { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.9rem, 4.5vw, 2.9rem); color: #fff; letter-spacing: -0.5px; margin-bottom: 0.9rem; }
-  .s-desc { font-size: 1.02rem; color: var(--dim); line-height: 1.75; max-width: 620px; margin-bottom: 2.75rem; }
-
-  /* ===== CARDS ===== */
-  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px,1fr)); gap: 1.5rem; }
-
-  .card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; padding: 1.65rem 1.5rem;
-    position: relative; overflow: hidden; transition: border-color 0.3s, transform 0.2s;
-  }
-  .card:hover { border-color: rgba(110,231,208,0.4); transform: translateY(-3px); }
-  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--violet), var(--teal)); }
-  .card-icon { font-size: 1.7rem; margin-bottom: 0.85rem; color: var(--amber); display: inline-flex; }
-  .card-title { font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; color: #fff; letter-spacing: 0.2px; margin-bottom: 0.6rem; }
-  .card-text { color: var(--dim); font-size: 0.88rem; line-height: 1.65; }
-
-  .checklist { display: flex; flex-direction: column; gap: 0.65rem; }
-  .check-row {
-    display: flex; align-items: flex-start; gap: 0.8rem;
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 8px; padding: 0.95rem 1.2rem; transition: border-color 0.2s;
-  }
-  .check-row:hover { border-color: rgba(110,231,208,0.35); }
-  .check-num {
-    flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
-    background: rgba(139,124,246,0.13); border: 1px solid rgba(139,124,246,0.4);
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; color: var(--violet);
-  }
-  .check-text { font-size: 0.92rem; color: var(--dim); line-height: 1.55; }
-  .check-text strong { color: var(--text); }
-
-  /* ===== TIMER WIDGET ===== */
-  .timer-box {
-    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
-    padding: 2.25rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: center;
-  }
-  .timer-display { text-align: center; }
-  .timer-clock { font-family: var(--font-mono); font-size: clamp(2.6rem, 6vw, 3.6rem); font-weight: 700; color: var(--text); letter-spacing: 1px; }
-  .timer-clock span { color: var(--muted); font-size: 0.55em; }
-  .timer-note { font-size: 0.78rem; color: var(--muted); margin-top: 0.5rem; }
-  .timer-controls { display: flex; gap: 0.7rem; justify-content: center; margin-top: 1.4rem; }
-  .timer-btn {
-    display: inline-flex; align-items: center; gap: 0.4rem;
-    background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text);
-    padding: 0.55rem 1.1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600;
-    cursor: pointer; transition: all 0.2s; font-family: var(--font-body);
-  }
-  .timer-btn:hover { border-color: var(--teal); color: var(--teal); }
-  .timer-btn.primary { background: linear-gradient(135deg, var(--violet), #6a5cd0); border: none; color: #fff; }
-  .timer-btn.primary:hover { box-shadow: 0 0 18px rgba(139,124,246,0.4); color: #fff; }
-
-  .slider-wrap label { font-size: 0.85rem; color: var(--dim); display: block; margin-bottom: 0.9rem; }
-  .slider-wrap label strong { color: var(--text); }
-  input[type=range] {
-    -webkit-appearance: none; width: 100%; height: 6px; border-radius: 4px;
-    background: linear-gradient(90deg, var(--violet), var(--teal));
-    outline: none; cursor: pointer;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
-    background: #fff; border: 3px solid var(--violet); cursor: pointer;
-    box-shadow: 0 0 8px rgba(139,124,246,0.5);
-  }
-  .slider-ticks { display: flex; justify-content: space-between; font-size: 0.65rem; color: var(--muted); margin-top: 0.5rem; font-family: var(--font-mono); }
-  .unlocked-msg {
-    margin-top: 1.1rem; font-size: 0.85rem; color: var(--teal); font-weight: 600;
-    display: flex; align-items: center; gap: 0.4rem;
-  }
-
-  /* ===== REWARDS ===== */
-  .rewards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(205px,1fr)); gap: 1.35rem; }
-  .reward-card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; padding: 1.6rem 1.3rem;
-    text-align: center; position: relative; overflow: hidden; transition: all 0.3s;
-    opacity: 0.55; filter: grayscale(0.4);
-  }
-  .reward-card.unlocked { opacity: 1; filter: none; border-color: rgba(255,180,84,0.5); box-shadow: 0 8px 28px rgba(255,180,84,0.1); }
-  .reward-card:hover { transform: translateY(-4px); }
-  .reward-badge {
-    position: absolute; top: 10px; right: 10px;
-    background: linear-gradient(135deg, var(--violet), #6a5cd0);
-    color: #fff; font-size: 0.6rem; font-weight: 700;
-    letter-spacing: 1px; padding: 0.18rem 0.5rem; border-radius: 4px;
-  }
-  .reward-icon { font-size: 2.1rem; display: block; margin-bottom: 0.9rem; color: var(--amber); }
-  .reward-name { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; color: #fff; letter-spacing: 0.2px; margin-bottom: 0.35rem; }
-  .reward-desc { font-size: 0.76rem; color: var(--muted); line-height: 1.5; }
-  .reward-hours {
-    display: inline-flex; align-items: center; gap: 0.3rem; margin-top: 0.7rem;
-    background: rgba(139,124,246,0.13); border: 1px solid rgba(139,124,246,0.22);
-    border-radius: 100px; padding: 0.18rem 0.65rem;
-    font-size: 0.68rem; color: var(--violet); font-weight: 600; font-family: var(--font-mono);
-  }
-  .reward-card.unlocked .reward-hours { background: rgba(255,180,84,0.15); border-color: rgba(255,180,84,0.35); color: var(--amber); }
-
-  /* ===== PROJECTS ===== */
-  .proj-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px,1fr)); gap: 1.4rem; }
-  .proj-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: all 0.3s; }
-  .proj-card:hover { border-color: var(--violet); transform: translateY(-3px); box-shadow: 0 8px 28px rgba(124,58,237,0.14); }
-  .proj-thumb { height: 130px; display: flex; align-items: center; justify-content: center; font-size: 2.6rem; color: var(--teal); }
-  .bg-a { background: linear-gradient(135deg,#0d0a1e,#170f2c); }
-  .bg-b { background: linear-gradient(135deg,#081a1e,#0d2a30); }
-  .bg-c { background: linear-gradient(135deg,#0a0e1e,#0f1830); }
-  .bg-d { background: linear-gradient(135deg,#0a1a12,#0e2a1a); }
-  .bg-e { background: linear-gradient(135deg,#1a1508,#2a2210); }
-  .bg-f { background: linear-gradient(135deg,#180a1e,#26102e); }
-  .proj-body { padding: 1.1rem 1.25rem; }
-  .proj-type { font-size: 0.63rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--violet); margin-bottom: 0.35rem; }
-  .proj-name { font-family: var(--font-display); font-weight: 700; font-size: 1.02rem; color: #fff; letter-spacing: 0.2px; margin-bottom: 0.35rem; }
-  .proj-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
-  .proj-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.65rem; }
-  .tag { background: rgba(110,231,208,0.08); border: 1px solid rgba(110,231,208,0.2); border-radius: 4px; padding: 0.12rem 0.45rem; font-size: 0.66rem; color: var(--teal); font-family: var(--font-mono); }
-
-  .guides { display: flex; flex-direction: column; gap: 0.85rem; margin-top: 2rem; }
-  .guide-row {
-    display: flex; align-items: center; gap: 1rem;
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 10px; padding: 1.1rem 1.4rem;
-    text-decoration: none; color: inherit; transition: all 0.2s;
-  }
-  .guide-row:hover { border-color: rgba(110,231,208,0.4); background: rgba(110,231,208,0.04); }
-  .guide-icon { font-size: 1.4rem; flex-shrink: 0; color: var(--amber); }
-  .guide-info { flex: 1; }
-  .guide-title { font-weight: 600; color: var(--text); font-size: 0.93rem; margin-bottom: 0.15rem; }
-  .guide-meta { font-size: 0.78rem; color: var(--muted); }
-  .guide-arrow { color: var(--muted); font-size: 1rem; }
-
-  /* ===== FAQ ===== */
-  .faq-list { display: flex; flex-direction: column; gap: 0.65rem; }
-  .faq-item { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; transition: border-color 0.2s; }
-  .faq-item.open { border-color: rgba(110,231,208,0.35); }
-  .faq-q {
-    width: 100%; display: flex; align-items: center; justify-content: space-between;
-    padding: 1.15rem 1.4rem; background: none; border: none;
-    cursor: pointer; color: var(--text); font-size: 0.96rem;
-    font-weight: 600; text-align: left; gap: 1rem; font-family: var(--font-body);
-  }
-  .faq-q:hover { color: #fff; }
-  .faq-chevron {
-    flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
-    background: rgba(139,124,246,0.12); border: 1px solid rgba(139,124,246,0.28);
-    display: flex; align-items: center; justify-content: center;
-    color: var(--violet); font-size: 0.75rem; transition: transform 0.3s;
-  }
-  .faq-item.open .faq-chevron { transform: rotate(180deg); }
-  .faq-a { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
-  .faq-a-inner { padding: 0 1.4rem 1.2rem; color: var(--dim); font-size: 0.9rem; line-height: 1.75; }
-  .faq-a-inner a { color: var(--teal); }
-  .faq-item.open .faq-a { max-height: 400px; }
-
-  /* ===== CTA ===== */
-  .cta-box {
-    background: radial-gradient(ellipse at center, rgba(139,124,246,0.13) 0%, transparent 70%), var(--bg2);
-    border: 1px solid rgba(139,124,246,0.22); border-radius: 16px;
-    padding: 4rem 3rem; text-align: center; position: relative; overflow: hidden;
-  }
-  .cta-box h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.8rem, 4vw, 2.7rem); color: #fff; margin-bottom: 0.9rem; letter-spacing: -0.5px; }
-  .cta-box p { color: var(--dim); font-size: 1.03rem; line-height: 1.7; max-width: 480px; margin: 0 auto 2rem; }
-.reward-media {
-  width: 100%;
-  height: 160px;
-  overflow: hidden;
-  border-radius: 8px;
-  margin-bottom: 12px;
-}
-
-.reward-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.rewards-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-    gap:1.5rem;
-}
-.reward-media{
-    width:100%;
-    height:180px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:rgba(255,255,255,.03);
-    border-radius:10px;
-    margin-bottom:1rem;
-    overflow:hidden;
-}
-
-
-
-.reward-img{
-    max-width:85%;
-    max-height:85%;
-    object-fit:contain;
-    transition:.25s ease;
-}
-
-.reward-card:hover .reward-img{
-    transform:scale(1.05);
-}
-  /* ===== FOOTER ===== */
-  footer { border-top: 1px solid var(--border); padding: 2.5rem 2rem; text-align: center; }
-  .footer-inner { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
-  footer img { height: 42px; }
-  .footer-links { display: flex; gap: 2rem; list-style: none; flex-wrap: wrap; justify-content: center; }
-  .footer-links a { color: var(--muted); text-decoration: none; font-size: 0.83rem; transition: color 0.2s; }
-  .footer-links a:hover { color: var(--teal); }
-  .footer-copy { font-size: 0.78rem; color: var(--muted); }
-  .footer-copy span { color: var(--amber); }
-
-  /* ===== RESPONSIVE ===== */
-  @media (max-width: 768px) {
-    .nav-links { display: none; flex-direction: column; position: fixed; top: 57px; left: 0; right: 0; background: rgba(6,8,14,0.98); padding: 1.75rem 2rem; gap: 1rem; border-bottom: 1px solid var(--border); z-index: 999; }
-    .nav-links.open { display: flex; }
-    .hamburger { display: flex; }
-    .nav-brand img { height: 26px; }
-    .nav-brand-text { font-size: 1.05rem; }
-    nav { padding: 0.8rem 1.25rem; }
-    .moon-wrap { width: 100px; height: 100px; right: 4%; top: 7%; }
-    .hero { padding: 8rem 1.25rem 0; }
-    .hero-content { padding-bottom: 11rem; }
-    .hero-stats { gap: 1.5rem; }
-    .btns { flex-direction: column; align-items: center; }
-    .btn { width: 100%; max-width: 300px; justify-content: center; }
-    .full-bleed .inner { padding: 4rem 1.25rem; }
-    .section { padding: 4rem 1.25rem; }
-    .cta-box { padding: 2.5rem 1.5rem; }
-    .rewards-grid { grid-template-columns: repeat(2, 1fr); }
-    .timer-box { grid-template-columns: 1fr; }
-  }
-  @media (max-width: 480px) {
-    .hero-title { font-size: clamp(2.3rem, 14vw, 3.6rem); }
-    .grid-2 { grid-template-columns: 1fr; }
-    .proj-grid { grid-template-columns: 1fr; }
-    .rewards-grid { grid-template-columns: 1fr; }
-  }
-.hero-flag{
-    position: absolute;
-    top: 28px;
-    left: 32px;
-    width: 140px;
-    height: auto;
-    z-index: 15;
-
-    filter:
-        drop-shadow(0 8px 20px rgba(0,0,0,.35))
-        drop-shadow(0 0 18px rgba(255,180,84,.2));
-
-    animation: flagFloat 4s ease-in-out infinite;
-    user-select: none;
-    pointer-events: none;
-}
-
-
-
-@keyframes flagFloat{
-    0%,100%{
-        transform: translateY(0);
-    }
-    50%{
-        transform: translateY(-6px);
-    }
-}
-
-@media (max-width:768px){
-    .hero-flag{
-        width:90px;
-        top:18px;
-        left:18px;
-    }
-}
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
-  }
-
-
-
-
-</style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<!-- ===== ICON SPRITE ===== -->
-<svg width="0" height="0" style="position:absolute">
-  <defs>
-    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
-    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></symbol>
-    <symbol id="i-code" viewBox="0 0 24 24"><path d="M8 6l-6 6 6 6"/><path d="M16 6l6 6-6 6"/></symbol>
-    <symbol id="i-square" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/></symbol>
-    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.8 2.5 2.8 15.5 0 18"/><path d="M12 3c-2.8 2.5-2.8 15.5 0 18"/></symbol>
-    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8L12 2z"/></symbol>
-    <symbol id="i-controller" viewBox="0 0 24 24"><rect x="2" y="8" width="20" height="9" rx="4"/><path d="M7 10.5v4M5 12.5h4"/><circle cx="16" cy="11" r="1"/><circle cx="18.5" cy="13.5" r="1"/></symbol>
-    <symbol id="i-headphones" viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0116 0v2"/><rect x="2" y="14" width="5" height="6" rx="1.5"/><rect x="17" y="14" width="5" height="6" rx="1.5"/></symbol>
-    <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h12"/></symbol>
-    <symbol id="i-mouse" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="5"/><path d="M12 2v7"/></symbol>
-    <symbol id="i-shirt" viewBox="0 0 24 24"><path d="M8 3L3 6l2 4 2-1v12h10V9l2 1 2-4-5-3-2 2h-2z"/></symbol>
-    <symbol id="i-terminal" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 9l3 3-3 3M12 15h6"/></symbol>
-    <symbol id="i-link" viewBox="0 0 24 24"><path d="M9 15l6-6"/><path d="M10 6l1-1a4 4 0 015.5 5.8L15 12"/><path d="M14 18l-1 1a4 4 0 01-5.5-5.8L9 12"/></symbol>
-    <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></symbol>
-    <symbol id="i-coffee" viewBox="0 0 24 24"><path d="M4 9h13v5a5 5 0 01-5 5H9a5 5 0 01-5-5V9z"/><path d="M17 10h2a2.5 2.5 0 010 5h-2"/><path d="M8 3c0 1-1 1-1 2M12 3c0 1-1 1-1 2"/></symbol>
-    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-9.5-9A5.5 5.5 0 0112 6a5.5 5.5 0 019.5 5c-2.5 4.5-9.5 9-9.5 9z"/></symbol>
-    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 01-10 0V4z"/><path d="M4 6h3M20 6h-3"/><path d="M10 14v3M14 14v3"/><path d="M8 20h8"/><path d="M10 17h4"/></symbol>
-    <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M12 2c3 2 5 6 5 10-1 1-2 2-5 2s-4-1-5-2c0-4 2-8 5-10z"/><circle cx="12" cy="9" r="1.5"/><path d="M9 16l-2 4M15 16l2 4M10 14H7M14 14h3"/></symbol>
-    <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 100 18c1.5 0 2-1 2-2s-.5-1.5-.5-2.5S14.5 15 16 15h1a4 4 0 004-4c0-4.4-4-8-9-8z"/><circle cx="7.5" cy="10.5" r="1"/><circle cx="10.5" cy="7.5" r="1"/><circle cx="14.5" cy="8" r="1"/></symbol>
-    <symbol id="i-chip" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M9 3v3M12 3v3M15 3v3M9 18v3M12 18v3M15 18v3M3 9h3M3 12h3M3 15h3M18 9h3M18 12h3M18 15h3"/></symbol>
-    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 016.5 3H12v16H6.5A2.5 2.5 0 004 16.5v-11z"/><path d="M20 5.5A2.5 2.5 0 0017.5 3H12v16h5.5a2.5 2.5 0 012.5 2.5v-16z"/></symbol>
-    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 4h16v12H8l-4 4V4z"/></symbol>
-    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6"/></symbol>
-    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
-    <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z" fill="currentColor" stroke="none"/></symbol>
-    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="currentColor" stroke="none"/><rect x="14" y="4" width="4" height="16" fill="currentColor" stroke="none"/></symbol>
-    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 1 3 6.7"/><path d="M3 17v-5h5"/></symbol>
-    <symbol id="i-slack" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M9 9h6v6H9z"/></symbol>
-    <symbol id="i-cabin" viewBox="0 0 24 24"><path d="M3 21V10l9-6 9 6v11z"/><path d="M9 21v-7h6v7"/><path d="M14 9h2v3h-2z" fill="currentColor" stroke="none"/></symbol>
-  </defs>
-</svg>
-
-
-<!-- ===== HERO ===== -->
-
-<section class="hero">
-  <img
-  class="hero-flag"
-  src="https://cdn.hackclub.com/019de4a9-41f7-7f6d-b4c7-8c549bfb001d/flag-orpheus-left.svg"
-  alt="Hack Club"
-/>
-  
- <div class="hero-sky"></div>
-  <canvas id="starCanvas"></canvas>
-
-  <!-- Moon -->
-  <div class="moon-wrap" id="moonWrap">
-    <div class="moon-glow-3"></div>
-    <div class="moon-glow-2"></div>
-    <div class="moon-glow-1"></div>
-    <div class="moon-disk">
-      <svg style="position:absolute;inset:0;width:100%;height:100%;border-radius:50%;overflow:hidden" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="95" cy="85" rx="22" ry="18" fill="none" stroke="rgba(0,0,0,0.16)" stroke-width="3"/>
-        <ellipse cx="95" cy="85" rx="16" ry="12" fill="rgba(0,0,0,0.09)"/>
-        <ellipse cx="45" cy="110" rx="14" ry="11" fill="none" stroke="rgba(0,0,0,0.13)" stroke-width="2.5"/>
-        <ellipse cx="45" cy="110" rx="9" ry="7" fill="rgba(0,0,0,0.08)"/>
-        <ellipse cx="65" cy="40" rx="9" ry="7" fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="2"/>
-        <ellipse cx="65" cy="40" rx="5" ry="4" fill="rgba(0,0,0,0.07)"/>
-        <ellipse cx="120" cy="45" rx="7" ry="5.5" fill="none" stroke="rgba(0,0,0,0.11)" stroke-width="1.8"/>
-        <ellipse cx="120" cy="45" rx="4" ry="3" fill="rgba(0,0,0,0.06)"/>
-        <ellipse cx="30" cy="65" rx="6" ry="5" fill="none" stroke="rgba(0,0,0,0.10)" stroke-width="1.5"/>
-        <circle cx="75" cy="130" r="4" fill="rgba(0,0,0,0.06)"/>
-        <circle cx="140" cy="75" r="3.5" fill="rgba(0,0,0,0.05)"/>
-        <circle cx="20" cy="130" r="3" fill="rgba(0,0,0,0.05)"/>
-        <ellipse cx="60" cy="55" rx="35" ry="28" fill="rgba(255,255,255,0.07)"/>
-      </svg>
-      <div class="moon-shadow" id="moonShadow"></div>
-    </div>
-  </div>
-
-  <div class="fog-layer" id="fogLayer"></div>
-
-  <div class="hero-content">
-    <div class="eyebrow"><svg class="icon"><use href="#i-spark"/></svg> Sponsored by Sebastian Hernandez</div>
-    <h1 class="hero-title">YSWS <span>3AM</span></h1>
-    <p class="hero-sub" id="heroSub"></p>
-    <p class="hero-desc">
-      Build something <span> cool</span> that is Dark themed could be a site, a tool, a game, your wish,
-       <span>real reward</span> for your effort.
-    </p>
-    <div class="btns">
-      <button class="btn btn-primary" onclick="scrollTo('submit')"><svg class="icon"><use href="#i-arrow"/></svg>Submit your project</button>
-      <button class="btn btn-ghost" onclick="scrollTo('rules')"><svg class="icon"><use href="#i-book"/></svg>Read the rules</button>
-    </div>
-   
-
-  <!-- Skyline -->
-  <div class="land-wrap">
-    <svg viewBox="0 0 1440 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="hillGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#0b0e1a"/>
-          <stop offset="100%" stop-color="#070912"/>
-        </linearGradient>
-      </defs>
-      <path d="M0 220 Q180 170 360 210 Q560 250 760 190 Q980 140 1180 205 Q1320 240 1440 200 L1440 300 L0 300Z" fill="url(#hillGrad)"/>
-      <!-- pines -->
-      <g fill="#060811">
-        <polygon points="120,220 120,175 133,175 133,150 146,150 146,175 159,175 159,220"/>
-        <polygon points="150,220 150,185 160,185 160,165 170,165 170,185 180,185 180,220"/>
-        <polygon points="1250,215 1250,170 1263,170 1263,145 1276,145 1276,170 1289,170 1289,215"/>
-        <polygon points="1290,215 1290,182 1300,182 1300,162 1310,162 1310,182 1320,182 1320,215"/>
-        <polygon points="60,225 60,195 70,195 70,178 80,178 80,195 90,195 90,225"/>
-      </g>
-      <!-- cabin with lit window -->
-      <g>
-        <polygon points="660,230 660,190 700,160 740,190 740,230" fill="#080a14"/>
-        <rect x="675" y="205" width="14" height="25" fill="#050710"/>
-        <rect x="705" y="205" width="14" height="14" fill="#ffb454" opacity="0.85"/>
-        <rect x="705" y="205" width="14" height="14" fill="none" stroke="#050710" stroke-width="1.5"/>
-      </g>
-      <rect x="0" y="260" width="1440" height="40" fill="#070912"/>
-    </svg>
-  </div>
-
-  <div class="scroll-hint">
-    <span>Scroll down</span>
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-  </div>
-</section>
-
-<!-- WAVE DIVIDER -->
-<div class="wave-divider">
-  <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M0 30 Q360 0 720 30 T1440 30 V60 H0 Z" fill="#0c1019"/>
+  <svg width="0" height="0" class="sprite-container">
+    <defs>
+      <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8L12 2z"/></symbol>
+      <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 01-10 0V4z"/><path d="M4 6h3M20 6h-3"/><path d="M10 14v3M14 14v3"/><path d="M8 20h8"/><path d="M10 17h4"/></symbol>
+      <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 016.5 3H12v16H6.5A2.5 2.5 0 004 16.5v-11z"/><path d="M20 5.5A2.5 2.5 0 0017.5 3H12v16h5.5a2.5 2.5 0 012.5 2.5v-16z"/></symbol>
+      <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 4h16v12H8l-4 4V4z"/></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6"/></symbol>
+      <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M12 2c3 2 5 6 5 10-1 1-2 2-5 2s-4-1-5-2c0-4 2-8 5-10z"/><circle cx="12" cy="9" r="1.5"/><path d="M9 16l-2 4M15 16l2 4M10 14H7M14 14h3"/></symbol>
+      <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8V4z" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="currentColor" stroke="none"/><rect x="14" y="4" width="4" height="16" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-reset" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 1 3 6.7"/><path d="M3 17v-5h5"/></symbol>
+      <symbol id="i-slack" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M9 9h6v6H9z"/></symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+    </defs>
   </svg>
-</div>
 
-  
-<div class="wave-divider" style="transform:scaleY(-1)">
-  <svg viewBox="0 0 1440 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M0 20 Q360 0 720 20 T1440 20 V40 H0 Z" fill="#090c14"/>
-  </svg>
-</div>
-
-<!-- ===== REWARDS ===== -->
-<div class="full-bleed" id="rewards" style="background:var(--bg)">
-  <div class="inner">
-    <div class="s-tag">
-      <svg class="icon"><use href="#i-trophy"/></svg>
-      Rewards
-    </div>
-
-    <h2 class="s-title">Build. Ship. Get rewarded.</h2>
-
-    <p class="s-desc">
-      Forget fake trophies. Build something you're genuinely proud of and pick a reward you'll actually use.
-      Whether it's late-night coffee, a new Kindle, Minecraft, or a pair of noise-canceling headphones,
-      every reward is here to help you keep building long after <strong>3 AM</strong> is over.
-    </p>
-
-    <div class="rewards-grid" id="rewardsGrid">
-
-      <!-- Coffee -->
-      <div class="reward-card" data-hours="2">
-        <div class="reward-media">
-          <img class="reward-img"
-            src="https://cdn.hackclub.com/019fa456-b4dd-7a73-b639-80828e63b63c/image.png"
-            alt="Coffee Gift Card">
-        </div>
-
-        <div class="reward-name">$10 Coffee / Energy Drink Card</div>
-
-        <div class="reward-desc">
-          Fuel your next late-night coding session with your favorite coffee or energy drink.
-        </div>
-
-        <span class="reward-hours">2 hrs+</span>
-      </div>
-
-      <!-- Glasses -->
-      <div class="reward-card" data-hours="6">
-        <div class="reward-media">
-          <img class="reward-img"
-            src="https://cdn.hackclub.com/019fa458-4a5e-7024-941f-dc038a93780b/image.png"
-            alt="Blue Light Glasses">
-        </div>
-
-        <div class="reward-name">Blue Light Glasses</div>
-
-        <div class="reward-desc">
-          Protect your eyes during those long nights of coding without sacrificing comfort.
-        </div>
-
-        <span class="reward-hours">6 hrs+</span>
-      </div>
-
-      <!-- Minecraft -->
-      <div class="reward-card" data-hours="8">
-        <div class="reward-media">
-          <img class="reward-img"
-            src="https://hackyeah.hackclub.com/minecraft.png"
-            alt="Minecraft">
-        </div>
-
-        <div class="reward-name">Minecraft</div>
-
-        <div class="reward-desc">
-          One of the greatest games ever made. Build in code, then build in blocks.
-        </div>
-
-        <span class="reward-hours">8 hrs+</span>
-      </div>
-
-      <!-- Kindle -->
-      <div class="reward-card" data-hours="15">
-        <div class="reward-media">
-          <img class="reward-img"
-            src="https://cdn.hackclub.com/019fa458-6eee-713f-8837-ca7c41c3f4ad/image.png"
-            alt="Amazon Kindle">
-        </div>
-
-        <div class="reward-name">Amazon Kindle</div>
-
-        <div class="reward-desc">
-          Read books without distractions. Perfect for learning new tech, startups, and everything in between.
-        </div>
-
-        <span class="reward-hours">15 hrs+</span>
-      </div>
-
-      <!-- Headphones -->
-      <div class="reward-card" data-hours="30">
-        <div class="reward-media">
-          <img class="reward-img"
-            src="https://hackyeah.hackclub.com/headphones.webp"
-            alt="Sony WH-CH720N">
-        </div>
-
-        <div class="reward-name">Sony WH-CH720N</div>
-
-        <div class="reward-desc">
-          Noise-canceling headphones for deep focus. Comfortable enough for marathon coding sessions.
-        </div>
-
-        <span class="reward-hours">30 hrs+</span>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- ===== FAQ ===== -->
-<div class="full-bleed" id="faq" style="background:var(--bg)">
-  <div class="inner" style="max-width:780px">
-    <div class="s-tag"><svg class="icon"><use href="#i-chat"/></svg> Questions</div>
-    <h2 class="s-title">Frequently asked</h2>
-    <p class="s-desc">Everything you need to know before you start building.</p>
-    <div class="faq-list">
-      <div class="faq-item"><button class="faq-q" data-faq>Is this free?<div class="faq-chevron">▾</div></button><div class="faq-a"><div class="faq-a-inner">Yes — YSWS 3AM is 100% free, like every Hack Club event. Hack Club is a 501(c)(3) non-profit, and your project is all we're asking for.</div></div></div>
-      <div class="faq-item"><button class="faq-q" data-faq>What can I ship?<div class="faq-chevron">▾</div></button><div class="faq-a"><div class="faq-a-inner">Any project you've worked on for at least 1 hour since the event started — websites, games, tools, weird experiments. If it's live online, it counts.</div></div></div>
-      <div class="faq-item"><button class="faq-q" data-faq>Am I eligible?<div class="faq-chevron">▾</div></button><div class="faq-a"><div class="faq-a-inner">Anyone aged 13–18, anywhere in the world, can participate. No geography restrictions.</div></div></div>
-      <div class="faq-item"><button class="faq-q" data-faq>Do I have to code at exactly 3AM?<div class="faq-chevron">▾</div></button><div class="faq-a"><div class="faq-a-inner">"3AM" is the vibe — late-night, focused, creative energy. Code any time during the event window, though we do encourage at least one genuine late-night session.</div></div></div>
-      <div class="faq-item"><button class="faq-q" data-faq>What tech can I use?<div class="faq-chevron">▾</div></button><div class="faq-a"><div class="faq-a-inner">Anything — HTML/CSS/JS, Python, React, Svelte, Unity WebGL, Godot. It just needs to run in a browser and be publicly accessible.</div></div></div>
-      <div class="faq-item"><button class="faq-q" data-faq>How do I claim my reward?<div class="faq-chevron">▾</div></button><div class="faq-a"><div class="faq-a-inner">After you submit, our team reviews your project and Hackatime logs. Eligible participants get a reward selection link via Slack DM within 1–2 weeks.</div></div></div>
-      <div class="faq-item"><button class="faq-q" data-faq>Can I work in a team?<div class="faq-chevron">▾</div></button><div class="faq-a"><div class="faq-a-inner">Solo submissions only — one per person. Get feedback from friends on Hack Club Slack, but the code you submit must be your own.</div></div></div>
-      <div class="faq-item"><button class="faq-q" data-faq>Can I use AI tools?<div class="faq-chevron">▾</div></button><div class="faq-a"><div class="faq-a-inner">Tools like Copilot or a chat assistant are allowed as help. The idea, design, and architecture should be yours — don't just paste a prompt and submit.</div></div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== SUBMIT ===== -->
-<div class="full-bleed" id="submit" style="background:var(--bg2)">
-  <div class="inner">
-    <div class="cta-box">
-      <div class="s-tag" style="justify-content:center;margin-bottom:1rem"><svg class="icon"><use href="#i-rocket"/></svg> Ready?</div>
-      <h2>Ship it before sunrise</h2>
-      <p>You've built something you're proud of. Send it in and claim what's yours the night's almost over.</p>
-      <div class="btns">
-        <button class="btn btn-primary" style="font-size:1rem;padding:0.95rem 2.25rem"><svg class="icon"><use href="#i-arrow"/></svg>Submit your project</button>
-        <a href="https://hackclub.slack.com" target="_blank" class="btn btn-ghost"><svg class="icon"><use href="#i-slack"/></svg>Join Hack Club Slack</a>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== FOOTER ===== -->
-<footer>
-  <div class="footer-inner">
-    <img src="https://cdn.hackclub.com/019d730b-a931-785f-a435-c0b3eba933ce/puQ5T1DQN2FkLKxkse1UyxSH_MfbowlTpN71hRGDrvo" />
-    <ul class="footer-links">
-      <li>
-  <a href="https://hackclub.com/privacy-and-terms#hack-club-standard-terms-and-conditions"
-     target="_blank"
-     rel="noopener noreferrer">
-    Terms & Conditions
-  </a>
-</li>
-
-<li>
-  <a href="https://hackclub.com/privacy-and-terms#hack-club-privacy-notice"
-     target="_blank"
-     rel="noopener noreferrer">
-    Privacy Policy
-  </a>
-</li>
-
-<li>
-  <a href="https://forms.hackclub.com/bounty"
-     target="_blank"
-     rel="noopener noreferrer">
-    Fulfillment Bounty
-  </a>
-</li>
-      <li><a href="https://hackclub.com" target="_blank">Hack Club</a></li>
-      <li><a href="https://hackclub.com/slack" target="_blank">Slack</a></li>
-      <li><a href="https://hackatime.hackclub.com" target="_blank">Hackatime</a></li>
-      <li><a href="https://github.com/hackclub" target="_blank">GitHub</a></li>
+  <nav>
+    <a href="#" class="nav-brand">
+      <img src="https://hackclub.com/_next/image?url=%2Fassets%2Fhero_sticker2.webp&w=48&q=85&dpl=dpl_4BmwEEPBDqnBKceTthzmnpWdAwpu" alt="Hack Club Logo" />
+      <span class="nav-brand-text">YSWS <span>3AM</span></span>
+    </a>
+    <button class="hamburger" id="hamburger" aria-label="Toggle navigation">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#timer">Timer</a></li>
+      <li><a href="#rewards">Rewards</a></li>
       <li><a href="#faq">FAQ</a></li>
+      <li><a href="#submit" class="nav-cta">Submit Project</a></li>
     </ul>
-<p class="footer-copy">
-  Made with <span>♥</span> by
-  <a href="https://hridhaan.me"
-     target="_blank"
-     rel="noopener noreferrer"
-     class="footer-author">
-    Hridhaan Sahay
-  </a>
-  for
-  <a href="https://hackclub.com"
-     target="_blank"
-     rel="noopener noreferrer"
-     style="color:var(--teal);text-decoration:none;">
-    Hack Club
-  </a>
-</p>  </div>
-</footer>
+  </nav>
 
-<!-- Bat template -->
-<template id="batTpl">
-  <div class="bat">
-    <svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="60" cy="45" rx="9" ry="7" fill="#232b40"/>
-      <ellipse cx="60" cy="33" rx="7" ry="6" fill="#232b40"/>
-      <polygon points="52,29 49,19 56,28" fill="#232b40"/>
-      <polygon points="68,29 71,19 64,28" fill="#232b40"/>
-      <circle cx="57" cy="32" r="1.6" fill="#ffb454"/>
-      <circle cx="63" cy="32" r="1.6" fill="#ffb454"/>
-      <path class="wl" d="M51 38 Q30 12 4 24 Q22 40 51 44 Z" fill="#232b40"/>
-      <path d="M51 38 Q35 24 14 26 Q28 35 51 38 Z" fill="#323c58"/>
-      <path class="wr" d="M69 38 Q90 12 116 24 Q98 40 69 44 Z" fill="#232b40"/>
-      <path d="M69 38 Q85 24 106 26 Q92 35 69 38 Z" fill="#323c58"/>
-      <line x1="51" y1="38" x2="6"  y2="22" stroke="#323c58" stroke-width="1.3"/>
-      <line x1="51" y1="38" x2="18" y2="14" stroke="#323c58" stroke-width="1.1"/>
-      <line x1="51" y1="38" x2="33" y2="10" stroke="#323c58" stroke-width="0.9"/>
-      <line x1="69" y1="38" x2="114" y2="22" stroke="#323c58" stroke-width="1.3"/>
-      <line x1="69" y1="38" x2="102" y2="14" stroke="#323c58" stroke-width="1.1"/>
-      <line x1="69" y1="38" x2="87"  y2="10" stroke="#323c58" stroke-width="0.9"/>
+  <section class="hero">
+    <img class="hero-flag" src="https://cdn.hackclub.com/019de4a9-41f7-7f6d-b4c7-8c549bfb001d/flag-orpheus-left.svg" alt="Hack Club Flag" />
+    <div class="hero-sky"></div>
+    <canvas id="starCanvas"></canvas>
+
+    <div class="moon-wrap" id="moonWrap">
+      <div class="moon-glow-3"></div>
+      <div class="moon-glow-2"></div>
+      <div class="moon-glow-1"></div>
+      <div class="moon-disk">
+        <svg class="moon-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="95" cy="85" rx="22" ry="18" fill="none" stroke="rgba(0,0,0,0.16)" stroke-width="3"/>
+          <ellipse cx="95" cy="85" rx="16" ry="12" fill="rgba(0,0,0,0.09)"/>
+          <ellipse cx="45" cy="110" rx="14" ry="11" fill="none" stroke="rgba(0,0,0,0.13)" stroke-width="2.5"/>
+          <ellipse cx="45" cy="110" rx="9" ry="7" fill="rgba(0,0,0,0.08)"/>
+          <ellipse cx="65" cy="40" rx="9" ry="7" fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="2"/>
+          <ellipse cx="120" cy="45" rx="7" ry="5.5" fill="none" stroke="rgba(0,0,0,0.11)" stroke-width="1.8"/>
+          <circle cx="75" cy="130" r="4" fill="rgba(0,0,0,0.06)"/>
+        </svg>
+        <div class="moon-shadow" id="moonShadow"></div>
+      </div>
+    </div>
+
+    <div class="fog-layer" id="fogLayer"></div>
+
+    <div class="hero-content">
+      <div class="eyebrow">
+        <svg class="icon"><use href="#i-spark"/></svg> Sponsored by Sebastian Hernandez
+      </div>
+      <h1 class="hero-title">YSWS <span>3AM</span></h1>
+      <p class="hero-sub" id="heroSub"></p>
+      <p class="hero-desc">
+        Build something <span>cool</span> with a dark theme—a site, a tool, or a game—and earn <span>real rewards</span> for your effort.
+      </p>
+      <div class="btns">
+        <button class="btn btn-primary" onclick="scrollToSection('submit')">
+          <svg class="icon"><use href="#i-arrow"/></svg> Submit your project
+        </button>
+        <button class="btn btn-ghost" onclick="scrollToSection('faq')">
+          <svg class="icon"><use href="#i-book"/></svg> Read the rules
+        </button>
+      </div>
+    </div>
+
+    <div class="land-wrap">
+      <svg viewBox="0 0 1440 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="hillGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#0b0e1a"/>
+            <stop offset="100%" stop-color="#070912"/>
+          </linearGradient>
+        </defs>
+        <path d="M0 220 Q180 170 360 210 Q560 250 760 190 Q980 140 1180 205 Q1320 240 1440 200 L1440 300 L0 300Z" fill="url(#hillGrad)"/>
+        <g fill="#060811">
+          <polygon points="120,220 120,175 133,175 133,150 146,150 146,175 159,175 159,220"/>
+          <polygon points="1250,215 1250,170 1263,170 1263,145 1276,145 1276,170 1289,170 1289,215"/>
+        </g>
+        <g>
+          <polygon points="660,230 660,190 700,160 740,190 740,230" fill="#080a14"/>
+          <rect x="705" y="205" width="14" height="14" fill="#ffb454" opacity="0.85"/>
+        </g>
+        <rect x="0" y="260" width="1440" height="40" fill="#070912"/>
+      </svg>
+    </div>
+
+    <div class="scroll-hint">
+      <span>Scroll down</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M12 5v14M5 12l7 7 7-7"/>
+      </svg>
+    </div>
+  </section>
+
+  <div class="wave-divider">
+    <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 30 Q360 0 720 30 T1440 30 V60 H0 Z" fill="#0c1019"/>
     </svg>
   </div>
-</template>
 
-<script>
-/* ===== SCROLL HELPER ===== */
-function scrollTo(id) { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth' }); }
 
-/* ===== NAV ===== */
-document.getElementById('hamburger').addEventListener('click', () => document.getElementById('navLinks').classList.toggle('open'));
-document.querySelectorAll('#navLinks a').forEach(a => a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open')));
 
-/* ===== FAQ ===== */
-document.querySelectorAll('[data-faq]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const item = btn.closest('.faq-item');
-    const wasOpen = item.classList.contains('open');
-    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
-    if (!wasOpen) item.classList.add('open');
-  });
-});
+  <div class="full-bleed" id="rewards" style="background:var(--bg)">
+    <div class="inner">
+      <div class="s-tag"><svg class="icon"><use href="#i-trophy"/></svg> Rewards</div>
+      <h2 class="s-title">Build. Ship. Get rewarded.</h2>
+      <p class="s-desc">
+        Build something you're genuinely proud of and pick a reward you'll actually use to keep building long after <strong>3 AM</strong> is over.
+      </p>
 
-/* ===== STAR + CONSTELLATION CANVAS ===== */
-(function stars() {
-  const canvas = document.getElementById('starCanvas');
-  const ctx = canvas.getContext('2d');
-  const hero = document.querySelector('.hero');
-  let w, h, stars = [], mouse = { x: -9999, y: -9999 };
+      <div class="rewards-grid" id="rewardsGrid">
+        <div class="reward-card" data-hours="2">
+          <div class="reward-media">
+            <img class="reward-img" src="https://cdn.hackclub.com/019fa456-b4dd-7a73-b639-80828e63b63c/image.png" alt="Coffee Gift Card">
+          </div>
+          <div class="reward-name">$10 Coffee Card</div>
+          <div class="reward-desc">Fuel your next late-night coding session with your favorite brew.</div>
+          <span class="reward-hours">2 hrs</span>
+        </div>
 
-  function resize() {
-    w = canvas.width = hero.clientWidth;
-    h = canvas.height = hero.clientHeight;
-    const count = Math.floor((w * h) / 9000);
-    stars = Array.from({ length: count }, () => ({
-      x: Math.random() * w,
-      y: Math.random() * h * 0.68,
-      r: Math.random() * 1.4 + 0.4,
-      baseA: Math.random() * 0.5 + 0.25,
-      phase: Math.random() * Math.PI * 2,
-      speed: Math.random() * 0.015 + 0.006
-    }));
-  }
-  window.addEventListener('resize', resize);
-  resize();
+        <div class="reward-card" data-hours="6">
+          <div class="reward-media">
+            <img class="reward-img" src="https://cdn.hackclub.com/019fa458-4a5e-7024-941f-dc038a93780b/image.png" alt="Blue Light Glasses">
+          </div>
+          <div class="reward-name">Blue Light Glasses</div>
+          <div class="reward-desc">Protect your eyes during long late-night sessions.</div>
+          <span class="reward-hours">6 hrs</span>
+        </div>
 
-  hero.addEventListener('mousemove', e => {
-    const rect = hero.getBoundingClientRect();
-    mouse.x = e.clientX - rect.left;
-    mouse.y = e.clientY - rect.top;
-  });
-  hero.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
+        <div class="reward-card" data-hours="8">
+          <div class="reward-media">
+            <img class="reward-img" src="https://hackyeah.hackclub.com/minecraft.png" alt="Minecraft">
+          </div>
+          <div class="reward-name">Minecraft</div>
+          <div class="reward-desc">Build in code, then relax and build in blocks.</div>
+          <span class="reward-hours">8 hrs</span>
+        </div>
 
-  function frame(t) {
-    ctx.clearRect(0, 0, w, h);
-    stars.forEach(s => {
-      const a = s.baseA + Math.sin(t * s.speed + s.phase) * 0.25;
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(230,235,245,${Math.max(0, a)})`;
-      ctx.fill();
-    });
-    // constellation lines near cursor
-    const near = stars.filter(s => Math.hypot(s.x - mouse.x, s.y - mouse.y) < 140);
-    for (let i = 0; i < near.length; i++) {
-      for (let j = i + 1; j < near.length; j++) {
-        const d = Math.hypot(near[i].x - near[j].x, near[i].y - near[j].y);
-        if (d < 130) {
-          ctx.beginPath();
-          ctx.moveTo(near[i].x, near[i].y);
-          ctx.lineTo(near[j].x, near[j].y);
-          ctx.strokeStyle = `rgba(139,124,246,${0.35 * (1 - d / 130)})`;
-          ctx.lineWidth = 1;
-          ctx.stroke();
-        }
-      }
-    }
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-})();
+        <div class="reward-card" data-hours="15">
+          <div class="reward-media">
+            <img class="reward-img" src="https://cdn.hackclub.com/019fa458-6eee-713f-8837-ca7c41c3f4ad/image.png" alt="Amazon Kindle">
+          </div>
+          <div class="reward-name">Amazon Kindle</div>
+          <div class="reward-desc">Read technical documentation or books without distractions.</div>
+          <span class="reward-hours">15 hrs</span>
+        </div>
 
-/* ===== FOG ===== */
-(function buildFog() {
-  const layer = document.getElementById('fogLayer');
-  const clouds = [
-    { w:600, h:170, l:'-10%', b:'0', fd:'22s', fdelay:'0s', fx:'50px', fo:'0.4' },
-    { w:500, h:140, l:'20%',  b:'8px', fd:'26s', fdelay:'-8s', fx:'-40px', fo:'0.32' },
-    { w:700, h:190, l:'50%',  b:'0', fd:'19s', fdelay:'-5s', fx:'60px', fo:'0.42' },
-    { w:450, h:120, l:'70%',  b:'4px', fd:'24s', fdelay:'-12s', fx:'-55px', fo:'0.35' },
-    { w:550, h:150, l:'0%',   b:'16px', fd:'29s', fdelay:'-3s', fx:'45px', fo:'0.3' },
-  ];
-  clouds.forEach(c => {
-    const el = document.createElement('div');
-    el.className = 'fog-cloud';
-    el.style.cssText = `width:${c.w}px;height:${c.h}px;left:${c.l};bottom:${c.b};--fd:${c.fd};--fdelay:${c.fdelay};--fx:${c.fx};--fo:${c.fo};`;
-    layer.appendChild(el);
-  });
-})();
+        <div class="reward-card" data-hours="30">
+          <div class="reward-media">
+            <img class="reward-img" src="https://hackyeah.hackclub.com/headphones.webp" alt="Sony WH-CH720N">
+          </div>
+          <div class="reward-name">Sony WH-CH720N</div>
+          <div class="reward-desc">Active noise-canceling headphones for ultimate concentration.</div>
+          <span class="reward-hours">30 hrs</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
-/* ===== SCROLL-IN ANIMATIONS ===== */
-const animEls = document.querySelectorAll('.card,.reward-card,.proj-card,.check-row,.faq-item,.guide-row,.timer-box');
-animEls.forEach(el => { el.style.opacity='0'; el.style.transform='translateY(16px)'; el.style.transition='opacity 0.45s ease, transform 0.45s ease, border-color 0.3s, box-shadow 0.3s'; });
-const io = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; io.unobserve(e.target); } });
-}, { threshold: 0.08 });
-animEls.forEach(el => io.observe(el));
+  <div class="full-bleed" id="faq" style="background:var(--bg)">
+    <div class="inner faq-container">
+      <div class="s-tag"><svg class="icon"><use href="#i-chat"/></svg> Questions</div>
+      <h2 class="s-title">Frequently asked</h2>
+      <p class="s-desc">Everything you need to know before you start building.</p>
 
-/* ===== BAT (single nocturnal flyby, kept understated) ===== */
-const batTpl = document.getElementById('batTpl');
-let batBusy = false, batDir = Math.random() < 0.5 ? 1 : -1;
-function spawnBat() {
-  if (batBusy) return; batBusy = true;
-  const bat = batTpl.content.cloneNode(true).querySelector('.bat');
-  bat.style.top = `${8 + Math.random() * 45}vh`;
-  const goRight = batDir > 0; batDir *= -1;
-  const dur = 5 + Math.random() * 3;
-  bat.style.animation = `${goRight ? 'batRight' : 'batLeft'} ${dur}s ease-in-out forwards`;
-  let flapUp = true;
-  const wl = bat.querySelector('.wl'), wr = bat.querySelector('.wr');
-  const flapId = setInterval(() => {
-    if (!bat.isConnected) { clearInterval(flapId); return; }
-    flapUp = !flapUp;
-    wl.setAttribute('d', flapUp ? 'M51 38 Q30 12 4 24 Q22 40 51 44 Z' : 'M51 38 Q28 28 4 38 Q22 48 51 46 Z');
-    wr.setAttribute('d', flapUp ? 'M69 38 Q90 12 116 24 Q98 40 69 44 Z' : 'M69 38 Q92 28 116 38 Q98 48 69 46 Z');
-  }, 140);
-  document.body.appendChild(bat);
-  setTimeout(() => { clearInterval(flapId); bat.remove(); batBusy = false; }, dur * 1000 + 150);
-}
-setTimeout(spawnBat, 3000);
-setInterval(spawnBat, 16000 + Math.random() * 10000);
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-q" data-faq>Is this free?<div class="faq-chevron">▾</div></button>
+          <div class="faq-a"><div class="faq-a-inner">Yes — YSWS 3AM is 100% free, like every Hack Club event.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" data-faq>What can I ship?<div class="faq-chevron">▾</div></button>
+          <div class="faq-a"><div class="faq-a-inner">Any web-accessible project you've worked on during the event—websites, games, or digital tools.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" data-faq>Am I eligible?<div class="faq-chevron">▾</div></button>
+          <div class="faq-a"><div class="faq-a-inner">Anyone aged 13–18, anywhere in the world, can participate.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" data-faq>Do I have to code at exactly 3 AM?<div class="faq-chevron">▾</div></button>
+          <div class="faq-a"><div class="faq-a-inner">"3 AM" represents the focused night-owl vibe. Code whenever fits your routine during the event.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-/* ===== SUBTLE SPARK CURSOR TRAIL ===== */
-const trailPool = [];
-document.addEventListener('mousemove', e => {
-  if (Math.random() > 0.5) return; // sparse, subtle
-  const dot = document.createElement('div'); dot.className = 'trail-dot';
-  dot.style.left = e.clientX + 'px'; dot.style.top = e.clientY + 'px';
-  dot.style.opacity = String(0.2 + Math.random() * 0.3);
-  document.body.appendChild(dot); trailPool.push(dot);
-  if (trailPool.length > 12) { const old = trailPool.shift(); old.style.transition = 'opacity 0.35s'; old.style.opacity = '0'; setTimeout(() => old.remove(), 360); }
-  setTimeout(() => { dot.style.transition = 'opacity 0.3s'; dot.style.opacity = '0'; setTimeout(() => dot.remove(), 320); }, 200);
-});
+  <div class="full-bleed" id="submit" style="background:var(--bg2)">
+    <div class="inner">
+      <div class="cta-box">
+        <div class="s-tag cta-tag"><svg class="icon"><use href="#i-rocket"/></svg> Ready?</div>
+        <h2>Ship it before sunrise</h2>
+        <p>Send your project in and claim what's yours before the night is over.</p>
+        <div class="btns">
+          <button class="btn btn-primary cta-btn"><svg class="icon"><use href="#i-arrow"/></svg>Submit your project</button>
+          <a href="https://hackclub.slack.com" target="_blank" class="btn btn-ghost"><svg class="icon"><use href="#i-slack"/></svg>Join Hack Club Slack</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
-/* ===== TYPING EFFECT ===== */
-const phrases = ['You ship. We ship. After dark.', 'Build at night. Claim your reward.', 'Quiet hours, real projects.', 'Late-night code. Legendary prizes.'];
-let pi = 0, ci = 0, deleting = false;
-const heroSub = document.getElementById('heroSub');
-function typeLoop() {
-  const cur = phrases[pi];
-  if (!deleting) { heroSub.textContent = cur.slice(0, ++ci); if (ci === cur.length) { deleting = true; setTimeout(typeLoop, 2600); return; } }
-  else { heroSub.textContent = cur.slice(0, --ci); if (ci === 0) { deleting = false; pi = (pi + 1) % phrases.length; } }
-  setTimeout(typeLoop, deleting ? 38 : 68);
-}
-setTimeout(typeLoop, 900);
+  <footer>
+    <div class="footer-inner">
+      <img src="https://cdn.hackclub.com/019d730b-a931-785f-a435-c0b3eba933ce/puQ5T1DQN2FkLKxkse1UyxSH_MfbowlTpN71hRGDrvo" alt="Hack Club Logo" />
+      <ul class="footer-links">
+        <li><a href="https://hackclub.com/privacy-and-terms" target="_blank" rel="noopener noreferrer">Terms & Privacy</a></li>
+        <li><a href="https://hackclub.com" target="_blank">Hack Club</a></li>
+        <li><a href="https://hackclub.com/slack" target="_blank">Slack</a></li>
+        <li><a href="https://hackatime.hackclub.com" target="_blank">Hackatime</a></li>
+      </ul>
+      <p class="footer-copy">
+        Made with <span>♥</span> by <a href="https://hridhaan.me" target="_blank" rel="noopener noreferrer" class="footer-author">Hridhaan Sahay</a> for <a href="https://hackclub.com" target="_blank" rel="noopener noreferrer" class="footer-brand">Hack Club</a>
+      </p>
+    </div>
+  </footer>
 
-/* ===== SCROLL-LINKED MOON PHASE ===== */
-const moonShadow = document.getElementById('moonShadow');
-function updateMoonPhase() {
-  const doc = document.documentElement;
-  const max = doc.scrollHeight - doc.clientHeight;
-  const pct = max > 0 ? Math.min(1, window.scrollY / max) : 0;
-  const translate = 10 + pct * 150; // 10% (mostly covered) -> 160% (fully revealed)
-  moonShadow.style.transform = `translateX(${translate}%)`;
-}
-document.addEventListener('scroll', updateMoonPhase, { passive: true });
-updateMoonPhase();
+  <template id="batTpl">
+    <div class="bat">
+      <svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="60" cy="45" rx="9" ry="7" fill="#232b40"/>
+        <ellipse cx="60" cy="33" rx="7" ry="6" fill="#232b40"/>
+        <circle cx="57" cy="32" r="1.6" fill="#ffb454"/>
+        <circle cx="63" cy="32" r="1.6" fill="#ffb454"/>
+        <path class="wl" d="M51 38 Q30 12 4 24 Q22 40 51 44 Z" fill="#232b40"/>
+        <path class="wr" d="M69 38 Q90 12 116 24 Q98 40 69 44 Z" fill="#232b40"/>
+      </svg>
+    </div>
+  </template>
 
-/* ===== SESSION TIMER + HOURS SLIDER (unlocks rewards) ===== */
-const clockEl = document.getElementById('timerClock');
-const startBtn = document.getElementById('timerStart');
-const resetBtn = document.getElementById('timerReset');
-const slider = document.getElementById('hoursSlider');
-const hoursLabel = document.getElementById('hoursLabel');
-const unlockedMsg = document.getElementById('unlockedMsg');
-const rewardCards = Array.from(document.querySelectorAll('.reward-card'));
-
-let elapsedMs = 0, timerId = null, running = false, syncToTimer = true;
-
-function formatClock(ms) {
-  const totalSec = Math.floor(ms / 1000);
-  const hh = String(Math.floor(totalSec / 3600)).padStart(2, '0');
-  const mm = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
-  const ss = String(totalSec % 60).padStart(2, '0');
-  return `${hh}<span>:</span>${mm}<span>:</span>${ss}`;
-}
-
-function applyHours(hrs) {
-  hoursLabel.textContent = `${hrs} hrs`;
-  let unlockedCount = 0;
-  rewardCards.forEach(card => {
-    const need = parseFloat(card.dataset.hours);
-    const on = hrs >= need;
-    card.classList.toggle('unlocked', on);
-    if (on) unlockedCount++;
-  });
-  unlockedMsg.textContent = unlockedCount === 0
-    ? 'Log a bit more time to start unlocking rewards.'
-    : `${unlockedCount} of ${rewardCards.length} rewards unlocked at this pace.`;
-}
-
-function tick() {
-  elapsedMs += 1000;
-  clockEl.innerHTML = formatClock(elapsedMs);
-  if (syncToTimer) {
-    const hrs = Math.round((elapsedMs / 3600000) * 2) / 2;
-    slider.value = Math.min(12, hrs);
-    applyHours(parseFloat(slider.value));
-  }
-}
-
-startBtn.addEventListener('click', () => {
-  running = !running;
-  if (running) {
-    timerId = setInterval(tick, 1000);
-    startBtn.innerHTML = '<svg class="icon"><use href="#i-pause"/></svg>Pause';
-  } else {
-    clearInterval(timerId);
-    startBtn.innerHTML = '<svg class="icon"><use href="#i-play"/></svg>Resume';
-  }
-});
-resetBtn.addEventListener('click', () => {
-  clearInterval(timerId); running = false; elapsedMs = 0; syncToTimer = true;
-  clockEl.innerHTML = formatClock(0);
-  startBtn.innerHTML = '<svg class="icon"><use href="#i-play"/></svg>Start';
-  slider.value = 0; applyHours(0);
-});
-slider.addEventListener('input', () => {
-  syncToTimer = false;
-  applyHours(parseFloat(slider.value));
-});
-applyHours(0);
-</script>
+  <script src="script.js"></script>
 </body>
 </html>
