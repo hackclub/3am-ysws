@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
@@ -33,24 +33,6 @@
       <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
     </defs>
   </svg>
-
-  <nav>
-    <a href="#" class="nav-brand">
-      <img src="https://hackclub.com/_next/image?url=%2Fassets%2Fhero_sticker2.webp&w=48&q=85&dpl=dpl_4BmwEEPBDqnBKceTthzmnpWdAwpu" alt="Hack Club Logo" />
-      <span class="nav-brand-text">YSWS <span>3AM</span></span>
-    </a>
-    <button class="hamburger" id="hamburger" aria-label="Toggle navigation">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-    <ul class="nav-links" id="navLinks">
-      <li><a href="#timer">Timer</a></li>
-      <li><a href="#rewards">Rewards</a></li>
-      <li><a href="#faq">FAQ</a></li>
-      <li><a href="#submit" class="nav-cta">Submit Project</a></li>
-    </ul>
-  </nav>
 
   <section class="hero">
     <img class="hero-flag" src="https://cdn.hackclub.com/019de4a9-41f7-7f6d-b4c7-8c549bfb001d/flag-orpheus-left.svg" alt="Hack Club Flag" />
@@ -185,6 +167,60 @@
           <div class="reward-name">Sony WH-CH720N</div>
           <div class="reward-desc">Active noise-canceling headphones for ultimate concentration.</div>
           <span class="reward-hours">30 hrs</span>
+        </div>
+
+        <div class="reward-card" data-hours="20">
+          <div class="reward-media">
+            <img class="reward-img" src="https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQSHergPPhI3EYYWRS6FwpbH-wSfz1POogGOgIgTpYIigBAYwfWOkTTAF1PGU7h28FY9hsLWYcXp4aN93A4qt5VnOmFWRRfwX_0uX6Rz-a_Ag6qfa2UUetY7Q" alt="Laptop Grant">
+          </div>
+          <div class="reward-name">Laptop Grant</div>
+          <div class="reward-desc">Stackable $100 grant toward a new laptop, earned for every 20 hours you code.</div>
+          <span class="reward-hours">20 hrs (stackable)</span>
+        </div>
+
+        <div class="reward-card" data-hours="1">
+          <div class="reward-media">
+            <img class="reward-img" src="https://www.worthing.in/cdn/shop/products/IMG_20210820_170902.jpg?v=1629459850" alt="Book Grant">
+          </div>
+          <div class="reward-name">Book Grant</div>
+          <div class="reward-desc">$5 grant for every hour you code, redeemable for books.</div>
+          <span class="reward-hours">1 hr (stackable)</span>
+        </div>
+
+        <div class="reward-card" data-hours="65">
+          <div class="reward-media">
+            <img class="reward-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQo9va3cCWu3j-TtW7XKGbor2KuhKfez3-DRzWlcNOZrQ&s=10" alt="iPad 10th Gen">
+          </div>
+          <div class="reward-name">iPad (10th Gen)</div>
+          <div class="reward-desc">Sketch, take notes, and code on the go with a full-size iPad.</div>
+          <span class="reward-hours">65 hrs</span>
+        </div>
+
+        <div class="reward-card" data-hours="31">
+          <div class="reward-media">
+            <img class="reward-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIdPoIO0vVg-60XUh_XWz15aRIMLN1WKbOdAGD2wWGLA&s=10" alt="Standard Edition">
+          </div>
+          <div class="reward-name">Standard Edition ($79.99)</div>
+          <div class="reward-desc">The ultimate edition reward for dedicated night owls.</div>
+          <span class="reward-hours">31 hrs</span>
+        </div>
+
+        <div class="reward-card" data-hours="20">
+          <div class="reward-media">
+            <div class="reward-img" style="display:flex;align-items:center;justify-content:center;font-size:2.5rem;background:rgba(255,255,255,0.04);height:100%;">📱</div>
+          </div>
+          <div class="reward-name">Phone Grant</div>
+          <div class="reward-desc">Stackable $100 grant toward a new phone, earned for every 20 hours you code.</div>
+          <span class="reward-hours">20 hrs (stackable)</span>
+        </div>
+
+        <div class="reward-card" data-hours="10">
+          <div class="reward-media">
+            <img class="reward-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8YgHI-eO8T_VSS-6tA50IaVhsPWlC6CtM-WS7HRzEkA&s=10" alt="Hosting & Domain Grant">
+          </div>
+          <div class="reward-name">Hosting &amp; Domain Grant</div>
+          <div class="reward-desc">Stackable $10 grant toward hosting and domain costs for your project.</div>
+          <span class="reward-hours">10 hrs (stackable)</span>
         </div>
       </div>
     </div>
