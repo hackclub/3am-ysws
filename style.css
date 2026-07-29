@@ -1917,3 +1917,13 @@ footer img { height: 42px; }
   .btns { flex-direction: column; width: 100%; }
   .btn { width: 100%; justify-content: center; }
 }
+
+
+/* Update or add this under section 9 (CTA & FOOTER) */
+.cta-box .btns {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
