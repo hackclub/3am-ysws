@@ -31,9 +31,9 @@
 
   /* Typography */
   --font-display: 'Silkscreen', monospace;   /* pixel voice — used sparingly, for moments only */
-  --font-head: 'Space Grotesk', sans-serif;  /* section heads, carries the real hierarchy */
-  --font-body: 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-head: var(--font-space-grotesk), sans-serif;  /* section heads, carries the real hierarchy */
+  --font-body: var(--font-inter), sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
 
   /* Geometry */
   --radius-sm: 5px;
@@ -1018,7 +1018,6 @@ footer img { height: 42px; }
   box-shadow: 0 0 16px rgba(255, 180, 84, 0.5);
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Silkscreen:wght@400;700&family=Space+Grotesk:wght@500;700&family=Syne:wght@700;800&display=swap');
 
 /* ==========================================================================
    1. RESET & VARIABLES (Pure OLED Black System)
@@ -1049,9 +1048,9 @@ footer img { height: 42px; }
 
   /* Typography */
   --font-display: 'Silkscreen', monospace;
-  --font-head: 'Space Grotesk', sans-serif;
-  --font-body: 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-head: var(--font-space-grotesk), sans-serif;
+  --font-body: var(--font-inter), sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
 
   /* Geometry */
   --radius-sm: 5px;
