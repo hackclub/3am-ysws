@@ -83,8 +83,8 @@ const rewards: Reward[] = [
     desc: "For everyone who stayed up way past 3 AM to earn this one.",
   },
   {
-    hours: 10,
-    hoursLabel: "10 hrs (stackable)",
+    hours: 1,
+    hoursLabel: "1 hr (stackable)",
     img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8YgHI-eO8T_VSS-6tA50IaVhsPWlC6CtM-WS7HRzEkA&s=10",
     alt: "Hosting & Domain Grant",
     name: "Hosting & Domain Grant",
