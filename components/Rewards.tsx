@@ -88,7 +88,7 @@ const rewards: Reward[] = [
     img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8YgHI-eO8T_VSS-6tA50IaVhsPWlC6CtM-WS7HRzEkA&s=10",
     alt: "Hosting & Domain Grant",
     name: "Hosting & Domain Grant",
-    desc: "$10 toward keeping your project actually live on the internet.",
+    desc: "$5 toward keeping your project actually live on the internet.",
   },
 ];
 
