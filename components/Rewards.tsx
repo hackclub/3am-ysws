@@ -11,12 +11,44 @@ interface Reward {
 
 const rewards: Reward[] = [
   {
+    hours: 1,
+    hoursLabel: "1 hr (stackable)",
+    img: "https://www.worthing.in/cdn/shop/products/IMG_20210820_170902.jpg?v=1629459850",
+    alt: "Book Grant",
+    name: "Book Grant",
+    desc: "$5 per hour coded, toward whatever books you're into.",
+  },
+  {
+    hours: 1,
+    hoursLabel: "1 hr (stackable)",
+    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8YgHI-eO8T_VSS-6tA50IaVhsPWlC6CtM-WS7HRzEkA&s=10",
+    alt: "Hosting & Domain Grant",
+    name: "Hosting & Domain Grant",
+    desc: "$5 toward keeping your project actually live on the internet.",
+  },
+  {
     hours: 2,
     hoursLabel: "2 hrs",
     img: "https://cdn.hackclub.com/019fa456-b4dd-7a73-b639-80828e63b63c/image.png",
     alt: "Coffee Gift Card",
     name: "$10 Coffee Card",
     desc: "For the next 3 AM session, whenever it is.",
+  },
+  {
+    hours: 2,
+    hoursLabel: "2 hrs",
+    img: "https://user-cdn.hackclub-assets.com/019fc98d-8ee8-7350-b61e-8d8ac6a72ede/ai.webp",
+    alt: "AI & Hosting Credits",
+    name: "$10 AI & Hosting Credits (Stackable)",
+    desc: "A $10 grant for your favorite AI APIs or hosting services—stack as many as you need.",
+  },
+  {
+    hours: 5,
+    hoursLabel: "5 hrs",
+    img: "https://cdn.hackclub.com/019fc98d-90a6-7e78-bfff-d55d6b263f27/en_badge_web_generic.png",
+    alt: "Google Play Developer Account",
+    name: "Google Play Developer Account",
+    desc: "A $25 grant to cover the one-time registration fee to publish your apps on the Google Play Store.",
   },
   {
     hours: 6,
@@ -35,20 +67,20 @@ const rewards: Reward[] = [
     desc: "Because sometimes you want to build without a compiler yelling at you.",
   },
   {
-    hours: 15,
-    hoursLabel: "15 hrs",
-    img: "https://cdn.hackclub.com/019fa458-6eee-713f-8837-ca7c41c3f4ad/image.png",
-    alt: "Amazon Kindle",
-    name: "Amazon Kindle",
-    desc: "For docs, books, or whatever you'd rather read than another Stack Overflow tab.",
+    hours: 10,
+    hoursLabel: "10 hrs",
+    img: "https://cdn.hackclub.com/019fc991-f6bc-77f7-a2f8-994b155053ac/image.png",
+    alt: "E-Reader Grant",
+    name: "$50 E-Reader Grant (Stackable)",
+    desc: "A $50 grant toward any e-reader of your choice—stack multiple to cover the full cost.",
   },
   {
-    hours: 30,
-    hoursLabel: "30 hrs",
-    img: "https://hackyeah.hackclub.com/headphones.webp",
-    alt: "Sony WH-CH720N",
-    name: "Sony WH-CH720N",
-    desc: "Noise canceling, for when the house isn't as quiet as 3 AM should be.",
+    hours: 20,
+    hoursLabel: "20 hrs",
+    img: "https://user-cdn.hackclub-assets.com/019fc991-fb83-76a0-bade-ea4a310811d2/image.png",
+    alt: "Logitech MX Master 3S",
+    name: "Logitech MX Master 3S",
+    desc: "Ergonomic productivity mouse with quiet clicks, electromagnetic scrolling, and an 8K DPI sensor.",
   },
   {
     hours: 20,
@@ -59,20 +91,12 @@ const rewards: Reward[] = [
     desc: "$100 toward a new laptop. Stacks every 20 hours, so keep going.",
   },
   {
-    hours: 1,
-    hoursLabel: "1 hr (stackable)",
-    img: "https://www.worthing.in/cdn/shop/products/IMG_20210820_170902.jpg?v=1629459850",
-    alt: "Book Grant",
-    name: "Book Grant",
-    desc: "$5 per hour coded, toward whatever books you're into.",
-  },
-  {
-    hours: 65,
-    hoursLabel: "65 hrs",
-    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQo9va3cCWu3j-TtW7XKGbor2KuhKfez3-DRzWlcNOZrQ&s=10",
-    alt: "iPad 10th Gen",
-    name: "iPad (10th Gen)",
-    desc: "For sketching, notes, or coding from the couch instead of your desk.",
+    hours: 30,
+    hoursLabel: "30 hrs",
+    img: "https://hackyeah.hackclub.com/headphones.webp",
+    alt: "Sony WH-CH720N",
+    name: "Sony WH-CH720N",
+    desc: "Noise canceling, for when the house isn't as quiet as 3 AM should be.",
   },
   {
     hours: 31,
@@ -83,12 +107,36 @@ const rewards: Reward[] = [
     desc: "For everyone who stayed up way past 3 AM to earn this one.",
   },
   {
-    hours: 1,
-    hoursLabel: "1 hr (stackable)",
-    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8YgHI-eO8T_VSS-6tA50IaVhsPWlC6CtM-WS7HRzEkA&s=10",
-    alt: "Hosting & Domain Grant",
-    name: "Hosting & Domain Grant",
-    desc: "$5 toward keeping your project actually live on the internet.",
+    hours: 40,
+    hoursLabel: "40 hrs",
+    img: "https://user-cdn.hackclub-assets.com/019fc98d-8cd3-7f91-b55a-5f20132561e1/image.png",
+    alt: "Flipper Zero",
+    name: "Flipper Zero",
+    desc: "A pocket-sized multi-tool for educational usage for exploring hardware, RFID, NFC, and radio protocols.",
+  },
+  {
+    hours: 60,
+    hoursLabel: "60 hrs",
+    img: "https://user-cdn.hackclub-assets.com/019fc991-f942-75a1-a5e9-b38dd99fc9d8/lookaside.fbsbx.webp",
+    alt: "Meta Smart Glasses",
+    name: "Meta Smart Glasses",
+    desc: "Capture video, stream music, and build AI projects right from your frame.",
+  },
+  {
+    hours: 65,
+    hoursLabel: "65 hrs",
+    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQo9va3cCWu3j-TtW7XKGbor2KuhKfez3-DRzWlcNOZrQ&s=10",
+    alt: "iPad 10th Gen",
+    name: "iPad (10th Gen)",
+    desc: "For sketching, notes, or coding from the couch instead of your desk.",
+  },
+  {
+    hours: 70,
+    hoursLabel: "70 hrs",
+    img: "https://user-cdn.hackclub-assets.com/019fc98d-9272-7302-8ec7-cc4ff5f5161b/image.png",
+    alt: "Meta Quest 3S (128GB)",
+    name: "Meta Quest 3S (128GB)",
+    desc: "Entry-level mixed reality headset powered by the Snapdragon XR2 Gen 2 chip.",
   },
 ];
 
@@ -109,8 +157,8 @@ export default function Rewards() {
         </p>
 
         <div className="rewards-grid" id="rewardsGrid">
-          {rewards.map((r) => (
-            <div className="reward-card" data-hours={r.hours} key={r.name}>
+          {rewards.map((r, index) => (
+            <div className="reward-card" data-hours={r.hours} key={`${r.name}-${index}`}>
               <div className="reward-media">
                 <RewardImage src={r.img} alt={r.alt} />
               </div>
