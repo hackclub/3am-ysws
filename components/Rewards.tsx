@@ -58,8 +58,7 @@ const rewards: Reward[] = [
     alt: "Chrome Web Dev Extension",
     name: "Chrome Web Dev Extension",
     desc: "Build cool browser stuff and flex your dev tools skills like a absolute boss."
-  }
-]
+  },
   {
     hours: 2,
     hoursLabel: "2 hrs",
@@ -68,7 +67,6 @@ const rewards: Reward[] = [
     name: "$10 AI & Hosting Credits (Stackable)",
     desc: "A $10 grant for your favorite AI APIs or hosting services—stack as many as you need.",
   },
-      [
   {
     hours: 2,
     hoursLabel: "2 hrs (stackable)",
