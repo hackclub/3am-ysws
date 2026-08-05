@@ -21,6 +21,14 @@ const rewards: Reward[] = [
   {
     hours: 1,
     hoursLabel: "1 hr (stackable)",
+    img: "https://cdn.hackclub.com/019fd377-3649-75be-bf89-69efc5540c5c/image.png",
+    alt: "Hardware Component Grant",
+    name: "Hardware Component Grant",
+    desc: "$5 (Stackable) grant to pick up hardware components for your dream project, To build instead of dreaming",
+  },
+  {
+    hours: 1,
+    hoursLabel: "1 hr (stackable)",
     img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8YgHI-eO8T_VSS-6tA50IaVhsPWlC6CtM-WS7HRzEkA&s=10",
     alt: "Hosting & Domain Grant",
     name: "Hosting & Domain Grant",
