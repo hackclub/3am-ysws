@@ -68,6 +68,31 @@ const rewards: Reward[] = [
     name: "$10 AI & Hosting Credits (Stackable)",
     desc: "A $10 grant for your favorite AI APIs or hosting services—stack as many as you need.",
   },
+      [
+  {
+    hours: 2,
+    hoursLabel: "2 hrs (stackable)",
+    img: "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQanU0gF4QKpnvIgXnmJUeXQaI5NMaWyK6V-1rBVa_j6-A02MkS5HHPunbs1giqx9eRX24aUwAi7LwkTIqwEhmP4kNYda5OAZX-to5HLSdyUmuyT12EAuEldp8",
+    alt: "Peripheral Device Grant",
+    name: "Peripheral Device Grant",
+    desc: "Level up your setup so your fingers and eyes do not completely give up on you."
+  },
+  {
+    hours: 4,
+    hoursLabel: "4 hrs (stackable)",
+    img: "https://i5.walmartimages.com/seo/TOPRenddon-32GB-Portable-MP3-Player-with-LCD-Screen-Ultra-Compact-Metal-Music-Player-USB-Rechargeable-SD-TF-Card-Reader-Audio-Player_fbcbfc6a-3222-41a9-8d8e-fcda8077fdb5.05a535eb8cadf1e8e52c7e97bac9d316.jpeg?odnHeight=573&odnWidth=573&odnBg=FFFFFF",
+    alt: "MP3 Player Grant",
+    name: "MP3 Player Grant",
+    desc: "Lock in with your favorite beats without your phone distracting you 24 7."
+  },
+  {
+    hours: 1,
+    hoursLabel: "1 hr (stackable)",
+    img: "https://cdn.hackclub.com/019e22e5-757a-781f-b5e3-a200ed973d98/image.png",
+    alt: "Chrome Web Dev Extension",
+    name: "Chrome Web Dev Extension",
+    desc: "Build cool browser stuff and flex your dev tools skills like a absolute boss."
+  },
   {
     hours: 5,
     hoursLabel: "5 hrs",
