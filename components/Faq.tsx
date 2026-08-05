@@ -9,7 +9,7 @@ const faqs = [
   },
   {
     q: "What can I ship?",
-    a: "Anything you can access from a browser that you built during the event, like a website, a game, a tool, whatever you've got.",
+    a: "Pick something dark themed to build, a site, a tool, a game, whatever you're into, Hardware works too and get real rewards for actually finishing it.",
   },
   {
     q: "Am I eligible?",
