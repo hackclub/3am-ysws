@@ -35,6 +35,14 @@ const rewards: Reward[] = [
     desc: "$5 toward keeping your project actually live on the internet.",
   },
   {
+  hours: 1,
+  hoursLabel: "1 hr",
+  img: "https://cdn.hackclub.com/019fe60c-0565-778a-838b-8623ec78508c/image.png",
+  alt: "Energy Drink Grant",
+  name: "Energy Drink Grant",
+  desc: "for when you feel sleepy and have no energy",
+},
+  {
     hours: 1,
     hoursLabel: "1 hr (stackable)",
     img: "https://cdn.hackclub.com/019e22e5-757a-781f-b5e3-a200ed973d98/image.png",
@@ -59,6 +67,14 @@ const rewards: Reward[] = [
     desc: "Get a $10 (Stackable) grant. Level up your setup so your fingers and eyes do not completely give up on you at 3am.",
   },
   {
+  hours: 2,
+  hoursLabel: "2 hrs",
+  img: "https://www.foodandwine.com/thmb/YxTpbJjamzotxmM7XzYEq_rloNE=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Here-Are-the-Most-Popular-Snacks-in-America-Per-State-6ada7279c64a46898b6ec09ad083f9f2.jpg",
+  alt: "Snacks for the Night",
+  name: "Snacks for the Night",
+  desc: "Brain food for the night. Stack it and never code on an empty stomach again.",
+},
+  {
     hours: 2,
     hoursLabel: "2 hrs",
     img: "https://user-cdn.hackclub-assets.com/019fc98d-8ee8-7350-b61e-8d8ac6a72ede/ai.webp",
@@ -67,6 +83,14 @@ const rewards: Reward[] = [
     desc: "A $10 grant for your favorite AI APIs or hosting services—stack as many as you need.",
   },
   {
+  hours: 4,
+  hoursLabel: "4 hrs",
+  img: "https://cdn.hackclub.com/019fe616-d1bd-7c38-8869-bcf4d63b6e71/image.png",
+  alt: "Horror Game Grant",
+  name: "Horror Game Grant",
+  desc: "For when #3AM ends and you have nothing to do at 3AM",
+},
+  {
     hours: 4,
     hoursLabel: "4 hrs (stackable)",
     img: "https://i5.walmartimages.com/seo/TOPRenddon-32GB-Portable-MP3-Player-with-LCD-Screen-Ultra-Compact-Metal-Music-Player-USB-Rechargeable-SD-TF-Card-Reader-Audio-Player_fbcbfc6a-3222-41a9-8d8e-fcda8077fdb5.05a535eb8cadf1e8e52c7e97bac9d316.jpeg?odnHeight=573&odnWidth=573&odnBg=FFFFFF",
@@ -74,6 +98,14 @@ const rewards: Reward[] = [
     name: "MP3 Player Grant",
     desc: "Get a $20 (Stackable) grant to lock in with your favorite beats without your phone distracting you 24/7.",
   },
+  {
+  hours: 4,
+  hoursLabel: "4 hrs",
+  img: "https://cdn.hackclub.com/019fe60b-15b1-705a-9bbc-ee6358328eae/image.png",
+  alt: "Brew Machine",
+  name: "Brew Machine Grant",
+  desc: "Because instant coffee is a crime against humanity and your all-nighters deserve better. Brew your own fuel like the caffeine-dependent legend you are.",
+},
   {
     hours: 5,
     hoursLabel: "5 hrs",
@@ -122,6 +154,22 @@ const rewards: Reward[] = [
     name: "Laptop Grant",
     desc: "$100 toward a new laptop. Stacks every 20 hours, so keep going.",
   },
+  {
+  hours: 20,
+  hoursLabel: "20 hrs",
+  img: "https://media.licdn.com/dms/image/v2/D4D22AQFtGTkok3Eniw/feedshare-shrink_800/feedshare-shrink_800/0/1701798439889?e=1787788800&v=beta&t=2lMisyqKuoQLh-8q9orDyJJVBltM6Vkp_y_ODux5I2E",
+  alt: "Telescope",
+  name: "Telescope Grant 100$ (Stackable)",
+  desc: "That's literally my own telescope in the pic btw :D ",
+},
+  {
+  hours: 26,
+  hoursLabel: "26 hrs",
+  img: "https://cdn.hackclub.com/019fe615-bd5b-7ea1-853d-2b7ce27dcab8/image.png",
+  alt: "Apple Pencil",
+  name: "Apple Pencil",
+  desc: "Turn your iPad into an actual whiteboard instead of just a very expensive YouTube machine. Sketch your system design diagrams like you're a real engineer and not just cosplaying as one.",
+},
   {
     hours: 30,
     hoursLabel: "30 hrs",
