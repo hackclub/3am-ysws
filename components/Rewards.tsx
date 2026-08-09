@@ -52,7 +52,7 @@ const rewards: Reward[] = [
   },
   {
     hours: 2,
-    hoursLabel: "2 hrs",
+    hoursLabel: "2 hrs (stackable)",
     img: "https://cdn.hackclub.com/019fa456-b4dd-7a73-b639-80828e63b63c/image.png",
     alt: "Coffee Gift Card",
     name: "$10 Coffee Card",
@@ -68,7 +68,7 @@ const rewards: Reward[] = [
   },
   {
   hours: 2,
-  hoursLabel: "2 hrs",
+  hoursLabel: "2 hrs (stackable)",
   img: "https://www.foodandwine.com/thmb/YxTpbJjamzotxmM7XzYEq_rloNE=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Here-Are-the-Most-Popular-Snacks-in-America-Per-State-6ada7279c64a46898b6ec09ad083f9f2.jpg",
   alt: "Snacks for the Night",
   name: "Snacks for the Night",
@@ -76,7 +76,7 @@ const rewards: Reward[] = [
 },
   {
     hours: 2,
-    hoursLabel: "2 hrs",
+    hoursLabel: "2 hrs (stackable)",
     img: "https://user-cdn.hackclub-assets.com/019fc98d-8ee8-7350-b61e-8d8ac6a72ede/ai.webp",
     alt: "AI & Hosting Credits",
     name: "$10 AI & Hosting Credits (Stackable)",
@@ -84,7 +84,7 @@ const rewards: Reward[] = [
   },
   {
   hours: 4,
-  hoursLabel: "4 hrs",
+  hoursLabel: "4 hrs (stackable)",
   img: "https://cdn.hackclub.com/019fe616-d1bd-7c38-8869-bcf4d63b6e71/image.png",
   alt: "Horror Game Grant",
   name: "Horror Game Grant",
@@ -100,7 +100,7 @@ const rewards: Reward[] = [
   },
   {
   hours: 4,
-  hoursLabel: "4 hrs",
+  hoursLabel: "4 hrs (stackable)",
   img: "https://cdn.hackclub.com/019fe60b-15b1-705a-9bbc-ee6358328eae/image.png",
   alt: "Brew Machine",
   name: "Brew Machine Grant",
@@ -116,7 +116,7 @@ const rewards: Reward[] = [
   },
   {
     hours: 6,
-    hoursLabel: "6 hrs",
+    hoursLabel: "6 hrs (stackable)",
     img: "https://cdn.hackclub.com/019fa458-4a5e-7024-941f-dc038a93780b/image.png",
     alt: "Blue Light Glasses",
     name: "Blue Light Glasses",
