@@ -1,3 +1,4 @@
+import YswsImpact from "@/components/YswsImpact";
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import Rewards from "@/components/Rewards";
@@ -17,7 +18,7 @@ export default function Page() {
           <path d="M0 30 Q360 0 720 30 T1440 30 V60 H0 Z" fill="#0c1019" />
         </svg>
       </div>
-
+      <YswsImpact />
       <Rewards />
       <Faq />
       <Submit />
