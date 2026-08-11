@@ -1,14 +1,24 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export default function BatSpawner() {
+  const isSpawningRef = useRef(false);
+
   useEffect(() => {
-    let batBusy = false;
+    let active = true;
 
     function spawnBat() {
-      if (batBusy) return;
-      batBusy = true;
+      // Prevent multiple bats from spawning simultaneously
+      if (isSpawningRef.current || !active) return;
+      
+      // Clean up any stray bat DOM elements before spawning a new one
+      const existingBats = document.querySelectorAll(".bat");
+      if (existingBats.length > 0) {
+        existingBats.forEach((b) => b.remove());
+      }
+
+      isSpawningRef.current = true;
 
       const bat = document.createElement("div");
       bat.className = "bat";
@@ -30,13 +40,16 @@ export default function BatSpawner() {
       document.body.appendChild(bat);
 
       setTimeout(() => {
-        bat.remove();
-        batBusy = false;
+        if (bat.parentNode) bat.remove();
+        isSpawningRef.current = false;
       }, dur * 1000);
     }
 
     const intervalId = setInterval(spawnBat, 15000);
-    return () => clearInterval(intervalId);
+    return () => {
+      active = false;
+      clearInterval(intervalId);
+    };
   }, []);
 
   return null;

@@ -9,16 +9,17 @@ const phrases = [
 ];
 
 export default function TypewriterSubtitle() {
-  const [text, setText] = useState("");
+  const [text, setText] = useState(phrases[0]);
 
   useEffect(() => {
     let pi = 0;
-    let ci = 0;
-    let deleting = false;
+    let ci = phrases[0].length;
+    let deleting = true; // Pause briefly on first phrase before cycling
     let timeoutId: ReturnType<typeof setTimeout>;
 
     function typeLoop() {
       const cur = phrases[pi];
+
       if (!deleting) {
         ci++;
         setText(cur.slice(0, ci));
@@ -35,16 +36,16 @@ export default function TypewriterSubtitle() {
           pi = (pi + 1) % phrases.length;
         }
       }
-      timeoutId = setTimeout(typeLoop, deleting ? 38 : 68);
+      timeoutId = setTimeout(typeLoop, deleting ? 35 : 65);
     }
 
-    timeoutId = setTimeout(typeLoop, 900);
+    timeoutId = setTimeout(typeLoop, 2200);
 
     return () => clearTimeout(timeoutId);
   }, []);
 
   return (
-    <p className="hero-sub" id="heroSub">
+    <p className="hero-sub" id="heroSub" style={{ minHeight: "1.6em" }}>
       {text}
     </p>
   );

@@ -5,10 +5,10 @@ import { useEffect, useRef } from "react";
 interface Star {
   x: number;
   y: number;
-  r: number;
-  baseA: number;
+  size: number;
+  baseOpacity: number;
+  twinkleSpeed: number;
   phase: number;
-  speed: number;
 }
 
 export default function StarCanvas() {
@@ -19,80 +19,62 @@ export default function StarCanvas() {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    const hero = canvas.closest(".hero") as HTMLElement | null;
-    if (!hero) return;
 
-    let w = 0;
-    let h = 0;
-    let stars: Star[] = [];
-    const mouse = { x: -9999, y: -9999 };
-    let rafId = 0;
+    let animationFrameId: number;
 
-    function resize() {
-      w = canvas!.width = hero!.clientWidth;
-      h = canvas!.height = hero!.clientHeight;
-      const count = Math.floor((w * h) / 9000);
-      stars = Array.from({ length: count }, () => ({
-        x: Math.random() * w,
-        y: Math.random() * h * 0.68,
-        r: Math.random() * 1.4 + 0.4,
-        baseA: Math.random() * 0.5 + 0.25,
-        phase: Math.random() * Math.PI * 2,
-        speed: Math.random() * 0.015 + 0.006,
-      }));
-    }
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
 
-    function handleMouseMove(e: MouseEvent) {
-      const rect = hero!.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
-    }
+    // Generate 160 Background Twinkling Stars
+    const bgStars: Star[] = Array.from({ length: 160 }, () => ({
+      x: Math.random(),
+      y: Math.random(),
+      size: Math.random() * 2 + 0.5,
+      baseOpacity: Math.random() * 0.5 + 0.2,
+      twinkleSpeed: Math.random() * 0.003 + 0.001,
+      phase: Math.random() * Math.PI * 2,
+    }));
 
-    function handleMouseLeave() {
-      mouse.x = -9999;
-      mouse.y = -9999;
-    }
+    const render = (timestamp: number) => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    function render(t: number) {
-      ctx!.clearRect(0, 0, w, h);
-      stars.forEach((s) => {
-        const a = s.baseA + Math.sin(t * s.speed + s.phase) * 0.25;
-        ctx!.beginPath();
-        ctx!.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx!.fillStyle = `rgba(230,235,245,${Math.max(0, a)})`;
-        ctx!.fill();
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // Draw Twinkling Background Stars
+      bgStars.forEach((star) => {
+        const opacity =
+          star.baseOpacity + Math.sin(timestamp * star.twinkleSpeed + star.phase) * 0.3;
+        ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0.1, Math.min(1, opacity))})`;
+        ctx.beginPath();
+        ctx.arc(star.x * w, star.y * h, star.size, 0, Math.PI * 2);
+        ctx.fill();
       });
 
-      const near = stars.filter((s) => Math.hypot(s.x - mouse.x, s.y - mouse.y) < 140);
-      for (let i = 0; i < near.length; i++) {
-        for (let j = i + 1; j < near.length; j++) {
-          const d = Math.hypot(near[i].x - near[j].x, near[i].y - near[j].y);
-          if (d < 130) {
-            ctx!.beginPath();
-            ctx!.moveTo(near[i].x, near[i].y);
-            ctx!.lineTo(near[j].x, near[j].y);
-            ctx!.strokeStyle = `rgba(139,124,246,${0.35 * (1 - d / 130)})`;
-            ctx!.lineWidth = 1;
-            ctx!.stroke();
-          }
-        }
-      }
-      rafId = requestAnimationFrame(render);
-    }
+      animationFrameId = requestAnimationFrame(render);
+    };
 
-    window.addEventListener("resize", resize);
-    hero.addEventListener("mousemove", handleMouseMove);
-    hero.addEventListener("mouseleave", handleMouseLeave);
-    resize();
-    rafId = requestAnimationFrame(render);
+    animationFrameId = requestAnimationFrame(render);
 
     return () => {
-      cancelAnimationFrame(rafId);
       window.removeEventListener("resize", resize);
-      hero.removeEventListener("mousemove", handleMouseMove);
-      hero.removeEventListener("mouseleave", handleMouseLeave);
+      cancelAnimationFrame(animationFrameId);
     };
   }, []);
 
-  return <canvas id="starCanvas" ref={canvasRef} />;
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: "absolute",
+        inset: 0,
+        pointerEvents: "none",
+        zIndex: 2,
+      }}
+    />
+  );
 }
