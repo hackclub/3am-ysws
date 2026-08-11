@@ -1,10 +1,9 @@
 import https from "https";
 
-const AIRTABLE_API_KEY = process.env.AIRTABLE_PAT || process.env.AIRTABLE_API_KEY!;
-const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID!;
-const PROJECTS_TABLE_NAME = "YSWS Project Submission";
+// Exact label confirmed via https://ships.hackclub.com/api/v1/stats
+const YSWS_NAME = "3am";
 
-function airtableFetchIPv4(url: string): Promise<any> {
+function fetchIPv4(url: string): Promise<any> {
   return new Promise((resolve, reject) => {
     const urlObj = new URL(url);
     const req = https.request(
@@ -13,10 +12,7 @@ function airtableFetchIPv4(url: string): Promise<any> {
         path: urlObj.pathname + urlObj.search,
         method: "GET",
         family: 4,
-        headers: {
-          Authorization: `Bearer ${AIRTABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       },
       (res) => {
         let body = "";
@@ -34,38 +30,30 @@ function airtableFetchIPv4(url: string): Promise<any> {
         });
       }
     );
-
     req.on("error", (err) => reject(err));
     req.end();
   });
 }
 
 export async function getYswsStats() {
-  if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) {
-    return { totalProjects: 0, totalHours: 0 };
-  }
-
   try {
-    const encodedProjectsTable = encodeURIComponent(PROJECTS_TABLE_NAME);
-    const projectsUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodedProjectsTable}`;
-    const data = await airtableFetchIPv4(projectsUrl);
+    const entries = await fetchIPv4("https://ships.hackclub.com/api/v1/ysws_entries");
 
-    let totalProjects = 0;
-    let totalHours = 0;
-
-    if (data?.records && Array.isArray(data.records)) {
-      totalProjects = data.records.length;
-
-      for (const rec of data.records) {
-        const f = rec.fields;
-        const hours = Number(f["Hours"] || f["Hours Spent"] || f["Approved Hours"] || f["Hours Approved"] || 0);
-        totalHours += hours;
-      }
+    if (!Array.isArray(entries)) {
+      console.error("Unexpected Ships API response shape:", entries);
+      return { totalProjects: 0, totalHours: 0 };
     }
+
+    const ours = entries.filter(
+      (e: any) => (e.ysws || "").toLowerCase() === YSWS_NAME.toLowerCase()
+    );
+
+    const totalProjects = ours.length;
+    const totalHours = ours.reduce((sum: number, e: any) => sum + (Number(e.hours) || 0), 0);
 
     return { totalProjects, totalHours };
   } catch (err) {
-    console.error("Airtable API Error in getYswsStats:", err);
+    console.error("Ships API Error in getYswsStats:", err);
     return { totalProjects: 0, totalHours: 0 };
   }
 }
