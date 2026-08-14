@@ -33,3 +33,8 @@ setInterval(() => {
     owlFrame = (owlFrame + 1) % owlFrames.length;
     owlImg.src = owlFrames[owlFrame];
 }, 500);
+
+const favicon = document.createElement('link');
+favicon.rel = 'icon';
+favicon.href = 'https://assets.hackclub.com/icon-rounded.svg';
+document.head.appendChild(favicon);
