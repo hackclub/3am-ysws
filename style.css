@@ -6,7 +6,7 @@
 
 * {
     font-family: "Augie", cursive;
-    box-sizing: border-box
+    box-sizing: border-box;
 }
 
 html { font-size: 16px; }
@@ -18,31 +18,13 @@ body {
     line-height: 1.55;
 }
 
-.ysws-credit {
-    text-align: center;
-    padding: 8px;
-    font-size: 14px;
-    color: #81768f;
-    background: rgba(16,16,20,0.7);
-    letter-spacing: 1px;
-}
-
-.navbar {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    padding: 18px 36px;
-    border-bottom: 2px solid #29272b;
-    background: rgba(16, 16, 20, 0.55);
-    backdrop-filter: blur(8px);
-}
-
+.ysws-credit { text-align: center; padding: 8px; font-size: 14px; color: #81768f; background: rgba(16,16,20,0.7); letter-spacing: 1px; }
+.navbar { display: flex; align-items: center; gap: 24px; padding: 18px 36px; border-bottom: 2px solid #29272b; background: rgba(16, 16, 20, 0.55); backdrop-filter: blur(8px); }
 .logo { font-size: 34px; color: #f7e9a8; text-decoration: none; text-shadow: 3px 3px 0 #6f6387; transform: rotate(-2deg); display: inline-flex; align-items: center; gap: 8px; }
 .nav-flag { height: 32px; image-rendering: pixelated; }
 .nav-links { display: flex; gap: 20px; margin-left: auto; }
 .nav-links a { color: #c8c3cc; text-decoration: none; font-size: 22px; }
 .nav-links a:hover { color: #f7e9a8; text-decoration: underline; text-decoration-style: wavy; }
-
 .hero-inner { max-width: 680px; margin: 0 auto; padding: 32px; display: flex; flex-direction: column; gap: 12px; }
 .hero-buttons { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 4px; }
 .section { max-width: 680px; margin:48px auto; padding: 32px; border: 2px solid #393642; border-radius: 3px 10px 5px 8px / 8px 3px 10px 4px; background: rgba(16, 16, 20, 0.55); backdrop-filter: blur(8px); }
@@ -98,14 +80,30 @@ footer a:hover { color: #d6b8dc; }
 .faq-item.open .faq-a { grid-template-rows: 1fr; padding-bottom: 18px; }
 .faq-a-inner { overflow: hidden; min-height: 0; font-size: 20px; color: #c8c3cc; line-height: 1.6; }
 
+/* readability pass */
+body { font-size: 18px; }
+.section-label { font-size: 19px; }
+.hero-credit { font-size: 16px; }
+.big-copy { font-size: 23px; line-height: 1.7; }
+.step-body p { font-size: 24px; line-height: 1.6; }
+.step-body .hand-note, .hand-note, .scribble { font-size: 21px; line-height: 1.5; }
+.step-title h3 { font-size: 30px; }
+.reward-item { font-size: 17px; }
+.reward-price { font-size: 15px; }
+.faq-q { font-size: 24px; }
+.faq-a-inner { font-size: 22px; }
+footer a { font-size: 20px; }
+
 @media (max-width: 700px) {
     .navbar { padding: 14px 18px; }
     .nav-links { gap: 12px; }
-    .nav-links a { font-size: 17px; }
+    .nav-links a { font-size: 19px; }
     .hero-inner, .section, footer { margin-left: 14px; margin-right: 14px; padding: 24px 20px; }
-    h1 { font-size: 42px; }
-    .big-copy { font-size: 18px; }
-    .step-body p { font-size: 19px; }
-    .step-title h3 { font-size: 24px; }
-    .button, .dashboard-button { font-size: 20px; }
+    h1 { font-size: 46px; }
+    .big-copy { font-size: 20px; }
+    .step-body p { font-size: 21px; }
+    .step-title h3 { font-size: 26px; }
+    .button, .dashboard-button { font-size: 22px; }
+    .faq-q { font-size: 21px; }
+    .faq-a-inner { font-size: 20px; }
 }
