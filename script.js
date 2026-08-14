@@ -9,15 +9,15 @@ function tick() {
     const h = Math.floor((diff % 86400000) / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
-    document.getElementById('days').textContent    = String(d).padStart(2, '0');
-    document.getElementById('hours').textContent   = String(h).padStart(2, '0');
+    document.getElementById('days').textContent = String(d).padStart(2, '0');
+    document.getElementById('hours').textContent = String(h).padStart(2, '0');
     document.getElementById('minutes').textContent = String(m).padStart(2, '0');
     document.getElementById('seconds').textContent = String(s).padStart(2, '0');
 }
 tick();
 setInterval(tick, 1000);
 
-document.querySelectorAll('[data-faq').forEach(btn => {
+document.querySelectorAll('[data-faq]').forEach(btn => {
     btn.addEventListener('click', () => {
         const item = btn.closest('.faq-item');
         const isOpen = item.classList.contains('open');
@@ -29,7 +29,21 @@ document.querySelectorAll('[data-faq').forEach(btn => {
 const owlFrames = ['assets/owl.png', 'assets/owl1.png'];
 let owlFrame = 0;
 const owlImg = document.querySelector('.owl');
-setInterval(() => {
-    owlFrame = (owlFrame + 1) % owlFrames.length;
-    owlImg.src = owlFrames[owlFrame];
-}, 500);
+if (owlImg) {
+    setInterval(() => {
+        owlFrame = (owlFrame + 1) % owlFrames.length;
+        owlImg.src = owlFrames[owlFrame];
+    }, 500);
+}
+
+// Keep visible copy natural and remove dash punctuation from rendered text.
+document.addEventListener('DOMContentLoaded', () => {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    let node;
+    while ((node = walker.nextNode())) nodes.push(node);
+    nodes.forEach(textNode => {
+        if (textNode.parentElement && ['SCRIPT', 'STYLE'].includes(textNode.parentElement.tagName)) return;
+        textNode.nodeValue = textNode.nodeValue.replace(/[\u2012\u2013\u2014\u2212]/g, ' ').replace(/\s+-\s+/g, ' ');
+    });
+});
