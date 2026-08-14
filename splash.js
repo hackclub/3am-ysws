@@ -12,7 +12,20 @@ const img = document.getElementById('splashImg');
 const imgNext = document.getElementById('splashImgNext');
 const label = document.getElementById('splashLabel');
 const splash = document.getElementById('splash');
+const skipIntro = document.getElementById('skipIntro');
 let current = 0;
+let interval;
+let skipped = false;
+
+function goToSite() {
+    if (skipped) return;
+    skipped = true;
+    clearInterval(interval);
+    sessionStorage.setItem('splashSeen', '1');
+    window.location.href = 'index.html';
+}
+
+skipIntro?.addEventListener('click', goToSite);
 
 function next() {
     current++;
@@ -29,12 +42,9 @@ function next() {
         setTimeout(() => {
             splash.style.transition = 'opacity 1s ease';
             splash.style.opacity = 0;
-            setTimeout(() => {
-                sessionStorage.setItem('splashSeen', '1');
-                window.location.href = 'index.html';
-            }, 1000);
+            setTimeout(goToSite, 1000);
         }, 1400);
     }
 }
 
-const interval = setInterval(next, 900);
+interval = setInterval(next, 900);
