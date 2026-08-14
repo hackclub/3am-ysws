@@ -48,3 +48,8 @@ function next() {
 }
 
 interval = setInterval(next, 900);
+
+const favicon = document.createElement('link');
+favicon.rel = 'icon';
+favicon.href = 'https://assets.hackclub.com/icon-rounded.svg';
+document.head.appendChild(favicon);
