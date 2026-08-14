@@ -22,7 +22,7 @@ function goToSite() {
     skipped = true;
     clearInterval(interval);
     sessionStorage.setItem('splashSeen', '1');
-    window.location.href = 'index.html';
+    window.location.href = '/home';
 }
 
 skipIntro?.addEventListener('click', goToSite);
