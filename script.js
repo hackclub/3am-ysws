@@ -43,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let node;
     while ((node = walker.nextNode())) nodes.push(node);
     nodes.forEach(textNode => {
-        if (textNode.parentElement && ['SCRIPT', 'STYLE'].includes(textNode.parentElement.tagName)) return;
-        textNode.nodeValue = textNode.nodeValue.replace(/[\u2012\u2013\u2014\u2212]/g, ' ').replace(/\s+-\s+/g, ' ');
+        const parent = textNode.parentElement;
+        if (parent && ['SCRIPT', 'STYLE'].includes(parent.tagName)) return;
+        textNode.nodeValue = textNode.nodeValue.replace(/[\-\u2012\u2013\u2014\u2212]/g, ' ');
     });
 });
