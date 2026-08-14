@@ -1,0 +1,63 @@
+@font-face {
+    font-family: "Augie";
+    src: url("./fonts/augiepixel.ttf") format("truetype");
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #101014;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.splash {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.splash-img {
+    width: 60vw;
+    height: 60vh;
+    object-fit: contain;
+    image-rendering: pixelated;
+    opacity: 1;
+    transition: opacity 0.4s ease;
+    position: absolute;
+}
+
+.splash-img-next {
+    opacity: 0;
+}
+
+.splash-label {
+    position: absolute;
+    top: calc(50% + 31vh);
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: "Augie", cursive;
+    font-size: 32px;
+    color: #f7e9a8;
+    text-shadow: 3px 3px 0 #6f6387;
+    letter-spacing: 6px;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.splash-credit {
+    font-size: 14px;
+    color: #81768f;
+    letter-spacing: 2px;
+    text-shadow: none;
+}
