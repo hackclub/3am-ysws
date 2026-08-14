@@ -1,4 +1,10 @@
 {
+  "redirects": [
+    { "source": "/index.html", "destination": "/home", "permanent": true },
+    { "source": "/dashboard.html", "destination": "/dash", "permanent": true },
+    { "source": "/shop.html", "destination": "/shop", "permanent": true },
+    { "source": "/splash.html", "destination": "/welcome", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/home", "destination": "/index.html" },
     { "source": "/dash", "destination": "/dashboard.html" },
