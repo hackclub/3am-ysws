@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/home", "destination": "/index.html" },
+    { "source": "/dash", "destination": "/dashboard.html" },
+    { "source": "/shop", "destination": "/shop.html" },
+    { "source": "/welcome", "destination": "/splash.html" }
+  ]
+}
