@@ -43,6 +43,13 @@
       "when": 1786823561448,
       "tag": "0005_brown_the_hood",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786824148393,
+      "tag": "0006_bouncy_quasar",
+      "breakpoints": true
     }
   ]
 }

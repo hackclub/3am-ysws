@@ -18,20 +18,31 @@ export async function balanceFor(userSub: string): Promise<number> {
   return row?.total ?? 0;
 }
 
-export async function creditApproval(project: Pick<Project, "id" | "userSub" | "approvedMinutes">) {
-  const delta = beansForMinutes(project.approvedMinutes);
-  if (delta <= 0) return { credited: 0 };
+export async function netForProject(projectId: string): Promise<number> {
+  const [row] = await getDb()
+    .select({ total: sql<number>`coalesce(sum(${beansLedger.delta}), 0)::int` })
+    .from(beansLedger)
+    .where(eq(beansLedger.projectId, projectId));
+  return row?.total ?? 0;
+}
 
-  const inserted = await getDb()
+export async function reconcileProjectBeans(
+  project: Pick<Project, "id" | "userSub" | "decision" | "approvedMinutes">,
+): Promise<{ delta: number }> {
+  const target = project.decision === "approved" ? beansForMinutes(project.approvedMinutes) : 0;
+  const net = await netForProject(project.id);
+  const delta = target - net;
+
+  if (delta === 0) return { delta: 0 };
+
+  await getDb()
     .insert(beansLedger)
     .values({
       userSub: project.userSub,
       delta,
-      reason: "approval",
+      reason: delta > 0 ? "approval" : "revert",
       projectId: project.id,
-    })
-    .onConflictDoNothing()
-    .returning({ id: beansLedger.id });
+    });
 
-  return { credited: inserted.length > 0 ? delta : 0 };
+  return { delta };
 }

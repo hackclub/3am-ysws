@@ -83,9 +83,7 @@ export const beansLedger = pgTable(
   },
   (table) => [
     index("beans_ledger_user_sub_idx").on(table.userSub),
-    uniqueIndex("beans_ledger_project_reason_idx")
-      .on(table.projectId, table.reason)
-      .where(sql`${table.projectId} is not null`),
+    index("beans_ledger_project_id_idx").on(table.projectId),
   ],
 );
 

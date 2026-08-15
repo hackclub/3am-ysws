@@ -1,5 +1,6 @@
 import { and, eq, isNotNull, isNull } from "drizzle-orm";
 
+import { reconcileProjectBeans } from "@/lib/beans";
 import { getDb } from "@/lib/db";
 import { projects } from "@/lib/db/schema";
 import type { Project } from "@/lib/db/schema";
@@ -40,7 +41,10 @@ export async function applyDecision(input: DecisionInput): Promise<ApplyResult> 
     )
     .returning();
 
-  if (updated) return { status: "applied", project: updated };
+  if (updated) {
+    await reconcileProjectBeans(updated);
+    return { status: "applied", project: updated };
+  }
 
   const [existing] = await db
     .select()
@@ -62,9 +66,12 @@ export async function clearDecision(projectId: string): Promise<ClearResult> {
     .update(projects)
     .set({ decision: null, approvedMinutes: null, noteToMaker: null, decidedAt: null })
     .where(and(eq(projects.id, projectId), isNotNull(projects.decision)))
-    .returning({ id: projects.id });
+    .returning();
 
-  if (updated) return { status: "cleared" };
+  if (updated) {
+    await reconcileProjectBeans(updated);
+    return { status: "cleared" };
+  }
 
   const [existing] = await db
     .select({ id: projects.id })
