@@ -1,0 +1,81 @@
+.balance {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 16px;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--lamp);
+  border: 2px dashed var(--muted);
+  border-radius: var(--wobble);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: var(--s4);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  padding: var(--s4);
+  background: var(--surface);
+  border: 2px solid var(--edge);
+  border-radius: var(--wobble);
+  box-shadow: var(--drop-quiet);
+}
+
+.short {
+  opacity: 0.55;
+}
+
+.thumb {
+  height: 110px;
+  border-radius: var(--wobble-sm);
+  object-fit: cover;
+  background: var(--raised);
+}
+
+.blank {
+  display: grid;
+  place-items: center;
+  height: 110px;
+  font-size: 26px;
+  border-radius: var(--wobble-sm);
+  background: linear-gradient(135deg, var(--raised), #241f30);
+}
+
+.name {
+  font-size: 16px;
+  color: var(--cream);
+}
+
+.description {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.price {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: auto;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--lamp);
+}
+
+.stock {
+  font-family: var(--data);
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.gone {
+  color: var(--bad);
+}
