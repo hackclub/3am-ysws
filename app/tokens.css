@@ -26,6 +26,19 @@
   --wordmark: var(--font-wordmark), "Comic Sans MS", cursive;
   --data: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
+  --t-hero: clamp(52px, 8vw, 92px);
+  --t-title: 34px;
+  --t-section: 26px;
+  --t-control: 17px;
+  --t-body: 17px;
+  --t-eyebrow: 13px;
+  --t-help: 13.5px;
+  --t-label: 13px;
+  --t-data: 12.5px;
+
+  --track-eyebrow: 1.8px;
+  --track-label: 1.4px;
+
   --s1: 4px;
   --s2: 8px;
   --s3: 12px;

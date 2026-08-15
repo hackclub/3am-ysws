@@ -1,4 +1,5 @@
 import "./tokens.css";
+import "./base.css";
 
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
