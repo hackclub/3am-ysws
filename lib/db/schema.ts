@@ -107,6 +107,48 @@ export const items = pgTable(
   ],
 );
 
+export const orderStatus = pgEnum("order_status", [
+  "placed",
+  "needs_address",
+  "packing",
+  "posted",
+  "cancelled",
+]);
+
+export const orders = pgTable(
+  "orders",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userSub: text("user_sub")
+      .notNull()
+      .references(() => users.sub),
+    itemId: uuid("item_id").references(() => items.id),
+
+    itemName: text("item_name").notNull(),
+    cost: integer("cost").notNull(),
+    status: orderStatus("status").notNull().default("placed"),
+
+    fullName: text("full_name"),
+    email: text("email"),
+    addressLine1: text("address_line1"),
+    addressLine2: text("address_line2"),
+    city: text("city"),
+    postcode: text("postcode"),
+    country: text("country"),
+
+    adminNote: text("admin_note"),
+    tracking: text("tracking"),
+
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    fulfilledAt: timestamp("fulfilled_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("orders_user_sub_idx").on(table.userSub),
+    index("orders_status_idx").on(table.status),
+    check("orders_cost_not_negative", sql`${table.cost} >= 0`),
+  ],
+);
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Project = typeof projects.$inferSelect;
@@ -117,3 +159,5 @@ export type BeansEntry = typeof beansLedger.$inferSelect;
 export type NewBeansEntry = typeof beansLedger.$inferInsert;
 export type Item = typeof items.$inferSelect;
 export type NewItem = typeof items.$inferInsert;
+export type Order = typeof orders.$inferSelect;
+export type NewOrder = typeof orders.$inferInsert;
