@@ -26,7 +26,7 @@ export function Field({ id, label, help, error, children }: FieldProps) {
 
   return (
     <div className={styles.field}>
-      <label className={styles.label} htmlFor={id}>
+      <label className={styles.label} htmlFor={id} id={`${id}-label`}>
         {label}
       </label>
       {control}
