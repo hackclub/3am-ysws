@@ -11,3 +11,15 @@
   gap: var(--s4);
   flex-wrap: wrap;
 }
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s4);
+}
+
+@media (max-width: 760px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+}

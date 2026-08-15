@@ -8,12 +8,14 @@ import { Banner } from "@/components/ui/Banner";
 import { ButtonLink } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Panel, PanelLabel } from "@/components/ui/Panel";
+import { StatCard } from "@/components/ui/StatCard";
 import { RowLink, RowText } from "@/components/ui/Row";
 import { ProjectStatusWord } from "@/components/ui/StatusWord";
 import { getCurrentUser } from "@/lib/auth/users";
 import { getDb } from "@/lib/db";
 import { projects } from "@/lib/db/schema";
-import { projectStatus } from "@/lib/projects/status";
+import { isOpen, projectStatus } from "@/lib/projects/status";
+import { BEANS_PER_HOUR } from "@/lib/rewards";
 
 import styles from "./page.module.css";
 
@@ -62,8 +64,33 @@ export default async function DashboardPage() {
     );
   }
 
+  const approved = mine.filter((project) => project.decision === "approved");
+  const approvedMinutes = approved.reduce(
+    (total, project) => total + (project.approvedMinutes ?? 0),
+    0,
+  );
+  const beans = approved.reduce(
+    (total, project) => total + Math.floor((project.approvedMinutes ?? 0) / 60) * BEANS_PER_HOUR,
+    0,
+  );
+  const waiting = mine.filter(isOpen);
+
   return (
     <AppShell title="tonight" action={<ButtonLink href="/dash/new">send in a project</ButtonLink>}>
+      <div className={styles.cards}>
+        <StatCard
+          accent
+          label="hours approved"
+          value={Math.floor(approvedMinutes / 60)}
+          sub={approved.length === 1 ? "across 1 project" : `across ${approved.length} projects`}
+        />
+        <StatCard label="beans" value={beans} sub={`${BEANS_PER_HOUR} per approved hour`} />
+        <StatCard
+          label="waiting on us"
+          value={waiting.length}
+          sub={waiting.length === 0 ? "nothing in the queue" : "we will message you on Slack"}
+        />
+      </div>
       <Panel>
         <div className={styles.head}>
           <PanelLabel>your projects</PanelLabel>
