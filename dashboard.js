@@ -43,17 +43,29 @@ function renderProjects(projects) {
 }
 
 async function loadDashboard() {
+    errorState.hidden = true;
     try {
-        const response = await fetch('/api/dashboard', { credentials: 'include', cache: 'no-store' });
-        const data = await response.json();
+        const response = await fetch(`/api/dashboard?ts=${Date.now()}`, {
+            credentials: 'include',
+            cache: 'no-store',
+            headers: { Accept: 'application/json' }
+        });
 
-        if (response.status === 401 || data.authenticated === false) {
+        const contentType = response.headers.get('content-type') || '';
+        const data = contentType.includes('application/json') ? await response.json() : null;
+
+        if (response.status === 401 || data?.authenticated === false) {
             showLoggedOut();
             return;
         }
+
         if (!response.ok) {
-            const code = data.errorCode ? ` (${data.errorCode})` : '';
-            throw new Error(`${data.error || 'Dashboard request failed'}${code}`);
+            const code = data?.errorCode || `HTTP_${response.status}`;
+            throw new Error(data?.error ? `${data.error} (${code})` : `Dashboard API failed (${code})`);
+        }
+
+        if (data?.error) {
+            throw new Error(data.errorCode ? `${data.error} (${data.errorCode})` : data.error);
         }
 
         const user = data.user || {};
@@ -61,7 +73,6 @@ async function loadDashboard() {
         document.getElementById('logout').hidden = false;
         loginCard.hidden = true;
         dashboardContent.hidden = false;
-        errorState.hidden = true;
 
         document.getElementById('approved-hours').textContent = `${Number(data.approvedHours || 0)}h`;
         document.getElementById('beans').textContent = Number(data.beans || 0);
@@ -69,10 +80,10 @@ async function loadDashboard() {
         renderProjects(data.projects || []);
         setupNote.hidden = !data.setupRequired;
     } catch (error) {
-        console.error(error);
+        console.error('Dashboard load failed:', error);
+        dashboardContent.hidden = true;
         errorState.hidden = false;
-        const message = errorState.querySelector('[data-error-message]') || errorState.querySelector('p');
-        if (message) message.textContent = `Something went wrong while loading your dashboard. ${error.message}`;
+        errorState.textContent = `Something went wrong while loading your dashboard. ${error.message || 'Unknown error.'}`;
     }
 }
 
