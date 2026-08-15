@@ -50,6 +50,16 @@ function field(record, patterns) {
   return entry ? entry[1] : null;
 }
 
+function chooseShopRecord(records) {
+  if (!records.length) return null;
+  return records.reduce((best, record) => {
+    if (!best) return record;
+    const bestBeans = numberValue(field(best, [/^coffee\s*beans$/i]));
+    const currentBeans = numberValue(field(record, [/^coffee\s*beans$/i]));
+    return currentBeans > bestBeans ? record : best;
+  }, null);
+}
+
 async function airtable(path) {
   const response = await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${path}`, {
     headers: { Authorization: `Bearer ${process.env.AIRTABLE_PAT}`, Accept: 'application/json' }
@@ -92,7 +102,7 @@ module.exports = async (req, res) => {
     const filter = formulas.length === 1 ? formulas[0] : `OR(${formulas.join(',')})`;
     const params = new URLSearchParams({ pageSize: '100', filterByFormula: filter });
     const data = await airtable(`${encodeURIComponent(shopTable.id)}?${params.toString()}`);
-    const record = data.records?.[0];
+    const record = chooseShopRecord(data.records || []);
     const beans = record ? numberValue(field(record, [/^coffee\s*beans$/i])) : 0;
     const text = escapeXml(Number.isInteger(beans) ? String(beans) : String(Number(beans.toFixed(2))));
 
