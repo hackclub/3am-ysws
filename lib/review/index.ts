@@ -1,3 +1,4 @@
+import { ariBackend } from "./ari";
 import { localBackend } from "./local";
 import type { ReviewBackend } from "./types";
 
@@ -8,5 +9,5 @@ export function reviewIsExternal(): boolean {
 }
 
 export function getReviewBackend(): ReviewBackend {
-  return localBackend;
+  return reviewIsExternal() ? ariBackend : localBackend;
 }
