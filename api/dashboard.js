@@ -43,7 +43,8 @@ function numberValue(value) {
   return 0;
 }
 
-function isApproved(record) {
+function isApproved(record, tableName = '') {
+  if (/shop\s*data/i.test(tableName)) return true;
   const value = field(record, [/approved/i, /status/i, /decision/i]);
   if (value === true) return true;
   if (typeof value === 'string') return /approved|accept|yes|complete/i.test(value);
@@ -120,24 +121,39 @@ module.exports = async (req, res) => {
       }
     }
 
+    const hasShopDataMatch = matched.some(({ table }) => /shop\s*data/i.test(table));
+
     const projects = matched.map(({ table, record }) => {
-      const hours = numberValue(field(record, [/hours?\s*(spent|coded|worked)?/i, /time/i]));
+      const hours = numberValue(field(record, [
+        /hours?\s*approved/i,
+        /approved\s*hours?/i,
+        /hours?\s*(spent|coded|worked)/i,
+        /time/i
+      ]));
       const name = field(record, [/project\s*name/i, /^project$/i, /project/i, /title/i, /name/i]);
       const statusValue = field(record, [/status/i, /decision/i, /approved/i]);
-      const approved = isApproved(record);
+      const approved = hasShopDataMatch || isApproved(record, table);
       const github = field(record, [/github\s*(username|user|handle)/i, /github/i]);
-      const codeUrl = field(record, [/code\s*url/i, /github\s*url/i, /repository/i, /repo/i]);
+      const codeUrl = field(record, [
+        /code\s*url/i,
+        /github\s*url/i,
+        /repository/i,
+        /repo/i,
+        /github/i,
+        /url/i,
+        /link/i
+      ]);
       return {
         id: record.id,
         table,
         name: typeof name === 'string' ? name : `Project ${record.id.slice(-5)}`,
         hours,
         approved,
-        status: typeof statusValue === 'string' ? statusValue : approved ? 'approved' : 'submitted',
+        status: approved ? 'approved' : (typeof statusValue === 'string' ? statusValue : 'submitted'),
         githubUsername: typeof github === 'string' ? github.replace(/^@/, '') : null,
-        codeUrl: typeof codeUrl === 'string' ? codeUrl : null
+        codeUrl: typeof codeUrl === 'string' && /^https?:\/\//i.test(codeUrl) ? codeUrl : null
       };
-    }).filter(project => project.name && (project.hours || project.approved));
+    }).filter(project => project.name);
 
     const approvedHours = projects.filter(project => project.approved).reduce((sum, project) => sum + project.hours, 0);
 
