@@ -2,15 +2,16 @@ import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { readDeliveryHeaders, verifyDelivery } from "@/lib/ari/delivery";
+import { approvedMinutes, decisionFromEvent, noteToMaker } from "@/lib/ari/inbound";
+import type { AriDelivery } from "@/lib/ari/inbound";
 import { ariWebhookSecret } from "@/lib/ari/signature";
 import { getDb } from "@/lib/db";
 import { projects, webhookEvents } from "@/lib/db/schema";
+import { applyDecision } from "@/lib/review/decisions";
 
 export const dynamic = "force-dynamic";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-type Delivery = { event?: string; external_id?: string };
 
 export async function POST(request: Request) {
   const raw = await request.text();
@@ -29,9 +30,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: check.reason }, { status: 401 });
   }
 
-  let body: Delivery;
+  let body: AriDelivery;
   try {
-    body = JSON.parse(raw) as Delivery;
+    body = JSON.parse(raw) as AriDelivery;
   } catch {
     console.error(`[ari] delivery ${check.deliveryId} was not json`);
     return NextResponse.json({ error: "unreadable" }, { status: 400 });
@@ -67,6 +68,24 @@ export async function POST(request: Request) {
 
   if (!recorded) {
     return NextResponse.json({ ok: true, duplicate: true });
+  }
+
+  const decision = decisionFromEvent(body);
+  if (decision && projectId) {
+    const result = await applyDecision({
+      projectId,
+      decision,
+      approvedMinutes: approvedMinutes(body),
+      noteToMaker: noteToMaker(body),
+    });
+
+    if (result.status !== "applied") {
+      console.error(
+        `[ari] delivery ${check.deliveryId} could not be applied to ${projectId}: ${result.status}`,
+      );
+    }
+
+    return NextResponse.json({ ok: true, applied: result.status === "applied" });
   }
 
   return NextResponse.json({ ok: true });
