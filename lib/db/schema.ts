@@ -15,6 +15,8 @@ export const users = pgTable("users", {
   email: text("email").notNull(),
   name: text("name").notNull(),
   slackId: text("slack_id").notNull().unique(),
+  hackatimeId: text("hackatime_id"),
+  hackatimeToken: text("hackatime_token"),
 });
 
 export const decision = pgEnum("decision", ["approved", "changes", "rejected", "withdrawn"]);
