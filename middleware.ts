@@ -12,4 +12,4 @@ export async function middleware(request: NextRequest) {
   return NextResponse.redirect(login);
 }
 
-export const config = { matcher: ["/dash/:path*"] };
+export const config = { matcher: ["/dash/:path*", "/admin/:path*"] };

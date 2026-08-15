@@ -4,15 +4,22 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { APP_NAV, isActive } from "@/lib/nav";
+import type { NavItem } from "@/lib/nav";
 
 import styles from "./NavLinks.module.css";
 
-export function NavLinks({ variant }: { variant: "side" | "bar" }) {
+export function NavLinks({
+  variant,
+  items = APP_NAV,
+}: {
+  variant: "side" | "bar";
+  items?: NavItem[];
+}) {
   const pathname = usePathname() ?? "";
 
   return (
     <nav className={styles[variant]} aria-label={variant === "side" ? "sections" : undefined}>
-      {APP_NAV.map((item) => {
+      {items.map((item) => {
         const active = isActive(pathname, item.href);
         return (
           <Link

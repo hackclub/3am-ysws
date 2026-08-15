@@ -8,6 +8,11 @@ export const APP_NAV: NavItem[] = [
   { href: "/dash/settings", label: "settings" },
 ];
 
+export const ADMIN_NAV: NavItem[] = [
+  { href: "/admin", label: "overview" },
+  { href: "/admin/ships", label: "submissions" },
+];
+
 export const SITE_NAV: NavItem[] = [
   { href: "/#how-it-works", label: "how it works" },
   { href: "/#rewards", label: "rewards" },
@@ -15,6 +20,6 @@ export const SITE_NAV: NavItem[] = [
 ];
 
 export function isActive(pathname: string, href: string) {
-  if (href === "/dash") return pathname === "/dash";
+  if (href === "/dash" || href === "/admin") return pathname === href;
   return pathname === href || pathname.startsWith(`${href}/`);
 }
