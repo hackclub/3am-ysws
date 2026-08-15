@@ -13,8 +13,10 @@ import { getCurrentUser } from "@/lib/auth/users";
 import { getDb } from "@/lib/db";
 import { projects } from "@/lib/db/schema";
 import type { Project } from "@/lib/db/schema";
+import { livePhaseStatus } from "@/lib/ari/status";
 import { isOpen, projectStatus } from "@/lib/projects/status";
 import { getPickerProjects } from "@/lib/hackatime/projects";
+import { reviewIsExternal } from "@/lib/review";
 import { BEANS_PER_HOUR } from "@/lib/rewards";
 
 import { ResendForm } from "./ResendForm";
@@ -79,7 +81,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
 
   if (!project) notFound();
 
-  const status = projectStatus(project);
+  const stored = projectStatus(project);
+  const live = isOpen(project) && reviewIsExternal() ? await livePhaseStatus(project.id) : null;
+  const status = live ?? stored;
   const hours = Math.floor((project.approvedMinutes ?? 0) / 60);
   const resendable =
     project.decision === "changes" ||
