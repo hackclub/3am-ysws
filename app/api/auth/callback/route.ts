@@ -4,6 +4,7 @@ import type { NextRequest } from "next/server";
 import { exchangeCode } from "@/lib/auth/hca";
 import { verifyIdToken } from "@/lib/auth/id-token";
 import { OAUTH_STATE_COOKIE, parseOAuthState } from "@/lib/auth/oauth-state";
+import { setSession } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
@@ -47,12 +48,14 @@ export async function GET(request: NextRequest) {
     return failed(request, "no_identity");
   }
 
+  let sub: string;
   try {
-    await verifyIdToken(idToken);
+    sub = (await verifyIdToken(idToken)).sub;
   } catch (error) {
     console.error("[auth] id_token verification failed", error);
     return failed(request, "identity");
   }
 
-  return clearState(NextResponse.redirect(new URL(returnTo ?? "/dash", request.nextUrl.origin)));
+  const response = NextResponse.redirect(new URL(returnTo ?? "/dash", request.nextUrl.origin));
+  return clearState(await setSession(response, sub));
 }
