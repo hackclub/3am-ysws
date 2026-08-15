@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 
 import { AppShell } from "@/components/app/AppShell";
+import { Banner } from "@/components/ui/Banner";
 import { ButtonLink } from "@/components/ui/Button";
 import { Panel, PanelLabel } from "@/components/ui/Panel";
 import { ProjectStatusWord } from "@/components/ui/StatusWord";
@@ -13,7 +14,10 @@ import { getDb } from "@/lib/db";
 import { projects } from "@/lib/db/schema";
 import type { Project } from "@/lib/db/schema";
 import { projectStatus } from "@/lib/projects/status";
+import { getPickerProjects } from "@/lib/hackatime/projects";
 import { BEANS_PER_HOUR } from "@/lib/rewards";
+
+import { ResendForm } from "./ResendForm";
 
 import styles from "./page.module.css";
 
@@ -76,9 +80,24 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
 
   const status = projectStatus(project);
   const hours = Math.floor((project.approvedMinutes ?? 0) / 60);
+  const resendable =
+    project.decision === "changes" ||
+    project.decision === "rejected" ||
+    project.decision === "withdrawn";
+  const options = resendable ? ((await getPickerProjects(user)) ?? []) : [];
 
   return (
     <AppShell title={project.title}>
+      {project.decision === "changes" ? (
+        <Banner tone="warn" title="the reviewer asked for changes">
+          {project.noteToMaker ?? "Have another look and send it back."}
+        </Banner>
+      ) : null}
+      {project.decision === "rejected" ? (
+        <Banner tone="bad" title="not approved">
+          {project.noteToMaker ?? "You can fix it and send it back."}
+        </Banner>
+      ) : null}
       <div className={styles.split}>
         <Panel>
           <div className={styles.thumb}>
@@ -132,6 +151,21 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
           </Panel>
         </div>
       </div>
+
+      {resendable ? (
+        <ResendForm
+          project={{
+            id: project.id,
+            title: project.title,
+            description: project.description ?? "",
+            repoUrl: project.repoUrl ?? "",
+            demoUrl: project.demoUrl ?? "",
+            thumbnailUrl: project.thumbnailUrl ?? "",
+            hackatimeProjects: project.hackatimeProjects,
+          }}
+          options={options}
+        />
+      ) : null}
     </AppShell>
   );
 }
