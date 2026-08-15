@@ -1,0 +1,42 @@
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.step {
+  display: flex;
+  gap: var(--s5);
+  padding: var(--s4) 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.step:last-child {
+  border-bottom: none;
+}
+
+.number {
+  flex: none;
+  padding-top: 6px;
+  font-family: var(--data);
+  font-size: 13px;
+  color: var(--edge);
+  letter-spacing: 1px;
+}
+
+.title {
+  font-size: 21px;
+  color: var(--cream);
+  margin-bottom: 4px;
+}
+
+.body {
+  font-size: 16px;
+  color: var(--soft);
+}
+
+.note {
+  display: block;
+  margin-top: 4px;
+  font-size: 15px;
+  color: var(--blush);
+}
