@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { Notice } from "@/components/site/Notice";
-import { Banner } from "@/components/ui/Banner";
 import { ButtonLink } from "@/components/ui/Button";
 import { checkEligibility } from "@/lib/auth/eligibility";
 import { hcaIssuer } from "@/lib/auth/hca";

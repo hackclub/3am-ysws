@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useId, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 
 import { Banner } from "@/components/ui/Banner";
 import { Button } from "@/components/ui/Button";
@@ -26,6 +26,35 @@ export function SubmitForm({ projects }: { projects: PickerProject[] }) {
   const [picked, setPicked] = useState<string[]>([]);
   const [problem, setProblem] = useState<Problem | null>(null);
   const [sending, setSending] = useState(false);
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const draftId = useRef<string | null>(null);
+  const saving = useRef(false);
+
+  const saveDraft = useCallback(async () => {
+    if (!title.trim() || saving.current) return;
+    saving.current = true;
+    try {
+      const response = await fetch("/api/projects/draft", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: draftId.current,
+          title,
+          description,
+          repoUrl,
+          demoUrl,
+          thumbnailUrl,
+          hackatimeProjects: picked,
+        }),
+      });
+      if (!response.ok) return;
+      const body = (await response.json()) as { id?: string };
+      if (body.id) draftId.current = body.id;
+      setSavedAt(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+    } finally {
+      saving.current = false;
+    }
+  }, [title, description, repoUrl, demoUrl, thumbnailUrl, picked]);
 
   const errorFor = (field: string) => (problem?.field === field ? problem.message : undefined);
 
@@ -37,6 +66,7 @@ export function SubmitForm({ projects }: { projects: PickerProject[] }) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        id: draftId.current,
         title,
         description,
         repoUrl,
@@ -71,7 +101,7 @@ export function SubmitForm({ projects }: { projects: PickerProject[] }) {
   return (
     <Panel>
       <PanelLabel>your project</PanelLabel>
-      <div className={styles.form}>
+      <div className={styles.form} onBlur={saveDraft}>
         {problem && !problem.field ? <Banner tone="bad">{problem.message}</Banner> : null}
 
         <div className={styles.row}>
@@ -142,6 +172,7 @@ export function SubmitForm({ projects }: { projects: PickerProject[] }) {
           <Button onClick={send} loading={sending} loadingLabel="sending…">
             send it in
           </Button>
+          {savedAt ? <span className={styles.saved}>draft saved at {savedAt}</span> : null}
         </div>
       </div>
     </Panel>

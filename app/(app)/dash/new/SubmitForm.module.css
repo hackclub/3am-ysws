@@ -16,3 +16,8 @@
   align-items: center;
   gap: var(--s3);
 }
+
+.saved {
+  font-size: 13.5px;
+  color: var(--ok);
+}
