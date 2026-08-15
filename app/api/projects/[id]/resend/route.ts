@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { validateSubmission } from "@/lib/ari/payload";
+import { repoIsReachable } from "@/lib/ari/repo";
 import { getCurrentUser } from "@/lib/auth/users";
 import { getDb } from "@/lib/db";
 import { projects } from "@/lib/db/schema";
@@ -74,6 +75,17 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   if (problem) {
     return NextResponse.json(
       { error: "invalid", field: problem.field, message: problem.message },
+      { status: 422 },
+    );
+  }
+
+  if ((await repoIsReachable(submission.repoUrl)) === false) {
+    return NextResponse.json(
+      {
+        error: "invalid",
+        field: "repo_url",
+        message: "We cannot see that repository. Is it public, and is the link right?",
+      },
       { status: 422 },
     );
   }
