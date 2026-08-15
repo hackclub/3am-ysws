@@ -121,7 +121,10 @@ module.exports = async (req, res) => {
       }
     }
 
-    const hasShopDataMatch = matched.some(({ table }) => /shop\s*data/i.test(table));
+    const shopDataMatch = matched.find(({ table }) => /shop\s*data/i.test(table));
+    const shopDataRecord = shopDataMatch?.record || null;
+    const shopBeans = shopDataRecord ? numberValue(field(shopDataRecord, [/^coffee\s*beans$/i])) : 0;
+    const shopBeansSpent = shopDataRecord ? numberValue(field(shopDataRecord, [/coffee\s*beans\s*spent/i])) : 0;
 
     const projects = matched.map(({ table, record }) => {
       const hours = numberValue(field(record, [
@@ -132,9 +135,10 @@ module.exports = async (req, res) => {
       ]));
       const name = field(record, [/project\s*name/i, /^project$/i, /project/i, /title/i, /name/i]);
       const statusValue = field(record, [/status/i, /decision/i, /approved/i]);
-      const approved = hasShopDataMatch || isApproved(record, table);
+      const approved = /shop\s*data/i.test(table) || isApproved(record, table);
       const github = field(record, [/github\s*(username|user|handle)/i, /github/i]);
       const codeUrl = field(record, [
+        /ysws\s*project\s*submission/i,
         /code\s*url/i,
         /github\s*url/i,
         /repository/i,
@@ -155,7 +159,9 @@ module.exports = async (req, res) => {
       };
     }).filter(project => project.name);
 
-    const approvedHours = projects.filter(project => project.approved).reduce((sum, project) => sum + project.hours, 0);
+    const approvedHours = shopDataRecord
+      ? numberValue(field(shopDataRecord, [/^hours\s*approved$/i, /hours?\s*approved/i]))
+      : projects.filter(project => project.approved).reduce((sum, project) => sum + project.hours, 0);
 
     res.setHeader('Cache-Control', 'private, no-store');
     return res.status(200).json({
@@ -171,7 +177,8 @@ module.exports = async (req, res) => {
       },
       projects,
       approvedHours,
-      beans: Math.floor(approvedHours * 5)
+      beans: shopDataRecord ? shopBeans : Math.floor(approvedHours * 5),
+      beansSpent: shopDataRecord ? shopBeansSpent : 0
     });
   } catch (error) {
     console.error('Dashboard data error:', error);
