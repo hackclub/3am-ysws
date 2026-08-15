@@ -1,6 +1,7 @@
 import {
   index,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   text,
@@ -47,7 +48,21 @@ export const projects = pgTable(
   ],
 );
 
+export const webhookEvents = pgTable(
+  "webhook_events",
+  {
+    deliveryId: text("delivery_id").primaryKey(),
+    projectId: uuid("project_id").references(() => projects.id, { onDelete: "set null" }),
+    event: text("event").notNull(),
+    payload: jsonb("payload").$type<Record<string, unknown>>().notNull(),
+    receivedAt: timestamp("received_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("webhook_events_project_id_idx").on(table.projectId)],
+);
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;
+export type WebhookEvent = typeof webhookEvents.$inferSelect;
+export type NewWebhookEvent = typeof webhookEvents.$inferInsert;

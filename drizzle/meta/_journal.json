@@ -15,6 +15,13 @@
       "when": 1786809435606,
       "tag": "0001_cold_nighthawk",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786809570497,
+      "tag": "0002_unusual_maria_hill",
+      "breakpoints": true
     }
   ]
 }
