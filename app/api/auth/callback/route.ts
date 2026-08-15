@@ -5,6 +5,7 @@ import { exchangeCode } from "@/lib/auth/hca";
 import { verifyIdToken } from "@/lib/auth/id-token";
 import { OAUTH_STATE_COOKIE, parseOAuthState } from "@/lib/auth/oauth-state";
 import { setSession } from "@/lib/auth/session";
+import { MissingIdentityError, upsertUser } from "@/lib/auth/users";
 
 export const dynamic = "force-dynamic";
 
@@ -50,9 +51,13 @@ export async function GET(request: NextRequest) {
 
   let sub: string;
   try {
-    sub = (await verifyIdToken(idToken)).sub;
+    const claims = await verifyIdToken(idToken);
+    sub = (await upsertUser(claims)).sub;
   } catch (error) {
-    console.error("[auth] id_token verification failed", error);
+    if (error instanceof MissingIdentityError) {
+      return failed(request, `missing_${error.field}`);
+    }
+    console.error("[auth] could not establish identity", error);
     return failed(request, "identity");
   }
 
