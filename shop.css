@@ -220,3 +220,22 @@
     font-size: 16px;
     color: #81768f;
 }
+
+/* Coffee balance is intentionally hidden until the live balance connection is ready. */
+.beans-count {
+    font-size: 0;
+}
+
+.beans-count::after {
+    content: "coming soon";
+    font-size: 32px;
+}
+
+.beans-sub {
+    font-size: 0;
+}
+
+.beans-sub::after {
+    content: "coffee bean balance is coming soon";
+    font-size: 16px;
+}
