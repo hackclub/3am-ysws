@@ -1,0 +1,35 @@
+.banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s3);
+  padding: 14px 16px;
+  border: 1px solid currentColor;
+  border-radius: var(--wobble-sm);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.info {
+  color: var(--info);
+}
+
+.ok {
+  color: var(--ok);
+}
+
+.warn {
+  color: var(--warn);
+}
+
+.bad {
+  color: var(--bad);
+}
+
+.title {
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+
+.body {
+  font-size: 15px;
+  color: var(--soft);
+}

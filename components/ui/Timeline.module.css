@@ -1,0 +1,69 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  padding-left: var(--s2);
+}
+
+.step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: var(--s4);
+  padding-bottom: var(--s5);
+}
+
+.step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 20px;
+  bottom: 0;
+  width: 2px;
+  background: var(--rule);
+}
+
+.mark {
+  position: relative;
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--edge);
+  background: var(--night);
+}
+
+.done {
+  border-color: var(--sv, var(--ok));
+  background: color-mix(in srgb, var(--sv, var(--ok)) 20%, transparent);
+}
+
+.now {
+  border-color: var(--info);
+  background: color-mix(in srgb, var(--info) 20%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--info) 12%, transparent);
+}
+
+.title {
+  display: block;
+  font-size: 16px;
+  color: var(--cream);
+}
+
+.pending .title {
+  color: var(--muted);
+}
+
+.meta {
+  display: block;
+  font-family: var(--data);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.warnMark {
+  --sv: var(--warn);
+}
+
+.badMark {
+  --sv: var(--bad);
+}

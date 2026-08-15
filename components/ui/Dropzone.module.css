@@ -1,0 +1,38 @@
+.zone {
+  display: block;
+  width: 100%;
+  padding: var(--s6) var(--s5);
+  text-align: center;
+  color: var(--soft);
+  background: var(--night);
+  border: 2px dashed var(--muted);
+  border-radius: var(--wobble);
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.zone:hover,
+.over {
+  border-color: var(--lamp);
+  color: var(--lamp);
+}
+
+.title {
+  display: block;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--cream);
+}
+
+.help {
+  display: block;
+  margin-top: 4px;
+  font-size: var(--t-help);
+  color: var(--muted);
+}
+
+.input {
+  display: none;
+}
