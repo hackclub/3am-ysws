@@ -34,14 +34,14 @@
                     <div class="beans-jar">
                         <img src="assets/beans.png" alt="beans" class="beans-emoji">
                         <div class="beans-text">
-                            <span class="beans-count">120</span>
+                            <span class="beans-count">0</span>
                             <span class="beans-word">beans</span>
                         </div>
                     </div>
                     <div class="beans-divider"></div>
                     <div class="beans-info">
                         <span class="beans-tagline">your balance ✦</span>
-                        <span class="beans-sub">1 hour coded = 5 beans earned</span>
+                        <span class="beans-sub">coffee beans from your Shop Data balance</span>
                     </div>
                 </div>
 
@@ -386,5 +386,23 @@
                 </div>
             </main>
         </div>
+        <script>
+        (async () => {
+            try {
+                const response = await fetch(`/api/dashboard?ts=${Date.now()}`, {
+                    credentials: 'include',
+                    cache: 'no-store',
+                    headers: { Accept: 'application/json' }
+                });
+                const data = await response.json();
+                if (response.ok && data.authenticated) {
+                    const balance = document.querySelector('.beans-count');
+                    if (balance) balance.textContent = Number(data.beans || 0).toLocaleString();
+                }
+            } catch (error) {
+                console.error('Shop balance load failed:', error);
+            }
+        })();
+        </script>
     </body>
 </html>
