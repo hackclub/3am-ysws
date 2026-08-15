@@ -5,7 +5,7 @@ import { useCallback, useId, useRef, useState } from "react";
 
 import { Banner } from "@/components/ui/Banner";
 import { Button } from "@/components/ui/Button";
-import { ChipPicker } from "@/components/ui/ChipPicker";
+import { HackatimePicker } from "@/components/ui/HackatimePicker";
 import { Field, Input, Textarea } from "@/components/ui/Field";
 import { Panel, PanelLabel } from "@/components/ui/Panel";
 import type { PickerProject } from "@/lib/hackatime/projects";
@@ -137,16 +137,7 @@ export function SubmitForm({ projects }: { projects: PickerProject[] }) {
           help="Pick the ones you worked on for this."
           error={errorFor("hackatime_projects")}
         >
-          <ChipPicker
-            options={projects.map((project) => ({
-              key: project.key,
-              label: project.key,
-              hint: project.hours,
-            }))}
-            value={picked}
-            onChange={setPicked}
-            empty="Connect Hackatime and your projects will show up here."
-          />
+          <HackatimePicker options={projects} value={picked} onChange={setPicked} />
         </Field>
 
         <div className={styles.row}>

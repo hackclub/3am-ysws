@@ -5,7 +5,7 @@ import { useId, useState } from "react";
 
 import { Banner } from "@/components/ui/Banner";
 import { Button } from "@/components/ui/Button";
-import { ChipPicker } from "@/components/ui/ChipPicker";
+import { HackatimePicker } from "@/components/ui/HackatimePicker";
 import { Field, Input, Textarea } from "@/components/ui/Field";
 import { Panel, PanelLabel } from "@/components/ui/Panel";
 import type { PickerProject } from "@/lib/hackatime/projects";
@@ -117,16 +117,7 @@ export function ResendForm({
           label="hackatime projects"
           error={errorFor("hackatime_projects")}
         >
-          <ChipPicker
-            options={options.map((option) => ({
-              key: option.key,
-              label: option.key,
-              hint: option.hours,
-            }))}
-            value={picked}
-            onChange={setPicked}
-            empty="Connect Hackatime to pick projects."
-          />
+          <HackatimePicker options={options} value={picked} onChange={setPicked} />
         </Field>
 
         <div className={styles.actions}>

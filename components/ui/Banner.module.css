@@ -25,11 +25,14 @@
 }
 
 .title {
+  display: block;
   font-size: 15px;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 
 .body {
+  display: block;
   font-size: 15px;
+  line-height: 1.55;
   color: var(--soft);
 }
