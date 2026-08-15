@@ -1,5 +1,7 @@
 import {
   bigserial,
+  boolean,
+  check,
   index,
   integer,
   jsonb,
@@ -87,6 +89,26 @@ export const beansLedger = pgTable(
   ],
 );
 
+export const items = pgTable(
+  "items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: text("name").notNull(),
+    description: text("description"),
+    cost: integer("cost").notNull(),
+    imageUrl: text("image_url"),
+    stock: integer("stock"),
+    hidden: boolean("hidden").notNull().default(false),
+    position: integer("position").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("items_position_idx").on(table.position),
+    check("items_cost_positive", sql`${table.cost} > 0`),
+    check("items_stock_not_negative", sql`${table.stock} is null or ${table.stock} >= 0`),
+  ],
+);
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Project = typeof projects.$inferSelect;
@@ -95,3 +117,5 @@ export type WebhookEvent = typeof webhookEvents.$inferSelect;
 export type NewWebhookEvent = typeof webhookEvents.$inferInsert;
 export type BeansEntry = typeof beansLedger.$inferSelect;
 export type NewBeansEntry = typeof beansLedger.$inferInsert;
+export type Item = typeof items.$inferSelect;
+export type NewItem = typeof items.$inferInsert;
