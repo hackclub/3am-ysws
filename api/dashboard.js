@@ -45,6 +45,10 @@ function numberValue(value) {
   return 0;
 }
 
+function normalizeEmail(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
 function isUnified(record) {
   const entries = Object.entries(record.fields || {});
   const checkbox = entries.find(([name]) => /^submit\s*to\s*unified$/i.test(name));
@@ -68,6 +72,15 @@ async function airtable(path, options = {}) {
   return response.json();
 }
 
+function matchesIdentity(record, email, slackId) {
+  const entries = Object.entries(record.fields || {});
+  return entries.some(([name, value]) => {
+    if (/email|e-mail/i.test(name)) return normalizeEmail(value) === email;
+    if (/slack/i.test(name)) return String(value || '').trim() === slackId;
+    return false;
+  });
+}
+
 module.exports = async (req, res) => {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
   const session = getSession(req);
@@ -81,7 +94,7 @@ module.exports = async (req, res) => {
 
     const hca = await hcaResponse.json();
     const identity = hca.identity || {};
-    const email = (identity.primary_email || '').trim().toLowerCase();
+    const email = normalizeEmail(identity.primary_email);
     const slackId = (identity.slack_id || '').trim();
 
     const schema = await fetch(`https://api.airtable.com/v0/meta/bases/${process.env.AIRTABLE_BASE_ID}/tables`, {
@@ -98,12 +111,35 @@ module.exports = async (req, res) => {
     }
 
     const { tables = [] } = await schema.json();
+
+    // Shop Data is the source of truth for the user's current bean balance.
+    // Read that table directly instead of relying on the generic candidate-table matcher.
+    const shopDataTable = tables.find(table => /shop\s*data/i.test(table.name));
+    let shopDataRecord = null;
+    let shopBeans = 0;
+    let shopBeansSpent = 0;
+
+    if (shopDataTable) {
+      try {
+        const shopData = await airtable(`${encodeURIComponent(shopDataTable.id)}?maxRecords=100`);
+        shopDataRecord = (shopData.records || []).find(record => matchesIdentity(record, email, slackId)) || null;
+        if (shopDataRecord) {
+          shopBeans = numberValue(field(shopDataRecord, [/^coffee\s*beans$/i, /coffee\s*beans/i]));
+          shopBeansSpent = numberValue(field(shopDataRecord, [/^coffee\s*beans\s*spent$/i, /coffee\s*beans\s*spent/i]));
+        }
+      } catch (error) {
+        console.error('Unable to read Shop Data:', error.message);
+      }
+    }
+
     const candidateTables = tables.filter(table =>
       table.fields?.some(field => /email|e-mail|slack/i.test(field.name))
     ).slice(0, 15);
 
     const matched = [];
     for (const table of candidateTables) {
+      if (shopDataTable && table.id === shopDataTable.id) continue;
+
       const identityFields = table.fields.filter(field => /email|e-mail|slack/i.test(field.name)).map(field => field.name);
       const formulaParts = [];
       for (const name of identityFields) {
@@ -125,11 +161,6 @@ module.exports = async (req, res) => {
       }
     }
 
-    const shopDataMatches = matched.filter(({ table }) => /shop\s*data/i.test(table));
-    const shopDataRecord = shopDataMatches[0]?.record || null;
-    const shopBeans = shopDataRecord ? numberValue(field(shopDataRecord, [/^coffee\s*beans$/i])) : 0;
-    const shopBeansSpent = shopDataRecord ? numberValue(field(shopDataRecord, [/^coffee\s*beans\s*spent$/i])) : 0;
-
     const projects = matched.map(({ table, record }) => {
       const hours = numberValue(field(record, [
         /^hours\s*approved$/i,
@@ -141,8 +172,6 @@ module.exports = async (req, res) => {
       const name = field(record, [/project\s*name/i, /^project$/i, /project/i, /title/i, /name/i]);
       const statusValue = field(record, [/status/i, /decision/i, /approved/i]);
       const unified = isUnified(record);
-      const isShopData = /shop\s*data/i.test(table);
-      const approved = unified;
       const github = field(record, [/github\s*(username|user|handle)/i, /github/i]);
       const codeUrl = field(record, [
         /ysws\s*project\s*submission/i,
@@ -159,12 +188,11 @@ module.exports = async (req, res) => {
         table,
         name: typeof name === 'string' ? name : `Project ${record.id.slice(-5)}`,
         hours,
-        approved,
+        approved: unified,
         unified,
-        status: approved ? 'approved' : (typeof statusValue === 'string' ? statusValue : 'submitted'),
+        status: unified ? 'approved' : (typeof statusValue === 'string' ? statusValue : 'submitted'),
         githubUsername: typeof github === 'string' ? github.replace(/^@/, '') : null,
-        codeUrl: typeof codeUrl === 'string' && /^https?:\/\//i.test(codeUrl) ? codeUrl : null,
-        isShopData
+        codeUrl: typeof codeUrl === 'string' && /^https?:\/\//i.test(codeUrl) ? codeUrl : null
       };
     }).filter(project => project.unified);
 
