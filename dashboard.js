@@ -26,7 +26,9 @@ function renderProjects(projects) {
     for (const project of projects) {
         const item = document.createElement('article');
         item.className = 'project-item';
-        const status = project.approved ? 'approved ✓' : escapeHtml(project.status || 'submitted');
+        const state = project.status || 'submitted';
+        const status = project.approved ? 'approved ✓' : escapeHtml(state);
+        const statusClass = project.approved ? 'approved' : state === 'rejected' ? 'rejected' : state === 'pending' ? 'pending' : 'submitted';
         const link = project.codeUrl ? `<a href="${escapeHtml(project.codeUrl)}" target="_blank" rel="noopener noreferrer">code →</a>` : '';
         item.innerHTML = `
             <div class="project-main">
@@ -35,7 +37,7 @@ function renderProjects(projects) {
             </div>
             <div class="project-right">
                 <span class="project-hours">${Number(project.hours || 0)}h</span>
-                <span class="project-tag ${project.approved ? 'approved' : 'pending'}">${status}</span>
+                <span class="project-tag ${statusClass}">${status}</span>
                 ${link}
             </div>`;
         projectList.appendChild(item);
@@ -75,7 +77,7 @@ async function loadDashboard() {
         dashboardContent.hidden = false;
 
         document.getElementById('approved-hours').textContent = `${Number(data.approvedHours || 0)}h`;
-        document.getElementById('beans').textContent = Number(data.beans || 0);
+        document.getElementById('beans').textContent = Number(data.beans || 0).toLocaleString();
         document.getElementById('project-count').textContent = (data.projects || []).length;
         renderProjects(data.projects || []);
         setupNote.hidden = !data.setupRequired;
