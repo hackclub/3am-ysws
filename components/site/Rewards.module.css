@@ -1,0 +1,61 @@
+.intro {
+  font-size: 17px;
+  color: var(--cream);
+  margin-bottom: var(--s2);
+}
+
+.heading {
+  font-size: var(--t-section);
+  color: var(--cream);
+  margin-bottom: var(--s2);
+}
+
+.rate {
+  display: inline-block;
+  font-size: 15px;
+  color: var(--blush);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--s4);
+  margin-top: var(--s5);
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s2);
+  padding: var(--s4) var(--s3);
+  text-align: center;
+  background: var(--surface);
+  border: 1.5px solid var(--edge);
+  border-radius: var(--wobble-sm);
+}
+
+.art {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 68px;
+  font-size: 30px;
+  background: linear-gradient(135deg, var(--raised), #241f30);
+  border-radius: 4px;
+}
+
+.name {
+  font-size: 16px;
+  color: var(--cream);
+}
+
+.price {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--lamp);
+}
