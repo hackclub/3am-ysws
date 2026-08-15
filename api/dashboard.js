@@ -64,11 +64,19 @@ function isUnified(record) {
 }
 
 function internalReview(record) {
-  return textValue(field(record, [/^internal\s*review$/i, /internal\s*review/i])).toLowerCase();
+  return textValue(field(record, [
+    /^status\s*\(\s*internal\s*reviewer\s*\)$/i,
+    /^status\s*\(\s*internal\s*re-?viewer\s*\)$/i,
+    /internal\s*reviewer/i,
+    /internal\s*review/i
+  ])).toLowerCase();
 }
 
 function automationStatus(record) {
-  return textValue(field(record, [/^automation\s*status$/i, /automation\s*status/i])).toLowerCase();
+  return textValue(field(record, [
+    /^automation\s*[-–—]\s*status$/i,
+    /automation\s*[-–—]?\s*status/i
+  ])).toLowerCase();
 }
 
 async function airtable(path, options = {}) {
@@ -90,24 +98,34 @@ function tableByName(tables, pattern) {
 
 async function recordsForTable(table, email) {
   if (!table) return [];
-  const emailFields = (table.fields || []).filter(field => /^(email|e-mail)$/i.test(field.name) || /email|e-mail/i.test(field.name));
-  const formulaParts = emailFields.map(field => `{${field.name.replace(/([{}])/g, '$1')}} = "${email.replace(/"/g, '\\"')}"`);
+  const emailFields = (table.fields || []).filter(field => /email|e-mail/i.test(field.name));
+  const formulaParts = emailFields.map(field => `LOWER({${field.name}} & "") = "${email.replace(/"/g, '\\"')}"`);
   if (!formulaParts.length) return [];
-
-  const params = new URLSearchParams({
-    pageSize: '100',
-    filterByFormula: formulaParts.length === 1 ? formulaParts[0] : `OR(${formulaParts.join(',')})`
-  });
 
   const records = [];
   let offset = null;
   do {
+    const params = new URLSearchParams({
+      pageSize: '100',
+      filterByFormula: formulaParts.length === 1 ? formulaParts[0] : `OR(${formulaParts.join(',')})`
+    });
     if (offset) params.set('offset', offset);
     const data = await airtable(`${encodeURIComponent(table.id)}?${params.toString()}`);
     records.push(...(data.records || []));
     offset = data.offset || null;
   } while (offset);
   return records;
+}
+
+function projectStatus(record) {
+  const review = internalReview(record);
+  const automation = automationStatus(record);
+  const unified = isUnified(record);
+
+  if (/reject|rejected|deny|denied/i.test(review)) return { status: 'rejected', approved: false, unified };
+  if (unified) return { status: 'approved', approved: true, unified: true };
+  if (/pending/i.test(automation)) return { status: 'pending', approved: false, unified: false };
+  return { status: 'submitted', approved: false, unified: false };
 }
 
 module.exports = async (req, res) => {
@@ -124,65 +142,51 @@ module.exports = async (req, res) => {
     const hca = await hcaResponse.json();
     const identity = hca.identity || {};
     const email = (identity.primary_email || '').trim().toLowerCase();
-    const slackId = (identity.slack_id || '').trim();
 
     const schema = await fetch(`https://api.airtable.com/v0/meta/bases/${process.env.AIRTABLE_BASE_ID}/tables`, {
       headers: { Authorization: `Bearer ${process.env.AIRTABLE_PAT}` }
     });
 
     if (!schema.ok) {
-      return res.status(200).json({ authenticated: true, setupRequired: true, user: { name: [identity.first_name, identity.last_name].filter(Boolean).join(' '), email, slackId }, projects: [], approvedHours: 0, beans: 0 });
+      return res.status(200).json({ authenticated: true, setupRequired: true, user: { name: [identity.first_name, identity.last_name].filter(Boolean).join(' '), email }, projects: [], approvedHours: 0, beans: 0, beansSpent: 0 });
     }
 
     const { tables = [] } = await schema.json();
     const projectsTable = tableByName(tables, /^ysws\s*project\s*submission$/i);
     const shopTable = tableByName(tables, /^shop\s*data\s*:\s*d$/i);
 
-    // These are deliberately separate tables. Never take Coffee Beans from an arbitrary
-    // table that happens to contain a similarly named field.
     const [projectRecords, shopRecords] = await Promise.all([
       recordsForTable(projectsTable, email),
       recordsForTable(shopTable, email)
     ]);
 
+    // Shop Data :D is the only source of truth for the balance. We intentionally
+    // ignore the emergency/testing "Add coffee Beans" field.
     const shopDataRecord = shopRecords[0] || null;
     const beans = shopDataRecord ? numberValue(field(shopDataRecord, [/^coffee\s*beans$/i])) : 0;
     const beansSpent = shopDataRecord ? numberValue(field(shopDataRecord, [/^coffee\s*beans\s*spent$/i])) : 0;
-    const approvedHours = shopDataRecord
-      ? numberValue(field(shopDataRecord, [/^hours\s*approved$/i, /hours?\s*approved/i]))
-      : 0;
 
     const projects = projectRecords.map(record => {
-      const review = internalReview(record);
-      const automation = automationStatus(record);
-      const unified = isUnified(record);
-
-      let status = 'submitted';
-      let approved = false;
-      if (/reject|rejected|deny|denied/i.test(review)) {
-        status = 'rejected';
-      } else if (unified) {
-        status = 'approved';
-        approved = true;
-      } else if (/pending/i.test(automation)) {
-        status = 'pending';
-      }
-
-      const nameValue = field(record, [/project\s*name/i, /^project$/i, /title/i, /^name$/i]);
+      const state = projectStatus(record);
       const codeValue = field(record, [/ysws\s*project\s*submission/i, /code\s*url/i, /github\s*url/i, /repository/i, /repo/i, /url/i, /link/i]);
+      const rawName = field(record, [/project\s*name/i, /^project$/i, /title/i, /^name$/i]);
+      const codeUrl = textValue(codeValue);
       const hours = numberValue(field(record, [/^hours\s*approved$/i, /hours?\s*approved/i, /approved\s*hours?/i, /hours?\s*(spent|coded|worked)/i]));
+      const name = textValue(rawName) || (codeUrl ? codeUrl.replace(/^https?:\/\//i, '').split('/').filter(Boolean).pop() : '') || `Project ${record.id.slice(-5)}`;
 
       return {
         id: record.id,
         table: projectsTable?.name || 'YSWS Project Submission',
-        name: textValue(nameValue) || `Project ${record.id.slice(-5)}`,
+        name,
         hours,
-        approved,
-        unified,
-        status,
-        codeUrl: /^https?:\/\//i.test(textValue(codeValue)) ? textValue(codeValue) : null
+        approved: state.approved,
+        unified: state.unified,
+        status: state.status,
+        codeUrl: /^https?:\/\//i.test(codeUrl) ? codeUrl : null
       };
     });
+
+    const approvedHours = projects.filter(project => project.approved).reduce((sum, project) => sum + project.hours, 0);
 
     res.setHeader('Cache-Control', 'private, no-store');
     return res.status(200).json({
