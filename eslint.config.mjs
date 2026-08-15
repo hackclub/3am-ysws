@@ -7,9 +7,6 @@ const config = [
       ".next/**",
       "node_modules/**",
       "out/**",
-      // the static site, removed in full by the app router port
-      "script.js",
-      "splash.js",
     ],
   },
   ...coreWebVitals,

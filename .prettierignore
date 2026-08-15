@@ -2,11 +2,3 @@
 .claude
 node_modules
 package-lock.json
-fonts
-assets
-
-# the static site, replaced in full by the app router port
-*.html
-*.css
-script.js
-splash.js
