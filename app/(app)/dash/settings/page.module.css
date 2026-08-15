@@ -1,0 +1,51 @@
+.panel {
+  max-width: 620px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s4);
+}
+
+.readonly {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 240px;
+}
+
+.label {
+  font-size: var(--t-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--lilac);
+}
+
+.value {
+  padding: 11px 13px;
+  font-size: 16px;
+  color: var(--soft);
+  background: var(--night);
+  border: 2px solid var(--edge);
+  border-radius: var(--radius-input);
+}
+
+.help {
+  font-size: var(--t-help);
+  color: var(--muted);
+}
+
+.line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  flex-wrap: wrap;
+}
+
+.actions {
+  display: flex;
+  gap: var(--s3);
+}
