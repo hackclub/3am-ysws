@@ -117,6 +117,19 @@ async function recordsForTable(table, email) {
   return records;
 }
 
+function chooseShopRecord(records) {
+  if (!records.length) return null;
+  // A user can have more than one matching Shop Data row. Prefer the row
+  // containing the highest actual Coffee Beans balance rather than blindly
+  // taking Airtable's first row (which may be a zero/testing row).
+  return records.reduce((best, record) => {
+    if (!best) return record;
+    const bestBeans = numberValue(field(best, [/^coffee\s*beans$/i]));
+    const currentBeans = numberValue(field(record, [/^coffee\s*beans$/i]));
+    return currentBeans > bestBeans ? record : best;
+  }, null);
+}
+
 function projectStatus(record) {
   const review = internalReview(record);
   const automation = automationStatus(record);
@@ -160,9 +173,7 @@ module.exports = async (req, res) => {
       recordsForTable(shopTable, email)
     ]);
 
-    // Shop Data :D is the only source of truth for the balance. We intentionally
-    // ignore the emergency/testing "Add coffee Beans" field.
-    const shopDataRecord = shopRecords[0] || null;
+    const shopDataRecord = chooseShopRecord(shopRecords);
     const beans = shopDataRecord ? numberValue(field(shopDataRecord, [/^coffee\s*beans$/i])) : 0;
     const beansSpent = shopDataRecord ? numberValue(field(shopDataRecord, [/^coffee\s*beans\s*spent$/i])) : 0;
 
