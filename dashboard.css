@@ -44,6 +44,8 @@ body { background: #101014; color: #f4f0e8; min-height: 100vh; line-height: 1.5;
 .project-tag { font-size: 17px; }
 .project-tag.approved { color: #a8d8a8; }
 .project-tag.pending { color: #d7a9c5; }
+.project-tag.rejected { color: #e5a5a5; }
+.project-tag.submitted { color: #a89bbd; }
 .project-right a { color: #d6b8dc; font-size: 17px; text-decoration: none; }
 .project-right a:hover { text-decoration: underline; }
 .empty-state, .error-state, .setup-note { color: #a89bbd; font-size: 19px; padding-top: 14px; }
