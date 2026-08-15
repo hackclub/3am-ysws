@@ -21,6 +21,11 @@
   --bad: #e39aa0;
   --info: #9ab6e0;
 
+  --display: var(--font-readex), ui-sans-serif, system-ui, sans-serif;
+  --body: var(--font-readex), ui-sans-serif, system-ui, sans-serif;
+  --wordmark: var(--font-wordmark), "Comic Sans MS", cursive;
+  --data: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
   --s1: 4px;
   --s2: 8px;
   --s3: 12px;

@@ -3,6 +3,8 @@ import "./tokens.css";
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
+import { augie, readex } from "./fonts";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://3am.hackclub.com"),
   title: {
@@ -25,7 +27,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${readex.variable} ${augie.variable}`}>
       <body>{children}</body>
     </html>
   );
