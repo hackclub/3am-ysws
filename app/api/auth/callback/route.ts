@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 import { exchangeCode } from "@/lib/auth/hca";
+import { verifyIdToken } from "@/lib/auth/id-token";
 import { OAUTH_STATE_COOKIE, parseOAuthState } from "@/lib/auth/oauth-state";
 
 export const dynamic = "force-dynamic";
@@ -33,11 +34,24 @@ export async function GET(request: NextRequest) {
     return failed(request, "state");
   }
 
+  let idToken: string | undefined;
   try {
-    await exchangeCode(code);
+    idToken = (await exchangeCode(code)).id_token;
   } catch (error) {
     console.error("[auth] token exchange failed", error);
     return failed(request, "exchange");
+  }
+
+  if (!idToken) {
+    console.error("[auth] token response carried no id_token");
+    return failed(request, "no_identity");
+  }
+
+  try {
+    await verifyIdToken(idToken);
+  } catch (error) {
+    console.error("[auth] id_token verification failed", error);
+    return failed(request, "identity");
   }
 
   return clearState(NextResponse.redirect(new URL(returnTo ?? "/dash", request.nextUrl.origin)));
