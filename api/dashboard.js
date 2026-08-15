@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 
-const TABLE_NAME = 'Shop Data : D';
+const TABLE_CANDIDATES = ['Shop Data : D', 'Shop Data'];
 
 function parseCookies(req) {
   const header = req.headers.cookie || '';
@@ -32,7 +32,7 @@ function getSession(req) {
 }
 
 function normalize(value) {
-  return String(value || '').trim().toLowerCase();
+  return String(value ?? '').trim().toLowerCase();
 }
 
 function numberValue(value) {
@@ -41,36 +41,23 @@ function numberValue(value) {
   return match ? Number(match[0]) : 0;
 }
 
-function firstField(fields, names) {
-  for (const name of names) {
-    if (Object.prototype.hasOwnProperty.call(fields, name)) return fields[name];
-  }
-  return null;
-}
-
-async function getAirtableRecords() {
+async function getAirtableRecords(tableName) {
   const base = process.env.AIRTABLE_BASE_ID;
   const pat = process.env.AIRTABLE_PAT;
-  if (!base || !pat) throw new Error('AIRTABLE_NOT_CONFIGURED');
-
   const records = [];
   let offset = '';
 
   do {
     const params = new URLSearchParams({ pageSize: '100' });
     if (offset) params.set('offset', offset);
-
-    const url = `https://api.airtable.com/v0/${encodeURIComponent(base)}/${encodeURIComponent(TABLE_NAME)}?${params}`;
+    const url = `https://api.airtable.com/v0/${encodeURIComponent(base)}/${encodeURIComponent(tableName)}?${params}`;
     const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${pat}`,
-        Accept: 'application/json'
-      }
+      headers: { Authorization: `Bearer ${pat}`, Accept: 'application/json' }
     });
 
     if (!response.ok) {
-      console.error('Airtable records request failed:', response.status);
-      throw new Error(`AIRTABLE_HTTP_${response.status}`);
+      const body = await response.text();
+      throw new Error(`AIRTABLE_HTTP_${response.status}:${body.slice(0, 160)}`);
     }
 
     const data = await response.json();
@@ -92,30 +79,48 @@ module.exports = async (req, res) => {
       headers: { Authorization: `Bearer ${session.accessToken}` }
     });
 
-    if (!hcaResponse.ok) return res.status(401).json({ authenticated: false });
+    if (!hcaResponse.ok) {
+      console.error('HCA /me failed:', hcaResponse.status);
+      return res.status(401).json({ authenticated: false, errorCode: `HCA_ME_${hcaResponse.status}` });
+    }
 
     const hca = await hcaResponse.json();
     const identity = hca.identity || {};
     const email = normalize(identity.primary_email);
 
-    if (!email) {
-      return res.status(200).json({
+    if (!process.env.AIRTABLE_BASE_ID || !process.env.AIRTABLE_PAT) {
+      return res.status(500).json({ authenticated: true, error: 'Airtable is not configured.', errorCode: 'AIRTABLE_NOT_CONFIGURED' });
+    }
+
+    let records = null;
+    let tableUsed = null;
+    let lastError = null;
+
+    for (const tableName of TABLE_CANDIDATES) {
+      try {
+        records = await getAirtableRecords(tableName);
+        tableUsed = tableName;
+        break;
+      } catch (error) {
+        lastError = error;
+        console.error(`Airtable table ${tableName} failed:`, error.message);
+      }
+    }
+
+    if (!records) {
+      return res.status(502).json({
         authenticated: true,
-        user: { name: [identity.first_name, identity.last_name].filter(Boolean).join(' ') || null, email: null },
-        projects: [],
-        approvedHours: 0,
-        beans: 0,
-        errorCode: 'NO_EMAIL'
+        error: 'Unable to connect to the YSWS data.',
+        errorCode: lastError?.message?.split(':')[0] || 'AIRTABLE_UNKNOWN'
       });
     }
 
-    const records = await getAirtableRecords();
     const matched = records.filter(record => normalize(record.fields?.Email) === email);
 
     const projects = matched.map(record => {
       const fields = record.fields || {};
-      const hours = numberValue(firstField(fields, ['Hours Approved']));
-      const submission = firstField(fields, ['YSWS Project Submission']);
+      const hours = numberValue(fields['Hours Approved']);
+      const submission = fields['YSWS Project Submission'];
       const name = typeof submission === 'string' && submission.trim()
         ? submission.trim()
         : `Project ${record.id.slice(-5)}`;
@@ -126,7 +131,7 @@ module.exports = async (req, res) => {
         hours,
         approved: hours > 0,
         status: hours > 0 ? 'approved' : 'submitted',
-        coffeeBeansSpent: numberValue(firstField(fields, ['Coffee Beans Spent'])),
+        coffeeBeansSpent: numberValue(fields['Coffee Beans Spent']),
         codeUrl: typeof submission === 'string' && /^https?:\/\//i.test(submission) ? submission : null
       };
     });
@@ -147,10 +152,11 @@ module.exports = async (req, res) => {
       projects,
       approvedHours,
       beans: Math.floor(approvedHours * 5),
-      matchedRecords: matched.length
+      matchedRecords: matched.length,
+      tableUsed
     });
   } catch (error) {
     console.error('Dashboard data error:', error);
-    return res.status(500).json({ error: 'Unable to load dashboard data', errorCode: error.message || 'UNKNOWN' });
+    return res.status(500).json({ authenticated: true, error: 'Unable to load dashboard data.', errorCode: error.message || 'UNKNOWN' });
   }
 };
