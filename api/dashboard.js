@@ -36,6 +36,8 @@ function field(record, patterns) {
 
 function numberValue(value) {
   if (typeof value === 'number') return value;
+  if (Array.isArray(value)) return numberValue(value[0]);
+  if (value && typeof value === 'object') return numberValue(value.value ?? value.name ?? value.text);
   if (typeof value === 'string') {
     const match = value.replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
     return match ? Number(match[0]) : 0;
@@ -43,12 +45,14 @@ function numberValue(value) {
   return 0;
 }
 
-function isApproved(record, tableName = '') {
-  if (/shop\s*data/i.test(tableName)) return true;
-  const value = field(record, [/approved/i, /status/i, /decision/i]);
+function isUnified(record) {
+  const entries = Object.entries(record.fields || {});
+  const checkbox = entries.find(([name]) => /^submit\s*to\s*unified$/i.test(name));
+  if (!checkbox) return false;
+  const value = checkbox[1];
   if (value === true) return true;
-  if (typeof value === 'string') return /approved|accept|yes|complete/i.test(value);
-  return Boolean(field(record, [/approved[_ ]?at/i]));
+  if (typeof value === 'string') return /^(true|yes|checked|approved)$/i.test(value.trim());
+  return Boolean(value);
 }
 
 async function airtable(path, options = {}) {
@@ -104,8 +108,8 @@ module.exports = async (req, res) => {
       const formulaParts = [];
       for (const name of identityFields) {
         const escapedName = name.replace(/([{}])/g, '$1');
-        if (email && /email|e-mail/i.test(name)) formulaParts.push(`{${escapedName}} = \"${email.replace(/\"/g, '\\\"')}\"`);
-        if (slackId && /slack/i.test(name)) formulaParts.push(`{${escapedName}} = \"${slackId.replace(/\"/g, '\\\"')}\"`);
+        if (email && /email|e-mail/i.test(name)) formulaParts.push(`{${escapedName}} = "${email.replace(/"/g, '\\"')}"`);
+        if (slackId && /slack/i.test(name)) formulaParts.push(`{${escapedName}} = "${slackId.replace(/"/g, '\\"')}"`);
       }
       if (!formulaParts.length) continue;
 
@@ -121,13 +125,14 @@ module.exports = async (req, res) => {
       }
     }
 
-    const shopDataMatch = matched.find(({ table }) => /shop\s*data/i.test(table));
-    const shopDataRecord = shopDataMatch?.record || null;
+    const shopDataMatches = matched.filter(({ table }) => /shop\s*data/i.test(table));
+    const shopDataRecord = shopDataMatches[0]?.record || null;
     const shopBeans = shopDataRecord ? numberValue(field(shopDataRecord, [/^coffee\s*beans$/i])) : 0;
-    const shopBeansSpent = shopDataRecord ? numberValue(field(shopDataRecord, [/coffee\s*beans\s*spent/i])) : 0;
+    const shopBeansSpent = shopDataRecord ? numberValue(field(shopDataRecord, [/^coffee\s*beans\s*spent$/i])) : 0;
 
     const projects = matched.map(({ table, record }) => {
       const hours = numberValue(field(record, [
+        /^hours\s*approved$/i,
         /hours?\s*approved/i,
         /approved\s*hours?/i,
         /hours?\s*(spent|coded|worked)/i,
@@ -135,7 +140,9 @@ module.exports = async (req, res) => {
       ]));
       const name = field(record, [/project\s*name/i, /^project$/i, /project/i, /title/i, /name/i]);
       const statusValue = field(record, [/status/i, /decision/i, /approved/i]);
-      const approved = /shop\s*data/i.test(table) || isApproved(record, table);
+      const unified = isUnified(record);
+      const isShopData = /shop\s*data/i.test(table);
+      const approved = unified;
       const github = field(record, [/github\s*(username|user|handle)/i, /github/i]);
       const codeUrl = field(record, [
         /ysws\s*project\s*submission/i,
@@ -153,15 +160,17 @@ module.exports = async (req, res) => {
         name: typeof name === 'string' ? name : `Project ${record.id.slice(-5)}`,
         hours,
         approved,
+        unified,
         status: approved ? 'approved' : (typeof statusValue === 'string' ? statusValue : 'submitted'),
         githubUsername: typeof github === 'string' ? github.replace(/^@/, '') : null,
-        codeUrl: typeof codeUrl === 'string' && /^https?:\/\//i.test(codeUrl) ? codeUrl : null
+        codeUrl: typeof codeUrl === 'string' && /^https?:\/\//i.test(codeUrl) ? codeUrl : null,
+        isShopData
       };
-    }).filter(project => project.name);
+    }).filter(project => project.unified);
 
     const approvedHours = shopDataRecord
       ? numberValue(field(shopDataRecord, [/^hours\s*approved$/i, /hours?\s*approved/i]))
-      : projects.filter(project => project.approved).reduce((sum, project) => sum + project.hours, 0);
+      : projects.reduce((sum, project) => sum + project.hours, 0);
 
     res.setHeader('Cache-Control', 'private, no-store');
     return res.status(200).json({
@@ -177,7 +186,7 @@ module.exports = async (req, res) => {
       },
       projects,
       approvedHours,
-      beans: shopDataRecord ? shopBeans : Math.floor(approvedHours * 5),
+      beans: shopDataRecord ? shopBeans : 0,
       beansSpent: shopDataRecord ? shopBeansSpent : 0
     });
   } catch (error) {
