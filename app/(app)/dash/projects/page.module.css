@@ -1,0 +1,38 @@
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+
+.filter {
+  padding: 6px 12px;
+  font-family: var(--data);
+  font-size: 13px;
+  color: var(--soft);
+  text-decoration: none;
+  background: var(--night);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-pill);
+}
+
+.filter:hover {
+  border-color: var(--glow);
+  color: var(--cream);
+}
+
+.on {
+  border-color: var(--lamp);
+  color: var(--lamp);
+  background: rgba(247, 233, 168, 0.08);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.none {
+  font-size: 15px;
+  color: var(--muted);
+}
