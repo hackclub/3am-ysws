@@ -1,10 +1,8 @@
-import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { isOrganizer } from "@/lib/auth/organizer";
 import { getCurrentUser } from "@/lib/auth/users";
-import { getDb } from "@/lib/db";
-import { projects } from "@/lib/db/schema";
+import { applyDecision } from "@/lib/review/decisions";
 
 export const dynamic = "force-dynamic";
 
@@ -46,22 +44,20 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     );
   }
 
-  const db = getDb();
-  const [project] = await db.select().from(projects).where(eq(projects.id, id)).limit(1);
+  const result = await applyDecision({
+    projectId: id,
+    decision,
+    approvedMinutes: Math.round(hours * 60),
+    noteToMaker: note,
+  });
 
-  if (!project) return NextResponse.json({ error: "not found" }, { status: 404 });
-  if (!project.submittedAt) return NextResponse.json({ error: "not_sent" }, { status: 409 });
-  if (project.decision) return NextResponse.json({ error: "already_decided" }, { status: 409 });
-
-  await db
-    .update(projects)
-    .set({
-      decision,
-      approvedMinutes: decision === "approved" ? Math.round(hours * 60) : 0,
-      noteToMaker: note,
-      decidedAt: new Date(),
-    })
-    .where(eq(projects.id, project.id));
+  if (result.status === "not_found")
+    return NextResponse.json({ error: "not found" }, { status: 404 });
+  if (result.status === "not_sent")
+    return NextResponse.json({ error: "not_sent" }, { status: 409 });
+  if (result.status === "already_decided") {
+    return NextResponse.json({ error: "already_decided" }, { status: 409 });
+  }
 
   return NextResponse.json({ ok: true, decision });
 }
