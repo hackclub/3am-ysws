@@ -1,0 +1,8 @@
+.ground {
+  min-height: 100vh;
+  background-color: var(--night);
+  background-image:
+    radial-gradient(1100px 620px at 78% -8%, rgba(111, 99, 135, 0.3), transparent 62%),
+    radial-gradient(760px 480px at 8% 4%, rgba(214, 184, 220, 0.09), transparent 60%);
+  background-attachment: fixed;
+}

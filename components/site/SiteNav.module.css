@@ -1,12 +1,3 @@
-.strip {
-  padding: 6px;
-  text-align: center;
-  font-size: 12px;
-  letter-spacing: 1px;
-  color: var(--muted);
-  background: rgba(16, 16, 20, 0.7);
-}
-
 .nav {
   display: flex;
   align-items: center;

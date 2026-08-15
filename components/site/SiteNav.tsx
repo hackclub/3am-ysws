@@ -8,7 +8,6 @@ import styles from "./SiteNav.module.css";
 export function SiteNav() {
   return (
     <header>
-      <p className={styles.strip}>a hack club ysws</p>
       <nav className={styles.nav}>
         <Link href="/" className={styles.wordmark}>
           3am
