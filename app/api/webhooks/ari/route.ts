@@ -7,7 +7,7 @@ import type { AriDelivery } from "@/lib/ari/inbound";
 import { ariWebhookSecret } from "@/lib/ari/signature";
 import { getDb } from "@/lib/db";
 import { projects, webhookEvents } from "@/lib/db/schema";
-import { applyDecision } from "@/lib/review/decisions";
+import { applyDecision, clearDecision } from "@/lib/review/decisions";
 
 export const dynamic = "force-dynamic";
 
@@ -68,6 +68,16 @@ export async function POST(request: Request) {
 
   if (!recorded) {
     return NextResponse.json({ ok: true, duplicate: true });
+  }
+
+  if (body.event === "review.reverted" || body.event === "review.requeued") {
+    if (!projectId) return NextResponse.json({ ok: true });
+
+    const cleared = await clearDecision(projectId);
+    if (cleared.status === "not_found") {
+      console.error(`[ari] cannot clear unknown project ${projectId}`);
+    }
+    return NextResponse.json({ ok: true, cleared: cleared.status === "cleared" });
   }
 
   const decision = decisionFromEvent(body);

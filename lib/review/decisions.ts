@@ -52,3 +52,25 @@ export async function applyDecision(input: DecisionInput): Promise<ApplyResult> 
   if (!existing.submittedAt) return { status: "not_sent" };
   return { status: "already_decided" };
 }
+
+export type ClearResult = { status: "cleared" | "was_open" | "not_found" };
+
+export async function clearDecision(projectId: string): Promise<ClearResult> {
+  const db = getDb();
+
+  const [updated] = await db
+    .update(projects)
+    .set({ decision: null, approvedMinutes: null, noteToMaker: null, decidedAt: null })
+    .where(and(eq(projects.id, projectId), isNotNull(projects.decision)))
+    .returning({ id: projects.id });
+
+  if (updated) return { status: "cleared" };
+
+  const [existing] = await db
+    .select({ id: projects.id })
+    .from(projects)
+    .where(eq(projects.id, projectId))
+    .limit(1);
+
+  return { status: existing ? "was_open" : "not_found" };
+}
