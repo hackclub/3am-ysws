@@ -7,6 +7,7 @@ import { Banner } from "@/components/ui/Banner";
 import { Button } from "@/components/ui/Button";
 import { HackatimePicker } from "@/components/ui/HackatimePicker";
 import { Field, Input, Textarea } from "@/components/ui/Field";
+import { ThumbnailField } from "@/components/ui/ThumbnailField";
 import { Panel, PanelLabel } from "@/components/ui/Panel";
 import type { PickerProject } from "@/lib/hackatime/projects";
 
@@ -151,11 +152,11 @@ export function SubmitForm({ projects }: { projects: PickerProject[] }) {
           </Field>
           <Field
             id={`${ids}-thumb`}
-            label="screenshot link"
+            label="screenshot"
             help="Shown to reviewers and on your dashboard."
             error={errorFor("thumbnail_url")}
           >
-            <Input value={thumbnailUrl} onChange={(event) => setThumbnailUrl(event.target.value)} />
+            <ThumbnailField value={thumbnailUrl} onChange={setThumbnailUrl} />
           </Field>
         </div>
 

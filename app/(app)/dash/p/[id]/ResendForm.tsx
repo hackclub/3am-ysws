@@ -7,6 +7,7 @@ import { Banner } from "@/components/ui/Banner";
 import { Button } from "@/components/ui/Button";
 import { HackatimePicker } from "@/components/ui/HackatimePicker";
 import { Field, Input, Textarea } from "@/components/ui/Field";
+import { ThumbnailField } from "@/components/ui/ThumbnailField";
 import { Panel, PanelLabel } from "@/components/ui/Panel";
 import type { PickerProject } from "@/lib/hackatime/projects";
 
@@ -107,8 +108,8 @@ export function ResendForm({
           <Field id={`${ids}-demo`} label="demo link" error={errorFor("demo_url")}>
             <Input value={demoUrl} onChange={(event) => setDemoUrl(event.target.value)} />
           </Field>
-          <Field id={`${ids}-thumb`} label="screenshot link" error={errorFor("thumbnail_url")}>
-            <Input value={thumbnailUrl} onChange={(event) => setThumbnailUrl(event.target.value)} />
+          <Field id={`${ids}-thumb`} label="screenshot" error={errorFor("thumbnail_url")}>
+            <ThumbnailField value={thumbnailUrl} onChange={setThumbnailUrl} />
           </Field>
         </div>
 
