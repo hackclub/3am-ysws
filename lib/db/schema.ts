@@ -1,4 +1,5 @@
 import {
+  bigserial,
   index,
   integer,
   jsonb,
@@ -9,6 +10,7 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const users = pgTable("users", {
   sub: text("sub").primaryKey(),
@@ -62,9 +64,34 @@ export const webhookEvents = pgTable(
   (table) => [index("webhook_events_project_id_idx").on(table.projectId)],
 );
 
+export const beansReason = pgEnum("beans_reason", ["approval", "revert", "purchase", "manual"]);
+
+export const beansLedger = pgTable(
+  "beans_ledger",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    userSub: text("user_sub")
+      .notNull()
+      .references(() => users.sub),
+    delta: integer("delta").notNull(),
+    reason: beansReason("reason").notNull(),
+    projectId: uuid("project_id").references(() => projects.id, { onDelete: "set null" }),
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("beans_ledger_user_sub_idx").on(table.userSub),
+    uniqueIndex("beans_ledger_project_reason_idx")
+      .on(table.projectId, table.reason)
+      .where(sql`${table.projectId} is not null`),
+  ],
+);
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;
 export type WebhookEvent = typeof webhookEvents.$inferSelect;
 export type NewWebhookEvent = typeof webhookEvents.$inferInsert;
+export type BeansEntry = typeof beansLedger.$inferSelect;
+export type NewBeansEntry = typeof beansLedger.$inferInsert;
