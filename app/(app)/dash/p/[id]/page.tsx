@@ -13,11 +13,12 @@ import { getCurrentUser } from "@/lib/auth/users";
 import { getDb } from "@/lib/db";
 import { projects } from "@/lib/db/schema";
 import type { Project } from "@/lib/db/schema";
-import { projectStatus } from "@/lib/projects/status";
+import { isOpen, projectStatus } from "@/lib/projects/status";
 import { getPickerProjects } from "@/lib/hackatime/projects";
 import { BEANS_PER_HOUR } from "@/lib/rewards";
 
 import { ResendForm } from "./ResendForm";
+import { WithdrawButton } from "./WithdrawButton";
 
 import styles from "./page.module.css";
 
@@ -149,6 +150,14 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
               ) : null}
             </div>
           </Panel>
+
+          {isOpen(project) ? (
+            <Panel>
+              <PanelLabel>changed your mind?</PanelLabel>
+              <p className={styles.note}>You can pull it back until someone decides.</p>
+              <WithdrawButton id={project.id} />
+            </Panel>
+          ) : null}
         </div>
       </div>
 
