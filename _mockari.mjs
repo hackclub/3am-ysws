@@ -19,7 +19,10 @@ const server = createServer((req, res) => {
       return res.writeHead(200).end(JSON.stringify({ status: "withdrawn" }));
     }
     if (id === "dupe") return res.writeHead(409).end("{}");
-    if (id === "bad") return res.writeHead(422).end(JSON.stringify({ field: "thumbnail_url", message: "thumbnail is unreachable" }));
+    if (id === "bad")
+      return res
+        .writeHead(422)
+        .end(JSON.stringify({ field: "thumbnail_url", message: "thumbnail is unreachable" }));
     if (id === "boom") return res.writeHead(500).end("{}");
     res.writeHead(202).end(JSON.stringify({ id: "AR-1" }));
   });
