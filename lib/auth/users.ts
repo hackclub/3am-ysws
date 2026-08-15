@@ -1,5 +1,9 @@
+import { eq } from "drizzle-orm";
+
 import { getDb } from "@/lib/db";
 import { users } from "@/lib/db/schema";
+
+import { getSession } from "./session";
 
 import { displayName } from "./id-token";
 import type { HcaClaims } from "./id-token";
@@ -31,4 +35,12 @@ export async function upsertUser(claims: HcaClaims) {
     });
 
   return row;
+}
+
+export async function getCurrentUser() {
+  const session = await getSession();
+  if (!session) return null;
+
+  const rows = await getDb().select().from(users).where(eq(users.sub, session.sub)).limit(1);
+  return rows[0] ?? null;
 }
