@@ -18,9 +18,8 @@ function getSession(req) {
   if (separator < 1) return null;
   const payload = raw.slice(0, separator);
   const signature = raw.slice(separator + 1);
-  const expected = sign(payload, secretOrEmpty(process.env.SESSION_SECRET));
+  const expected = sign(payload, process.env.SESSION_SECRET || '');
   if (signature.length !== expected.length || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
-
   try {
     const session = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
     return session.accessToken && Date.now() < session.expiresAt ? session : null;
@@ -29,76 +28,43 @@ function getSession(req) {
   }
 }
 
-function secretOrEmpty(value) {
-  return String(value || '');
-}
-
-function normalize(value) {
-  return String(value ?? '').trim().toLowerCase();
+function field(record, patterns) {
+  const entries = Object.entries(record.fields || {});
+  const found = entries.find(([name]) => patterns.some(pattern => pattern.test(name)));
+  return found ? found[1] : null;
 }
 
 function numberValue(value) {
   if (typeof value === 'number') return value;
-  const match = String(value ?? '').replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
-  return match ? Number(match[0]) : 0;
+  if (typeof value === 'string') {
+    const match = value.replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
+    return match ? Number(match[0]) : 0;
+  }
+  return 0;
 }
 
-function airtableConfig() {
-  return {
-    base: String(process.env.AIRTABLE_BASE_ID || '').trim(),
-    pat: String(process.env.AIRTABLE_PAT || '').trim(),
-    table: String(process.env.AIRTABLE_TABLE_NAME || 'Shop Data').trim(),
-    view: String(process.env.AIRTABLE_VIEW_NAME || '').trim()
-  };
+function isApproved(record) {
+  const value = field(record, [/approved/i, /status/i, /decision/i]);
+  if (value === true) return true;
+  if (typeof value === 'string') return /approved|accept|yes|complete/i.test(value);
+  return Boolean(field(record, [/approved[_ ]?at/i]));
 }
 
-async function getAirtableRecords(email) {
-  const { base, pat, table, view } = airtableConfig();
-  const records = [];
-  let offset = '';
-  const formulaEmail = String(email).replace(/'/g, "''");
-
-  do {
-    const params = new URLSearchParams({
-      pageSize: '100',
-      filterByFormula: `{Email}='${formulaEmail}'`
-    });
-    if (view) params.set('view', view);
-    if (offset) params.set('offset', offset);
-
-    for (const field of ['Email', 'YSWS Project Submission', 'Hours Approved', 'Coffee Beans Spent']) {
-      params.append('fields[]', field);
+async function airtable(path, options = {}) {
+  const response = await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${path}`, {
+    ...options,
+    headers: {
+      Authorization: `Bearer ${process.env.AIRTABLE_PAT}`,
+      Accept: 'application/json',
+      ...(options.headers || {})
     }
-
-    const url = `https://api.airtable.com/v0/${encodeURIComponent(base)}/${encodeURIComponent(table)}?${params}`;
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${pat}`,
-        Accept: 'application/json'
-      }
-    });
-
-    if (!response.ok) {
-      const body = await response.text();
-      let detail = body.slice(0, 300);
-      try {
-        const json = JSON.parse(body);
-        detail = json?.error?.message || json?.error?.type || detail;
-      } catch {}
-      throw new Error(`AIRTABLE_HTTP_${response.status}:${detail}`);
-    }
-
-    const data = await response.json();
-    records.push(...(data.records || []));
-    offset = data.offset || '';
-  } while (offset);
-
-  return { records, table, view: view || null };
+  });
+  if (!response.ok) throw new Error(`Airtable ${response.status}: ${await response.text()}`);
+  return response.json();
 }
 
 module.exports = async (req, res) => {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
-
   const session = getSession(req);
   if (!session) return res.status(401).json({ authenticated: false });
 
@@ -106,46 +72,79 @@ module.exports = async (req, res) => {
     const hcaResponse = await fetch('https://auth.hackclub.com/api/v1/me', {
       headers: { Authorization: `Bearer ${session.accessToken}` }
     });
-
-    if (!hcaResponse.ok) {
-      return res.status(401).json({ authenticated: false, errorCode: `HCA_ME_${hcaResponse.status}` });
-    }
+    if (!hcaResponse.ok) return res.status(401).json({ authenticated: false });
 
     const hca = await hcaResponse.json();
     const identity = hca.identity || {};
-    const email = normalize(identity.primary_email);
-    const config = airtableConfig();
+    const email = (identity.primary_email || '').trim().toLowerCase();
+    const slackId = (identity.slack_id || '').trim();
 
-    if (!config.base || !config.pat) {
-      return res.status(500).json({ authenticated: true, error: 'Airtable is not configured.', errorCode: 'AIRTABLE_NOT_CONFIGURED' });
-    }
-
-    const { records, table, view } = await getAirtableRecords(email);
-
-    const projects = records.map(record => {
-      const fields = record.fields || {};
-      const hours = numberValue(fields['Hours Approved']);
-      const submission = fields['YSWS Project Submission'];
-      const name = typeof submission === 'string' && submission.trim()
-        ? submission.trim()
-        : `Project ${record.id.slice(-5)}`;
-
-      return {
-        id: record.id,
-        name,
-        hours,
-        approved: hours > 0,
-        status: hours > 0 ? 'approved' : 'submitted',
-        coffeeBeansSpent: numberValue(fields['Coffee Beans Spent']),
-        codeUrl: typeof submission === 'string' && /^https?:\/\//i.test(submission) ? submission : null
-      };
+    const schema = await fetch(`https://api.airtable.com/v0/meta/bases/${process.env.AIRTABLE_BASE_ID}/tables`, {
+      headers: { Authorization: `Bearer ${process.env.AIRTABLE_PAT}` }
     });
 
-    const approvedHours = projects.reduce((sum, project) => sum + project.hours, 0);
+    if (!schema.ok) {
+      return res.status(200).json({
+        authenticated: true,
+        setupRequired: true,
+        user: { name: [identity.first_name, identity.last_name].filter(Boolean).join(' '), email, slackId },
+        projects: [], approvedHours: 0, beans: 0
+      });
+    }
+
+    const { tables = [] } = await schema.json();
+    const candidateTables = tables.filter(table =>
+      table.fields?.some(field => /email|e-mail|slack/i.test(field.name))
+    ).slice(0, 15);
+
+    const matched = [];
+    for (const table of candidateTables) {
+      const identityFields = table.fields.filter(field => /email|e-mail|slack/i.test(field.name)).map(field => field.name);
+      const formulaParts = [];
+      for (const name of identityFields) {
+        const escapedName = name.replace(/([{}])/g, '$1');
+        if (email && /email|e-mail/i.test(name)) formulaParts.push(`{${escapedName}} = \"${email.replace(/\"/g, '\\\"')}\"`);
+        if (slackId && /slack/i.test(name)) formulaParts.push(`{${escapedName}} = \"${slackId.replace(/\"/g, '\\\"')}\"`);
+      }
+      if (!formulaParts.length) continue;
+
+      const params = new URLSearchParams({
+        maxRecords: '100',
+        filterByFormula: `OR(${formulaParts.join(',')})`
+      });
+      try {
+        const data = await airtable(`${encodeURIComponent(table.id)}?${params.toString()}`);
+        for (const record of data.records || []) matched.push({ table: table.name, record });
+      } catch (error) {
+        console.error(`Skipping Airtable table ${table.name}:`, error.message);
+      }
+    }
+
+    const projects = matched.map(({ table, record }) => {
+      const hours = numberValue(field(record, [/hours?\s*(spent|coded|worked)?/i, /time/i]));
+      const name = field(record, [/project\s*name/i, /^project$/i, /project/i, /title/i, /name/i]);
+      const statusValue = field(record, [/status/i, /decision/i, /approved/i]);
+      const approved = isApproved(record);
+      const github = field(record, [/github\s*(username|user|handle)/i, /github/i]);
+      const codeUrl = field(record, [/code\s*url/i, /github\s*url/i, /repository/i, /repo/i]);
+      return {
+        id: record.id,
+        table,
+        name: typeof name === 'string' ? name : `Project ${record.id.slice(-5)}`,
+        hours,
+        approved,
+        status: typeof statusValue === 'string' ? statusValue : approved ? 'approved' : 'submitted',
+        githubUsername: typeof github === 'string' ? github.replace(/^@/, '') : null,
+        codeUrl: typeof codeUrl === 'string' ? codeUrl : null
+      };
+    }).filter(project => project.name && (project.hours || project.approved));
+
+    const approvedHours = projects.filter(project => project.approved).reduce((sum, project) => sum + project.hours, 0);
 
     res.setHeader('Cache-Control', 'private, no-store');
     return res.status(200).json({
       authenticated: true,
+      setupRequired: false,
       user: {
         id: identity.id || null,
         name: [identity.first_name, identity.last_name].filter(Boolean).join(' ') || null,
@@ -156,18 +155,10 @@ module.exports = async (req, res) => {
       },
       projects,
       approvedHours,
-      beans: Math.floor(approvedHours * 5),
-      matchedRecords: records.length,
-      tableUsed: table,
-      viewUsed: view
+      beans: Math.floor(approvedHours * 5)
     });
   } catch (error) {
     console.error('Dashboard data error:', error);
-    const errorText = error.message || 'UNKNOWN';
-    return res.status(502).json({
-      authenticated: true,
-      error: 'Unable to load dashboard data.',
-      errorCode: errorText.split(':')[0] || 'UNKNOWN'
-    });
+    return res.status(500).json({ error: 'Unable to load dashboard data' });
   }
 };
