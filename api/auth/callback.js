@@ -19,13 +19,16 @@ module.exports = async (req, res) => {
   const { HCA_CLIENT_ID, HCA_CLIENT_SECRET, HCA_REDIRECT_URI, SESSION_SECRET } = process.env;
   const cookies = parseCookies(req);
   const stateCookie = cookies.oauth_state || '';
-  const [state, stateSignature] = stateCookie.split('.');
+  const separator = stateCookie.lastIndexOf('.');
+  const state = separator > 0 ? stateCookie.slice(0, separator) : '';
+  const stateSignature = separator > 0 ? stateCookie.slice(separator + 1) : '';
 
   if (!code || !state || !stateSignature || !HCA_CLIENT_ID || !HCA_CLIENT_SECRET || !HCA_REDIRECT_URI || !SESSION_SECRET) {
     return res.status(400).send('Invalid authentication request.');
   }
 
-  if (!crypto.timingSafeEqual(Buffer.from(stateSignature), Buffer.from(sign(state, SESSION_SECRET)))) {
+  const expectedSignature = sign(state, SESSION_SECRET);
+  if (stateSignature.length !== expectedSignature.length || !crypto.timingSafeEqual(Buffer.from(stateSignature), Buffer.from(expectedSignature))) {
     return res.status(400).send('Invalid authentication state.');
   }
 
@@ -43,8 +46,7 @@ module.exports = async (req, res) => {
     });
 
     if (!tokenResponse.ok) {
-      const detail = await tokenResponse.text();
-      console.error('HCA token exchange failed:', detail);
+      console.error('HCA token exchange failed:', await tokenResponse.text());
       return res.status(502).send('Hack Club authentication failed.');
     }
 
@@ -58,7 +60,7 @@ module.exports = async (req, res) => {
     const sessionSignature = sign(sessionPayload, SESSION_SECRET);
 
     res.setHeader('Set-Cookie', [
-      `session=${sessionPayload}.${sessionSignature}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${Math.floor((token.expires_in || 15778800))}`,
+      `session=${sessionPayload}.${sessionSignature}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${Math.floor(token.expires_in || 15778800)}`,
       'oauth_state=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0'
     ]);
 
