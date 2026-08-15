@@ -42,8 +42,8 @@ function numberValue(value) {
 }
 
 async function getAirtableRecords(tableName) {
-  const base = process.env.AIRTABLE_BASE_ID;
-  const pat = process.env.AIRTABLE_PAT;
+  const base = String(process.env.AIRTABLE_BASE_ID || '').trim();
+  const pat = String(process.env.AIRTABLE_PAT || '').trim();
   const records = [];
   let offset = '';
 
@@ -57,7 +57,12 @@ async function getAirtableRecords(tableName) {
 
     if (!response.ok) {
       const body = await response.text();
-      throw new Error(`AIRTABLE_HTTP_${response.status}:${body.slice(0, 160)}`);
+      let detail = body.slice(0, 300);
+      try {
+        const json = JSON.parse(body);
+        detail = json?.error?.message || json?.error?.type || detail;
+      } catch {}
+      throw new Error(`AIRTABLE_HTTP_${response.status}:${detail}`);
     }
 
     const data = await response.json();
@@ -108,10 +113,11 @@ module.exports = async (req, res) => {
     }
 
     if (!records) {
+      const errorText = lastError?.message || 'AIRTABLE_UNKNOWN';
       return res.status(502).json({
         authenticated: true,
-        error: 'Unable to connect to the YSWS data.',
-        errorCode: lastError?.message?.split(':')[0] || 'AIRTABLE_UNKNOWN'
+        error: `Unable to connect to the YSWS data. ${errorText}`,
+        errorCode: errorText.split(':')[0] || 'AIRTABLE_UNKNOWN'
       });
     }
 
