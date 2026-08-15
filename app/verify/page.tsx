@@ -29,21 +29,8 @@ export default async function VerifyPage() {
     );
   }
 
-  if (result === "verified_but_over_18" || result === "rejected") {
-    return (
-      <Notice
-        owl="owl1"
-        title="you cannot take part"
-        actions={
-          <ButtonLink href="/" variant="quiet">
-            back home
-          </ButtonLink>
-        }
-      >
-        3am is for people aged 13 to 18. You are welcome in the Slack and the gallery either way.
-      </Notice>
-    );
-  }
+  if (result === "verified_but_over_18") redirect("/ineligible?reason=age");
+  if (result === "rejected") redirect("/ineligible?reason=review");
 
   const pending = result === "pending";
 
