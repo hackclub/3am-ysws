@@ -20,7 +20,7 @@ module.exports = (req, res) => {
     client_id: clientId,
     redirect_uri: redirectUri,
     response_type: 'code',
-    scope: 'openid profile email name slack_id'
+    scope: 'openid profile email'
   });
 
   res.writeHead(302, { Location: `https://auth.hackclub.com/oauth/authorize?${params}` });
