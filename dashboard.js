@@ -51,7 +51,10 @@ async function loadDashboard() {
             showLoggedOut();
             return;
         }
-        if (!response.ok) throw new Error(data.error || 'Dashboard request failed');
+        if (!response.ok) {
+            const code = data.errorCode ? ` (${data.errorCode})` : '';
+            throw new Error(`${data.error || 'Dashboard request failed'}${code}`);
+        }
 
         const user = data.user || {};
         userBadge.textContent = user.name || user.email || 'Hack Club user';
@@ -68,6 +71,8 @@ async function loadDashboard() {
     } catch (error) {
         console.error(error);
         errorState.hidden = false;
+        const message = errorState.querySelector('[data-error-message]') || errorState.querySelector('p');
+        if (message) message.textContent = `Something went wrong while loading your dashboard. ${error.message}`;
     }
 }
 
