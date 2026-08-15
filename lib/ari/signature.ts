@@ -1,8 +1,14 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 
-export function ariSecret(): string {
-  const value = process.env.ARI_SECRET;
-  if (!value) throw new Error("ARI_SECRET is not set");
+export function ariIngestSecret(): string {
+  const value = process.env.ARI_INGEST_SECRET;
+  if (!value) throw new Error("ARI_INGEST_SECRET is not set");
+  return value;
+}
+
+export function ariWebhookSecret(): string {
+  const value = process.env.ARI_WEBHOOK_SECRET;
+  if (!value) throw new Error("ARI_WEBHOOK_SECRET is not set");
   return value;
 }
 
@@ -16,7 +22,7 @@ export function ariBaseUrl(): string {
   return (process.env.ARI_BASE_URL ?? "https://webhooks.ari.hackclub.com").replace(/\/$/, "");
 }
 
-export function signBody(body: string, secret: string = ariSecret()): string {
+export function signBody(body: string, secret: string = ariIngestSecret()): string {
   return createHmac("sha256", secret).update(body, "utf8").digest("hex");
 }
 
@@ -24,7 +30,7 @@ export function signDelivery(
   timestamp: string,
   deliveryId: string,
   body: string,
-  secret: string = ariSecret(),
+  secret: string = ariWebhookSecret(),
 ): string {
   return createHmac("sha256", secret)
     .update(`${timestamp}.${deliveryId}.${body}`, "utf8")

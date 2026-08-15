@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { readDeliveryHeaders, verifyDelivery } from "@/lib/ari/delivery";
-import { ariSecret } from "@/lib/ari/signature";
+import { ariWebhookSecret } from "@/lib/ari/signature";
 import { getDb } from "@/lib/db";
 import { projects, webhookEvents } from "@/lib/db/schema";
 
@@ -17,9 +17,9 @@ export async function POST(request: Request) {
 
   let secret: string;
   try {
-    secret = ariSecret();
+    secret = ariWebhookSecret();
   } catch {
-    console.error("[ari] webhook received but ARI_SECRET is not set");
+    console.error("[ari] webhook received but ARI_WEBHOOK_SECRET is not set");
     return NextResponse.json({ error: "not configured" }, { status: 500 });
   }
 
