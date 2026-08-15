@@ -3,18 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { APP_NAV, isActive } from "@/lib/nav";
+import { isActive } from "@/lib/nav";
 import type { NavItem } from "@/lib/nav";
 
 import styles from "./NavLinks.module.css";
 
-export function NavLinks({
-  variant,
-  items = APP_NAV,
-}: {
-  variant: "side" | "bar";
-  items?: NavItem[];
-}) {
+export function NavLinks({ variant, items }: { variant: "side" | "bar"; items: NavItem[] }) {
   const pathname = usePathname() ?? "";
 
   return (

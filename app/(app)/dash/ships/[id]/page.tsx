@@ -7,9 +7,9 @@ import { Banner } from "@/components/ui/Banner";
 import { ButtonLink } from "@/components/ui/Button";
 import { Panel, PanelLabel } from "@/components/ui/Panel";
 import { ProjectStatusWord } from "@/components/ui/StatusWord";
+import { requireOrganizer } from "@/lib/auth/organizer";
 import { getDb } from "@/lib/db";
 import { projects, users } from "@/lib/db/schema";
-import { ADMIN_NAV } from "@/lib/nav";
 import { projectStatus } from "@/lib/projects/status";
 
 import { DecisionForm } from "./DecisionForm";
@@ -26,6 +26,8 @@ const WHEN = new Intl.DateTimeFormat("en-GB", {
 });
 
 export default async function ReviewPage({ params }: { params: Promise<{ id: string }> }) {
+  if (!(await requireOrganizer())) notFound();
+
   const { id } = await params;
 
   const [row] = await getDb()
@@ -40,7 +42,7 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
   const decided = Boolean(project.decision);
 
   return (
-    <AppShell title={project.title} nav={ADMIN_NAV} home="/admin">
+    <AppShell title={project.title}>
       <div className={styles.split}>
         <Panel>
           <PanelLabel>the submission</PanelLabel>

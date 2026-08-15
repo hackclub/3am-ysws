@@ -1,13 +1,14 @@
 import { desc, eq, isNotNull } from "drizzle-orm";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 
 import { AppShell } from "@/components/app/AppShell";
 import { Panel, PanelLabel } from "@/components/ui/Panel";
 import { ProjectStatusWord } from "@/components/ui/StatusWord";
+import { requireOrganizer } from "@/lib/auth/organizer";
 import { getDb } from "@/lib/db";
 import { projects, users } from "@/lib/db/schema";
-import { ADMIN_NAV } from "@/lib/nav";
 import { projectStatus } from "@/lib/projects/status";
 import type { ProjectStatus } from "@/lib/status";
 
@@ -31,6 +32,8 @@ export default async function ShipsPage({
 }: {
   searchParams: Promise<{ filter?: string }>;
 }) {
+  if (!(await requireOrganizer())) notFound();
+
   const { filter } = await searchParams;
   const active = FILTERS.find((option) => option.key === filter) ?? FILTERS[0];
 
@@ -44,12 +47,12 @@ export default async function ShipsPage({
   const shown = rows.filter((row) => active.matches(projectStatus(row.project)));
 
   return (
-    <AppShell title="submissions" nav={ADMIN_NAV} home="/admin">
+    <AppShell title="submissions">
       <nav className={styles.filters} aria-label="filter submissions">
         {FILTERS.map((option) => (
           <Link
             key={option.key}
-            href={`/admin/ships?filter=${option.key}`}
+            href={`/dash/ships?filter=${option.key}`}
             className={[styles.filter, option.key === active.key ? styles.on : null]
               .filter(Boolean)
               .join(" ")}
@@ -86,7 +89,7 @@ export default async function ShipsPage({
                       <span className={styles.sub}>{maker.slackId}</span>
                     </td>
                     <td>
-                      <Link href={`/admin/ships/${project.id}`}>{project.title}</Link>
+                      <Link href={`/dash/ships/${project.id}`}>{project.title}</Link>
                       <span className={styles.sub}>
                         {project.hackatimeProjects.join(", ") || "no hackatime projects"}
                       </span>

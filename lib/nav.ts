@@ -8,9 +8,9 @@ export const APP_NAV: NavItem[] = [
   { href: "/dash/settings", label: "settings" },
 ];
 
-export const ADMIN_NAV: NavItem[] = [
-  { href: "/admin", label: "overview" },
-  { href: "/admin/ships", label: "submissions" },
+export const ORGANIZER_NAV: NavItem[] = [
+  { href: "/dash/ships", label: "submissions" },
+  { href: "/dash/items", label: "shop items" },
 ];
 
 export const SITE_NAV: NavItem[] = [
@@ -20,6 +20,6 @@ export const SITE_NAV: NavItem[] = [
 ];
 
 export function isActive(pathname: string, href: string) {
-  if (href === "/dash" || href === "/admin") return pathname === href;
+  if (href === "/dash") return pathname === "/dash";
   return pathname === href || pathname.startsWith(`${href}/`);
 }

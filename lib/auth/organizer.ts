@@ -11,3 +11,9 @@ export function isOrganizer(user: Pick<User, "slackId"> | null | undefined): boo
   if (!user) return false;
   return organizerSlackIds().includes(user.slackId.trim().toUpperCase());
 }
+
+export async function requireOrganizer() {
+  const { getCurrentUser } = await import("./users");
+  const user = await getCurrentUser();
+  return isOrganizer(user) ? user : null;
+}
