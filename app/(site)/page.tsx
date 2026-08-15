@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import { Section } from "@/components/site/Section";
+import { Faq } from "@/components/site/Faq";
 import { Rewards } from "@/components/site/Rewards";
 import { Steps } from "@/components/site/Steps";
 import { ButtonLink } from "@/components/ui/Button";
@@ -53,6 +54,10 @@ export default function HomePage() {
 
       <Section id="rewards" label="rewards">
         <Rewards />
+      </Section>
+
+      <Section id="faq" label="questions">
+        <Faq />
       </Section>
     </>
   );
