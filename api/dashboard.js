@@ -45,18 +45,30 @@ function numberValue(value) {
   return 0;
 }
 
-function normalizeEmail(value) {
-  return String(value || '').trim().toLowerCase();
+function textValue(value) {
+  if (typeof value === 'string') return value.trim();
+  if (typeof value === 'number') return String(value);
+  if (Array.isArray(value)) return value.map(textValue).filter(Boolean).join(', ');
+  if (value && typeof value === 'object') return textValue(value.name ?? value.text ?? value.value);
+  return '';
+}
+
+function isTruthy(value) {
+  if (value === true) return true;
+  if (typeof value === 'string') return /^(true|yes|checked|approved|1)$/i.test(value.trim());
+  return Boolean(value);
 }
 
 function isUnified(record) {
-  const entries = Object.entries(record.fields || {});
-  const checkbox = entries.find(([name]) => /^submit\s*to\s*unified$/i.test(name));
-  if (!checkbox) return false;
-  const value = checkbox[1];
-  if (value === true) return true;
-  if (typeof value === 'string') return /^(true|yes|checked|approved)$/i.test(value.trim());
-  return Boolean(value);
+  return isTruthy(field(record, [/^submit\s*to\s*unified$/i]));
+}
+
+function internalReview(record) {
+  return textValue(field(record, [/^internal\s*review$/i, /internal\s*review/i])).toLowerCase();
+}
+
+function automationStatus(record) {
+  return textValue(field(record, [/^automation\s*status$/i, /automation\s*status/i])).toLowerCase();
 }
 
 async function airtable(path, options = {}) {
@@ -72,13 +84,30 @@ async function airtable(path, options = {}) {
   return response.json();
 }
 
-function matchesIdentity(record, email, slackId) {
-  const entries = Object.entries(record.fields || {});
-  return entries.some(([name, value]) => {
-    if (/email|e-mail/i.test(name)) return normalizeEmail(value) === email;
-    if (/slack/i.test(name)) return String(value || '').trim() === slackId;
-    return false;
+function tableByName(tables, pattern) {
+  return tables.find(table => pattern.test(String(table.name || '').trim()));
+}
+
+async function recordsForTable(table, email) {
+  if (!table) return [];
+  const emailFields = (table.fields || []).filter(field => /^(email|e-mail)$/i.test(field.name) || /email|e-mail/i.test(field.name));
+  const formulaParts = emailFields.map(field => `{${field.name.replace(/([{}])/g, '$1')}} = "${email.replace(/"/g, '\\"')}"`);
+  if (!formulaParts.length) return [];
+
+  const params = new URLSearchParams({
+    pageSize: '100',
+    filterByFormula: formulaParts.length === 1 ? formulaParts[0] : `OR(${formulaParts.join(',')})`
   });
+
+  const records = [];
+  let offset = null;
+  do {
+    if (offset) params.set('offset', offset);
+    const data = await airtable(`${encodeURIComponent(table.id)}?${params.toString()}`);
+    records.push(...(data.records || []));
+    offset = data.offset || null;
+  } while (offset);
+  return records;
 }
 
 module.exports = async (req, res) => {
@@ -94,7 +123,7 @@ module.exports = async (req, res) => {
 
     const hca = await hcaResponse.json();
     const identity = hca.identity || {};
-    const email = normalizeEmail(identity.primary_email);
+    const email = (identity.primary_email || '').trim().toLowerCase();
     const slackId = (identity.slack_id || '').trim();
 
     const schema = await fetch(`https://api.airtable.com/v0/meta/bases/${process.env.AIRTABLE_BASE_ID}/tables`, {
@@ -102,108 +131,63 @@ module.exports = async (req, res) => {
     });
 
     if (!schema.ok) {
-      return res.status(200).json({
-        authenticated: true,
-        setupRequired: true,
-        user: { name: [identity.first_name, identity.last_name].filter(Boolean).join(' '), email, slackId },
-        projects: [], approvedHours: 0, beans: 0
-      });
+      return res.status(200).json({ authenticated: true, setupRequired: true, user: { name: [identity.first_name, identity.last_name].filter(Boolean).join(' '), email, slackId }, projects: [], approvedHours: 0, beans: 0 });
     }
 
     const { tables = [] } = await schema.json();
+    const projectsTable = tableByName(tables, /^ysws\s*project\s*submission$/i);
+    const shopTable = tableByName(tables, /^shop\s*data\s*:\s*d$/i);
 
-    // Shop Data is the source of truth for the user's current bean balance.
-    // Read that table directly instead of relying on the generic candidate-table matcher.
-    const shopDataTable = tables.find(table => /shop\s*data/i.test(table.name));
-    let shopDataRecord = null;
-    let shopBeans = 0;
-    let shopBeansSpent = 0;
+    // These are deliberately separate tables. Never take Coffee Beans from an arbitrary
+    // table that happens to contain a similarly named field.
+    const [projectRecords, shopRecords] = await Promise.all([
+      recordsForTable(projectsTable, email),
+      recordsForTable(shopTable, email)
+    ]);
 
-    if (shopDataTable) {
-      try {
-        const shopData = await airtable(`${encodeURIComponent(shopDataTable.id)}?maxRecords=100`);
-        shopDataRecord = (shopData.records || []).find(record => matchesIdentity(record, email, slackId)) || null;
-        if (shopDataRecord) {
-          shopBeans = numberValue(field(shopDataRecord, [/^coffee\s*beans$/i, /coffee\s*beans/i]));
-          shopBeansSpent = numberValue(field(shopDataRecord, [/^coffee\s*beans\s*spent$/i, /coffee\s*beans\s*spent/i]));
-        }
-      } catch (error) {
-        console.error('Unable to read Shop Data:', error.message);
-      }
-    }
-
-    const candidateTables = tables.filter(table =>
-      table.fields?.some(field => /email|e-mail|slack/i.test(field.name))
-    ).slice(0, 15);
-
-    const matched = [];
-    for (const table of candidateTables) {
-      if (shopDataTable && table.id === shopDataTable.id) continue;
-
-      const identityFields = table.fields.filter(field => /email|e-mail|slack/i.test(field.name)).map(field => field.name);
-      const formulaParts = [];
-      for (const name of identityFields) {
-        const escapedName = name.replace(/([{}])/g, '$1');
-        if (email && /email|e-mail/i.test(name)) formulaParts.push(`{${escapedName}} = "${email.replace(/"/g, '\\"')}"`);
-        if (slackId && /slack/i.test(name)) formulaParts.push(`{${escapedName}} = "${slackId.replace(/"/g, '\\"')}"`);
-      }
-      if (!formulaParts.length) continue;
-
-      const params = new URLSearchParams({
-        maxRecords: '100',
-        filterByFormula: `OR(${formulaParts.join(',')})`
-      });
-      try {
-        const data = await airtable(`${encodeURIComponent(table.id)}?${params.toString()}`);
-        for (const record of data.records || []) matched.push({ table: table.name, record });
-      } catch (error) {
-        console.error(`Skipping Airtable table ${table.name}:`, error.message);
-      }
-    }
-
-    const projects = matched.map(({ table, record }) => {
-      const hours = numberValue(field(record, [
-        /^hours\s*approved$/i,
-        /hours?\s*approved/i,
-        /approved\s*hours?/i,
-        /hours?\s*(spent|coded|worked)/i,
-        /time/i
-      ]));
-      const name = field(record, [/project\s*name/i, /^project$/i, /project/i, /title/i, /name/i]);
-      const statusValue = field(record, [/status/i, /decision/i, /approved/i]);
-      const unified = isUnified(record);
-      const github = field(record, [/github\s*(username|user|handle)/i, /github/i]);
-      const codeUrl = field(record, [
-        /ysws\s*project\s*submission/i,
-        /code\s*url/i,
-        /github\s*url/i,
-        /repository/i,
-        /repo/i,
-        /github/i,
-        /url/i,
-        /link/i
-      ]);
-      return {
-        id: record.id,
-        table,
-        name: typeof name === 'string' ? name : `Project ${record.id.slice(-5)}`,
-        hours,
-        approved: unified,
-        unified,
-        status: unified ? 'approved' : (typeof statusValue === 'string' ? statusValue : 'submitted'),
-        githubUsername: typeof github === 'string' ? github.replace(/^@/, '') : null,
-        codeUrl: typeof codeUrl === 'string' && /^https?:\/\//i.test(codeUrl) ? codeUrl : null
-      };
-    }).filter(project => project.unified);
-
+    const shopDataRecord = shopRecords[0] || null;
+    const beans = shopDataRecord ? numberValue(field(shopDataRecord, [/^coffee\s*beans$/i])) : 0;
+    const beansSpent = shopDataRecord ? numberValue(field(shopDataRecord, [/^coffee\s*beans\s*spent$/i])) : 0;
     const approvedHours = shopDataRecord
       ? numberValue(field(shopDataRecord, [/^hours\s*approved$/i, /hours?\s*approved/i]))
-      : projects.reduce((sum, project) => sum + project.hours, 0);
+      : 0;
+
+    const projects = projectRecords.map(record => {
+      const review = internalReview(record);
+      const automation = automationStatus(record);
+      const unified = isUnified(record);
+
+      let status = 'submitted';
+      let approved = false;
+      if (/reject|rejected|deny|denied/i.test(review)) {
+        status = 'rejected';
+      } else if (unified) {
+        status = 'approved';
+        approved = true;
+      } else if (/pending/i.test(automation)) {
+        status = 'pending';
+      }
+
+      const nameValue = field(record, [/project\s*name/i, /^project$/i, /title/i, /^name$/i]);
+      const codeValue = field(record, [/ysws\s*project\s*submission/i, /code\s*url/i, /github\s*url/i, /repository/i, /repo/i, /url/i, /link/i]);
+      const hours = numberValue(field(record, [/^hours\s*approved$/i, /hours?\s*approved/i, /approved\s*hours?/i, /hours?\s*(spent|coded|worked)/i]));
+
+      return {
+        id: record.id,
+        table: projectsTable?.name || 'YSWS Project Submission',
+        name: textValue(nameValue) || `Project ${record.id.slice(-5)}`,
+        hours,
+        approved,
+        unified,
+        status,
+        codeUrl: /^https?:\/\//i.test(textValue(codeValue)) ? textValue(codeValue) : null
+      };
+    });
 
     res.setHeader('Cache-Control', 'private, no-store');
     return res.status(200).json({
       authenticated: true,
-      setupRequired: false,
+      setupRequired: !projectsTable || !shopTable,
       user: {
         id: identity.id || null,
         name: [identity.first_name, identity.last_name].filter(Boolean).join(' ') || null,
@@ -214,8 +198,8 @@ module.exports = async (req, res) => {
       },
       projects,
       approvedHours,
-      beans: shopDataRecord ? shopBeans : 0,
-      beansSpent: shopDataRecord ? shopBeansSpent : 0
+      beans,
+      beansSpent
     });
   } catch (error) {
     console.error('Dashboard data error:', error);
