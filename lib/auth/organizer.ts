@@ -1,13 +1,13 @@
 import type { User } from "@/lib/db/schema";
 
-export function organizerEmails(): string[] {
-  return (process.env.ORGANIZER_EMAILS ?? "")
+export function organizerSlackIds(): string[] {
+  return (process.env.ORGANIZER_SLACK_IDS ?? "")
     .split(",")
-    .map((entry) => entry.trim().toLowerCase())
+    .map((entry) => entry.trim().toUpperCase())
     .filter(Boolean);
 }
 
-export function isOrganizer(user: Pick<User, "email"> | null | undefined): boolean {
+export function isOrganizer(user: Pick<User, "slackId"> | null | undefined): boolean {
   if (!user) return false;
-  return organizerEmails().includes(user.email.trim().toLowerCase());
+  return organizerSlackIds().includes(user.slackId.trim().toUpperCase());
 }
