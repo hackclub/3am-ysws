@@ -11,6 +11,7 @@ export const APP_NAV: NavItem[] = [
 export const ORGANIZER_NAV: NavItem[] = [
   { href: "/dash/ships", label: "submissions" },
   { href: "/dash/items", label: "shop items" },
+  { href: "/dash/fulfilment", label: "fulfilment" },
 ];
 
 export const SITE_NAV: NavItem[] = [
