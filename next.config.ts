@@ -7,7 +7,8 @@ const extraOrigins = (process.env.DEV_ALLOWED_ORIGINS ?? "")
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  output: "standalone",
+  // Vercel handles the production output itself. Keep standalone for Docker/self-hosted builds.
+  output: process.env.VERCEL ? undefined : "standalone",
   allowedDevOrigins: [
     "*.trycloudflare.com",
     "*.ngrok-free.app",
