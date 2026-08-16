@@ -1,0 +1,64 @@
+:root {
+  --night: #101014;
+  --surface: #13111a;
+  --raised: #1b1826;
+  --rule: #29272b;
+  --edge: #393642;
+  --glow: #6f6387;
+
+  --cream: #f4f0e8;
+  --soft: #c8c3cc;
+  --lilac: #a89bbd;
+  --muted: #8d8299;
+
+  --lamp: #f7e9a8;
+  --orchid: #d6b8dc;
+  --blush: #d7a9c5;
+  --chalk: #c8bfd0;
+  --lamp-bright: #fff3bd;
+  --on-lamp: #14121a;
+
+  --ok: #a8d8a8;
+  --warn: #e8b98a;
+  --bad: #e39aa0;
+  --info: #9ab6e0;
+
+  --display: var(--font-readex), ui-sans-serif, system-ui, sans-serif;
+  --body: var(--font-readex), ui-sans-serif, system-ui, sans-serif;
+  --wordmark: var(--font-wordmark), "Comic Sans MS", cursive;
+  --data: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --t-hero: clamp(52px, 8vw, 92px);
+  --t-title: 34px;
+  --t-section: 26px;
+  --t-control: 17px;
+  --t-body: 17px;
+  --t-eyebrow: 13px;
+  --t-help: 13.5px;
+  --t-label: 13px;
+  --t-data: 12.5px;
+
+  --track-eyebrow: 1.8px;
+  --track-label: 1.4px;
+
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+  --s8: 72px;
+
+  --wobble: 3px 10px 5px 8px / 8px 3px 10px 4px;
+  --wobble-sm: 3px 8px 4px 6px / 6px 3px 8px 3px;
+  --radius-input: 6px;
+  --radius-pill: 999px;
+
+  --drop: 5px 5px 0 var(--chalk);
+  --drop-quiet: 4px 4px 0 var(--rule);
+  --tilt: -1.5deg;
+
+  --measure: 65ch;
+  --page: 680px;
+}

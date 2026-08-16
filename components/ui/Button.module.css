@@ -1,0 +1,103 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s2);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: var(--t-control);
+  line-height: 1;
+  letter-spacing: 0.2px;
+  padding: 13px 22px;
+  background: var(--lamp);
+  color: var(--on-lamp);
+  border: 3px solid var(--lamp);
+  border-radius: var(--wobble);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.root:hover {
+  background: var(--lamp-bright);
+  border-color: var(--lamp-bright);
+  transform: translateY(-2px);
+}
+
+.ghost {
+  background: transparent;
+  border: 2px dashed var(--muted);
+  color: var(--cream);
+  box-shadow: none;
+  padding: 13px 20px;
+}
+
+.ghost:hover {
+  background: #29243d;
+  border-style: solid;
+  box-shadow: none;
+  transform: rotate(-1deg) translateY(-3px);
+}
+
+.quiet {
+  background: transparent;
+  border: 2px solid var(--edge);
+  color: var(--soft);
+  box-shadow: none;
+  font-size: 15px;
+  padding: 10px 16px;
+}
+
+.quiet:hover {
+  color: var(--lamp);
+  border-color: var(--glow);
+  box-shadow: none;
+  transform: none;
+}
+
+.danger {
+  background: transparent;
+  border: 2px solid var(--bad);
+  color: var(--bad);
+  box-shadow: none;
+  font-size: 15px;
+  padding: 10px 16px;
+}
+
+.danger:hover {
+  background: rgba(227, 154, 160, 0.12);
+  box-shadow: none;
+  transform: none;
+}
+
+.root:disabled,
+.root[aria-disabled="true"] {
+  opacity: 0.42;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+  filter: grayscale(0.4);
+}
+
+.loading {
+  color: var(--lilac);
+  box-shadow: none;
+  transform: none;
+  cursor: progress;
+}
+
+.loading:hover {
+  box-shadow: none;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root:hover {
+    transform: none;
+  }
+}

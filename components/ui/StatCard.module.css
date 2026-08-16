@@ -1,0 +1,37 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 22px 20px;
+  background: var(--surface);
+  border: 2px solid var(--edge);
+  border-radius: var(--wobble);
+  box-shadow: var(--drop-quiet);
+}
+
+.accent {
+  border-color: var(--glow);
+  box-shadow: 4px 4px 0 var(--glow);
+}
+
+.label {
+  font-size: 12px;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--lilac);
+}
+
+.value {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 38px;
+  line-height: 1;
+  color: var(--lamp);
+  text-shadow: 3px 3px 0 var(--glow);
+  font-variant-numeric: tabular-nums;
+}
+
+.sub {
+  font-size: 14px;
+  color: var(--muted);
+}

@@ -1,0 +1,60 @@
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.side a {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 12px;
+  font-size: 14.5px;
+  color: var(--soft);
+  text-decoration: none;
+  border: 1.5px solid transparent;
+  border-radius: var(--wobble-sm);
+}
+
+.side a:hover {
+  background: var(--raised);
+  color: var(--cream);
+}
+
+.side a.on {
+  background: var(--raised);
+  border-color: var(--edge);
+  color: var(--lamp);
+}
+
+.bar {
+  display: flex;
+  background: var(--surface);
+  border-top: 2px solid var(--rule);
+}
+
+.bar a {
+  flex: 1;
+  min-height: 44px;
+  padding: 9px 0 11px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.bar a.on {
+  color: var(--lamp);
+}
+
+.mark {
+  display: block;
+  font-family: var(--data);
+  font-size: 13px;
+  margin-bottom: 2px;
+  color: var(--muted);
+}
+
+.on .mark {
+  color: var(--lamp);
+}

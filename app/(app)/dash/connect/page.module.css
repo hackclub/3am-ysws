@@ -1,0 +1,35 @@
+.copy {
+  max-width: 60ch;
+  font-size: 16px;
+  color: var(--soft);
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  font-family: var(--data);
+  font-size: 13px;
+  color: var(--soft);
+  background: var(--night);
+  border: 1px solid var(--edge);
+  border-radius: 5px;
+}
+
+.chip span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3);
+}
