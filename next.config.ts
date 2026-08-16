@@ -8,6 +8,9 @@ const extraOrigins = (process.env.DEV_ALLOWED_ORIGINS ?? "")
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   output: "standalone",
+  experimental: {
+    cpus: 2,
+  },
   allowedDevOrigins: [
     "*.trycloudflare.com",
     "*.ngrok-free.app",

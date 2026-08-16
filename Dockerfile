@@ -5,7 +5,8 @@ RUN npm ci
 
 FROM node:24-alpine AS builder
 WORKDIR /app
-ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_TELEMETRY_DISABLED=1 \
+    NODE_OPTIONS=--max-old-space-size=2048
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
@@ -14,6 +15,7 @@ FROM node:24-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
+    NODE_OPTIONS=--max-old-space-size=512 \
     PORT=3000 \
     HOSTNAME=0.0.0.0
 
