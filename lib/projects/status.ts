@@ -1,5 +1,5 @@
 import type { Project } from "@/lib/db/schema";
-import type { ProjectStatus } from "@/lib/status";
+import type { OrderStatus, ProjectStatus } from "@/lib/status";
 
 export function projectStatus(project: Pick<Project, "submittedAt" | "decision">): ProjectStatus {
   if (!project.submittedAt) return "draft";
@@ -20,4 +20,8 @@ export function projectStatus(project: Pick<Project, "submittedAt" | "decision">
 
 export function isOpen(project: Pick<Project, "submittedAt" | "decision">): boolean {
   return Boolean(project.submittedAt) && !project.decision;
+}
+
+export function orderStatusOf(status: string): OrderStatus {
+  return status === "needs_address" ? "needsAddress" : (status as OrderStatus);
 }
