@@ -12,10 +12,6 @@ function cdnToken(): string | null {
   return process.env.CDN_TOKEN?.trim() || null;
 }
 
-export function cdnIsConfigured(): boolean {
-  return cdnToken() !== null;
-}
-
 export async function uploadToCdn(file: File): Promise<UploadOutcome> {
   if (!ALLOWED_TYPES.includes(file.type)) return { status: "wrong_type" };
   if (file.size > MAX_UPLOAD_BYTES) return { status: "too_big" };

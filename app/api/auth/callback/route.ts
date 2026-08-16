@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+import { publicUrl } from "@/lib/http";
+
 import { exchangeCode } from "@/lib/auth/hca";
 import { verifyIdToken } from "@/lib/auth/id-token";
 import { OAUTH_STATE_COOKIE, parseOAuthState } from "@/lib/auth/oauth-state";
@@ -15,7 +17,7 @@ function clearState(response: NextResponse) {
 }
 
 function failed(request: NextRequest, reason: string) {
-  const url = new URL("/login", request.nextUrl.origin);
+  const url = publicUrl(request, "/login");
   url.searchParams.set("error", reason);
   return clearState(NextResponse.redirect(url));
 }
@@ -61,6 +63,6 @@ export async function GET(request: NextRequest) {
     return failed(request, "identity");
   }
 
-  const response = NextResponse.redirect(new URL(returnTo ?? "/dash", request.nextUrl.origin));
+  const response = NextResponse.redirect(publicUrl(request, returnTo ?? "/dash"));
   return clearState(await setSession(response, sub));
 }

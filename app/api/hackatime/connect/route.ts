@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+import { publicUrl } from "@/lib/http";
+
 import { appUrl } from "@/lib/auth/hca";
 import { OAUTH_STATE_MAX_AGE, createOAuthState } from "@/lib/auth/oauth-state";
 import { getSession } from "@/lib/auth/session";
@@ -10,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   if (!(await getSession())) {
-    return NextResponse.redirect(new URL("/login?next=%2Fdash%2Fconnect", request.nextUrl.origin));
+    return NextResponse.redirect(publicUrl(request, "/login?next=%2Fdash%2Fconnect"));
   }
 
   const { nonce, state } = createOAuthState();

@@ -15,7 +15,7 @@ import { getCurrentUser } from "@/lib/auth/users";
 import { getDb } from "@/lib/db";
 import { projects } from "@/lib/db/schema";
 import { isOpen, projectStatus } from "@/lib/projects/status";
-import { BEANS_PER_HOUR } from "@/lib/rewards";
+import { beansForMinutes } from "@/lib/beans";
 
 import styles from "./page.module.css";
 
@@ -70,7 +70,7 @@ export default async function DashboardPage() {
     0,
   );
   const beans = approved.reduce(
-    (total, project) => total + Math.floor((project.approvedMinutes ?? 0) / 60) * BEANS_PER_HOUR,
+    (total, project) => total + beansForMinutes(project.approvedMinutes),
     0,
   );
   const waiting = mine.filter(isOpen);
@@ -84,7 +84,7 @@ export default async function DashboardPage() {
           value={Math.floor(approvedMinutes / 60)}
           sub={approved.length === 1 ? "across 1 project" : `across ${approved.length} projects`}
         />
-        <StatCard label="beans" value={beans} sub={`${BEANS_PER_HOUR} per approved hour`} />
+        <StatCard label="beans" value={beans} sub="5 per approved hour" />
         <StatCard
           label="waiting on us"
           value={waiting.length}

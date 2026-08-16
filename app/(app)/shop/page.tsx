@@ -1,4 +1,4 @@
-import { and, asc, eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { redirect } from "next/navigation";

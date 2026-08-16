@@ -2,6 +2,8 @@ import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+import { publicUrl } from "@/lib/http";
+
 import { appUrl } from "@/lib/auth/hca";
 import { parseOAuthState } from "@/lib/auth/oauth-state";
 import { getSession } from "@/lib/auth/session";
@@ -17,7 +19,7 @@ import {
 export const dynamic = "force-dynamic";
 
 function back(request: NextRequest, status: string) {
-  const url = new URL("/dash/connect", request.nextUrl.origin);
+  const url = publicUrl(request, "/dash/connect");
   url.searchParams.set("status", status);
   const response = NextResponse.redirect(url);
   response.cookies.set(HACKATIME_STATE_COOKIE, "", { path: "/", maxAge: 0 });
@@ -27,7 +29,7 @@ function back(request: NextRequest, status: string) {
 export async function GET(request: NextRequest) {
   const session = await getSession();
   if (!session) {
-    return NextResponse.redirect(new URL("/login?next=%2Fdash%2Fconnect", request.nextUrl.origin));
+    return NextResponse.redirect(publicUrl(request, "/login?next=%2Fdash%2Fconnect"));
   }
 
   const params = request.nextUrl.searchParams;
