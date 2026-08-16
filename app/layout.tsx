@@ -13,6 +13,9 @@ export const metadata: Metadata = {
     template: "%s · 3am",
   },
   description: "Build something dark before the sun comes up. A Hack Club YSWS.",
+  icons: {
+    icon: "https://assets.hackclub.com/icon-rounded.svg",
+  },
   openGraph: {
     title: "3am",
     description: "Build something dark before the sun comes up. A Hack Club YSWS.",
