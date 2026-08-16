@@ -8,14 +8,24 @@
   border-bottom: 2px solid var(--rule);
 }
 
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+  text-decoration: none;
+  transform: rotate(-2deg);
+}
+
+.brand img {
+  margin-bottom: 4px;
+}
+
 .wordmark {
-  display: inline-block;
   font-family: var(--wordmark);
   font-size: 28px;
+  line-height: 1;
   color: var(--lamp);
   text-shadow: 3px 3px 0 var(--glow);
-  transform: rotate(-2deg);
-  text-decoration: none;
 }
 
 .links {

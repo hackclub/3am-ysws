@@ -16,14 +16,25 @@
   height: 100vh;
 }
 
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 13px;
+  align-self: flex-start;
+  text-decoration: none;
+  transform: rotate(-2deg);
+}
+
+.brand img {
+  margin-bottom: 3px;
+}
+
 .wordmark {
-  display: inline-block;
   font-family: var(--wordmark);
   font-size: 24px;
+  line-height: 1;
   color: var(--lamp);
   text-shadow: 2px 2px 0 var(--glow);
-  transform: rotate(-2deg);
-  text-decoration: none;
 }
 
 .sideFoot {

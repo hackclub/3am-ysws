@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -27,8 +28,16 @@ export async function AppShell({
     <>
       <div className={styles.shell}>
         <aside className={styles.side}>
-          <Link href="/dash" className={styles.wordmark}>
-            3am
+          <Link href="/dash" className={styles.brand}>
+            <Image
+              src="/assets/owl.png"
+              alt=""
+              width={26}
+              height={26}
+              className="pixel"
+              unoptimized
+            />
+            <span className={styles.wordmark}>3am</span>
           </Link>
           <NavLinks variant="side" items={nav} />
           {aside ? <div className={styles.sideFoot}>{aside}</div> : null}
