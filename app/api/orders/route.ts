@@ -2,6 +2,7 @@ import { and, eq, gt, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { getCurrentUser } from "@/lib/auth/users";
+import { readAddress, validateAddress } from "@/lib/address";
 import { getDb } from "@/lib/db";
 import { beansLedger, items, orders, users } from "@/lib/db/schema";
 
@@ -17,15 +18,6 @@ type Body = {
   postcode?: string;
   country?: string;
 };
-
-const REQUIRED: [keyof Body, string][] = [
-  ["fullName", "We need a name for the parcel."],
-  ["email", "We need an email in case something goes wrong."],
-  ["addressLine1", "We need a street and number."],
-  ["city", "We need a city."],
-  ["postcode", "We need a postcode."],
-  ["country", "We need a country."],
-];
 
 function invalid(field: string, message: string) {
   return NextResponse.json({ error: "invalid", field, message }, { status: 422 });
@@ -44,9 +36,9 @@ export async function POST(request: Request) {
 
   if (!body.itemId) return invalid("itemId", "Pick something first.");
 
-  for (const [field, message] of REQUIRED) {
-    if (!body[field]?.trim()) return invalid(field, message);
-  }
+  const address = readAddress(body);
+  const problem = validateAddress(address);
+  if (problem) return invalid(problem.field, problem.message);
   if (!body.email?.includes("@")) return invalid("email", "That does not look like an email.");
 
   try {
@@ -86,15 +78,27 @@ export async function POST(request: Request) {
           itemId: item.id,
           itemName: item.name,
           cost: item.cost,
-          fullName: body.fullName?.trim(),
+          fullName: address.fullName,
           email: body.email?.trim().toLowerCase(),
-          addressLine1: body.addressLine1?.trim(),
-          addressLine2: body.addressLine2?.trim() || null,
-          city: body.city?.trim(),
-          postcode: body.postcode?.trim(),
-          country: body.country?.trim(),
+          addressLine1: address.addressLine1,
+          addressLine2: address.addressLine2 || null,
+          city: address.city,
+          postcode: address.postcode,
+          country: address.country,
         })
         .returning({ id: orders.id });
+
+      await tx
+        .update(users)
+        .set({
+          fullName: address.fullName,
+          addressLine1: address.addressLine1,
+          addressLine2: address.addressLine2 || null,
+          city: address.city,
+          postcode: address.postcode,
+          country: address.country,
+        })
+        .where(eq(users.sub, user.sub));
 
       await tx.insert(beansLedger).values({
         userSub: user.sub,

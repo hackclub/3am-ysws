@@ -6,10 +6,12 @@ import { ButtonLink } from "@/components/ui/Button";
 import { Panel, PanelLabel } from "@/components/ui/Panel";
 import { SignOutButton } from "@/components/ui/SignOutButton";
 import { StatusWord } from "@/components/ui/StatusWord";
+import { readAddress } from "@/lib/address";
 import { hcaIssuer } from "@/lib/auth/hca";
 import { getCurrentUser } from "@/lib/auth/users";
 import { getPickerProjects } from "@/lib/hackatime/projects";
 
+import { AddressForm } from "./AddressForm";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = { title: "settings" };
@@ -21,6 +23,7 @@ export default async function SettingsPage() {
 
   const projects = await getPickerProjects(user);
   const connected = projects !== null;
+  const saved = readAddress(user);
 
   return (
     <AppShell title="settings">
@@ -61,6 +64,15 @@ export default async function SettingsPage() {
             ? `We can see ${projects.length} ${projects.length === 1 ? "project" : "projects"}. This is how your hours are counted.`
             : "Without it you cannot pick your projects when you ship, and typed names that do not match count as zero hours."}
         </p>
+      </Panel>
+
+      <Panel className={styles.panel}>
+        <PanelLabel>where grants go</PanelLabel>
+        <p className={styles.help}>
+          Fill this in once and checkout is one click. Only organizers packing your grant can see
+          it.
+        </p>
+        <AddressForm address={{ ...saved, fullName: saved.fullName || user.name }} />
       </Panel>
 
       <Panel className={styles.panel}>

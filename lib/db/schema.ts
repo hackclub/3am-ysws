@@ -21,6 +21,13 @@ export const users = pgTable("users", {
   slackId: text("slack_id").notNull().unique(),
   hackatimeId: text("hackatime_id"),
   hackatimeToken: text("hackatime_token"),
+
+  fullName: text("full_name"),
+  addressLine1: text("address_line1"),
+  addressLine2: text("address_line2"),
+  city: text("city"),
+  postcode: text("postcode"),
+  country: text("country"),
 });
 
 export const decision = pgEnum("decision", ["approved", "changes", "rejected", "withdrawn"]);
@@ -31,7 +38,7 @@ export const projects = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     userSub: text("user_sub")
       .notNull()
-      .references(() => users.sub),
+      .references(() => users.sub, { onUpdate: "cascade" }),
 
     title: text("title").notNull(),
     description: text("description"),
@@ -74,7 +81,7 @@ export const beansLedger = pgTable(
     id: bigserial("id", { mode: "number" }).primaryKey(),
     userSub: text("user_sub")
       .notNull()
-      .references(() => users.sub),
+      .references(() => users.sub, { onUpdate: "cascade" }),
     delta: integer("delta").notNull(),
     reason: beansReason("reason").notNull(),
     projectId: uuid("project_id").references(() => projects.id, { onDelete: "set null" }),
@@ -121,7 +128,7 @@ export const orders = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     userSub: text("user_sub")
       .notNull()
-      .references(() => users.sub),
+      .references(() => users.sub, { onUpdate: "cascade" }),
     itemId: uuid("item_id").references(() => items.id),
 
     itemName: text("item_name").notNull(),
