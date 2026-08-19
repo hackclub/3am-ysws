@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 
 import { getDb } from "@/lib/db";
 import { users } from "@/lib/db/schema";
@@ -23,10 +23,23 @@ export async function upsertUser(claims: HcaClaims) {
     sub: claims.sub,
     email: claims.email.trim().toLowerCase(),
     name: displayName(claims),
-    slackId: claims.slack_id,
+    slackId: claims.slack_id.trim(),
   };
 
-  await getDb()
+  const db = getDb();
+
+  const adopted = await db
+    .update(users)
+    .set(row)
+    .where(and(eq(users.slackId, row.slackId), ne(users.sub, row.sub)))
+    .returning({ sub: users.sub });
+
+  if (adopted.length > 0) {
+    console.info(`[auth] adopted migrated account ${row.slackId} as ${row.sub}`);
+    return row;
+  }
+
+  await db
     .insert(users)
     .values(row)
     .onConflictDoUpdate({

@@ -57,6 +57,13 @@
       "when": 1786824447590,
       "tag": "0007_dapper_ultragirl",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1787137610516,
+      "tag": "0008_chief_dracula",
+      "breakpoints": true
     }
   ]
 }

@@ -31,7 +31,7 @@ export const projects = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     userSub: text("user_sub")
       .notNull()
-      .references(() => users.sub),
+      .references(() => users.sub, { onUpdate: "cascade" }),
 
     title: text("title").notNull(),
     description: text("description"),
@@ -74,7 +74,7 @@ export const beansLedger = pgTable(
     id: bigserial("id", { mode: "number" }).primaryKey(),
     userSub: text("user_sub")
       .notNull()
-      .references(() => users.sub),
+      .references(() => users.sub, { onUpdate: "cascade" }),
     delta: integer("delta").notNull(),
     reason: beansReason("reason").notNull(),
     projectId: uuid("project_id").references(() => projects.id, { onDelete: "set null" }),
@@ -121,7 +121,7 @@ export const orders = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     userSub: text("user_sub")
       .notNull()
-      .references(() => users.sub),
+      .references(() => users.sub, { onUpdate: "cascade" }),
     itemId: uuid("item_id").references(() => items.id),
 
     itemName: text("item_name").notNull(),
