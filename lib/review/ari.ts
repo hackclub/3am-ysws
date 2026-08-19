@@ -3,6 +3,15 @@ import { ariBaseUrl, ariProgramId, signBody } from "@/lib/ari/signature";
 
 import type { ReviewBackend, ReviewSubmission, SubmitOutcome, WithdrawOutcome } from "./types";
 
+async function readStatus(response: Response): Promise<string | null> {
+  try {
+    const body = (await response.json()) as { status?: string };
+    return body.status ?? null;
+  } catch {
+    return null;
+  }
+}
+
 async function readField(response: Response): Promise<{ field?: string; message?: string }> {
   try {
     const body = (await response.json()) as { field?: string; error?: string; message?: string };
@@ -41,8 +50,12 @@ export const ariBackend: ReviewBackend = {
       return { status: "unavailable", message: "We could not reach the reviewers just now." };
     }
 
-    if (response.status === 202 || response.status === 200) return { status: "queued" };
     if (response.status === 409) return { status: "already_queued" };
+
+    if (response.status === 202 || response.status === 200) {
+      const reported = await readStatus(response);
+      return reported === "duplicate" ? { status: "already_queued" } : { status: "queued" };
+    }
 
     if (response.status === 422) {
       const { field, message } = await readField(response);
