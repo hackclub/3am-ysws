@@ -16,7 +16,8 @@
     "db:seed": "tsx --env-file=.env scripts/seed.ts",
     "db:seed-shop": "tsx --env-file=.env scripts/seed-shop.ts",
     "migrate:report": "tsx --env-file=.env scripts/migrate-report.ts",
-    "migrate:import": "tsx --env-file=.env scripts/migrate-import.ts"
+    "migrate:import": "tsx --env-file=.env scripts/migrate-import.ts",
+    "migrate:beans": "tsx --env-file=.env scripts/migrate-beans.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",
