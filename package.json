@@ -12,15 +12,18 @@
     "format:check": "prettier --check .",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:migrate:prod": "node --env-file=.env.prod node_modules/drizzle-kit/bin.cjs migrate",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx --env-file=.env scripts/seed.ts",
     "db:seed-shop": "tsx --env-file=.env scripts/seed-shop.ts",
+    "db:seed-shop:prod": "tsx --env-file=.env --env-file=.env.prod scripts/seed-shop.ts",
     "migrate:report": "tsx --env-file=.env scripts/migrate-report.ts",
     "migrate:import": "tsx --env-file=.env scripts/migrate-import.ts",
     "migrate:beans": "tsx --env-file=.env scripts/migrate-beans.ts",
     "migrate:orders": "tsx --env-file=.env scripts/migrate-orders.ts",
     "migrate:screenshots": "tsx --env-file=.env scripts/migrate-screenshots.ts",
-    "migrate:queue": "tsx --env-file=.env scripts/migrate-queue.ts"
+    "migrate:queue": "tsx --env-file=.env scripts/migrate-queue.ts",
+    "promote": "tsx --env-file=.env --env-file=.env.prod scripts/promote.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",
