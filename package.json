@@ -18,7 +18,8 @@
     "migrate:report": "tsx --env-file=.env scripts/migrate-report.ts",
     "migrate:import": "tsx --env-file=.env scripts/migrate-import.ts",
     "migrate:beans": "tsx --env-file=.env scripts/migrate-beans.ts",
-    "migrate:orders": "tsx --env-file=.env scripts/migrate-orders.ts"
+    "migrate:orders": "tsx --env-file=.env scripts/migrate-orders.ts",
+    "migrate:screenshots": "tsx --env-file=.env scripts/migrate-screenshots.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",

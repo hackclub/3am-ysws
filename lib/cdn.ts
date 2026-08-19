@@ -12,9 +12,9 @@ function cdnToken(): string | null {
   return process.env.CDN_TOKEN?.trim() || null;
 }
 
-export async function uploadToCdn(file: File): Promise<UploadOutcome> {
+export async function uploadToCdn(file: File, maxBytes = MAX_UPLOAD_BYTES): Promise<UploadOutcome> {
   if (!ALLOWED_TYPES.includes(file.type)) return { status: "wrong_type" };
-  if (file.size > MAX_UPLOAD_BYTES) return { status: "too_big" };
+  if (file.size > maxBytes) return { status: "too_big" };
 
   const token = cdnToken();
   if (!token) return { status: "not_configured" };
