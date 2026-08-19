@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 
 import { AppShell } from "@/components/app/AppShell";
 import { Panel, PanelLabel } from "@/components/ui/Panel";
+import { readAddress } from "@/lib/address";
 import { getCurrentUser } from "@/lib/auth/users";
 import { balanceFor } from "@/lib/beans";
 import { getDb } from "@/lib/db";
@@ -24,6 +25,7 @@ export default async function CheckoutPage({ params }: { params: Promise<{ id: s
   if (!item || item.hidden) notFound();
 
   const balance = await balanceFor(user.sub);
+  const saved = readAddress(user);
   const soldOut = item.stock !== null && item.stock <= 0;
   if (soldOut || balance < item.cost) redirect(`/shop/${item.id}`);
 
@@ -32,7 +34,13 @@ export default async function CheckoutPage({ params }: { params: Promise<{ id: s
       <div className={styles.split}>
         <Panel>
           <PanelLabel>where do we send it</PanelLabel>
-          <CheckoutForm itemId={item.id} defaults={{ fullName: user.name, email: user.email }} />
+          <CheckoutForm
+            itemId={item.id}
+            defaults={{
+              email: user.email,
+              address: { ...saved, fullName: saved.fullName || user.name },
+            }}
+          />
         </Panel>
 
         <Panel>

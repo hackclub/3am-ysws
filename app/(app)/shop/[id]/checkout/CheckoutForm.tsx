@@ -9,19 +9,21 @@ import { Field, Input } from "@/components/ui/Field";
 
 import styles from "./CheckoutForm.module.css";
 
-export type CheckoutDefaults = { fullName: string; email: string };
+import type { Address } from "@/lib/address";
+
+export type CheckoutDefaults = { email: string; address: Address };
 
 export function CheckoutForm({ itemId, defaults }: { itemId: string; defaults: CheckoutDefaults }) {
   const router = useRouter();
   const ids = useId();
 
-  const [fullName, setFullName] = useState(defaults.fullName);
+  const [fullName, setFullName] = useState(defaults.address.fullName);
   const [email, setEmail] = useState(defaults.email);
-  const [addressLine1, setAddressLine1] = useState("");
-  const [addressLine2, setAddressLine2] = useState("");
-  const [city, setCity] = useState("");
-  const [postcode, setPostcode] = useState("");
-  const [country, setCountry] = useState("");
+  const [addressLine1, setAddressLine1] = useState(defaults.address.addressLine1);
+  const [addressLine2, setAddressLine2] = useState(defaults.address.addressLine2);
+  const [city, setCity] = useState(defaults.address.city);
+  const [postcode, setPostcode] = useState(defaults.address.postcode);
+  const [country, setCountry] = useState(defaults.address.country);
   const [problem, setProblem] = useState<{ field?: string; message: string } | null>(null);
   const [working, setWorking] = useState(false);
 
