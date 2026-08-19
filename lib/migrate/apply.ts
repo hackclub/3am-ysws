@@ -1,0 +1,99 @@
+import { eq, sql } from "drizzle-orm";
+
+import { getDb } from "@/lib/db";
+import { projects, users } from "@/lib/db/schema";
+
+import type { Plan } from "./plan";
+
+export type ImportCounts = {
+  usersCreated: number;
+  usersExisting: number;
+  projectsCreated: number;
+  projectsExisting: number;
+};
+
+export async function importUsersAndProjects(plan: Plan): Promise<ImportCounts> {
+  const db = getDb();
+  const counts: ImportCounts = {
+    usersCreated: 0,
+    usersExisting: 0,
+    projectsCreated: 0,
+    projectsExisting: 0,
+  };
+
+  const subBySlackId = new Map<string, string>();
+
+  for (const user of plan.users) {
+    const [existing] = await db
+      .select({ sub: users.sub })
+      .from(users)
+      .where(eq(users.slackId, user.slackId))
+      .limit(1);
+
+    if (existing) {
+      subBySlackId.set(user.slackId, existing.sub);
+      counts.usersExisting += 1;
+      continue;
+    }
+
+    const [created] = await db
+      .insert(users)
+      .values({
+        sub: user.sub,
+        email: user.email,
+        name: user.name,
+        slackId: user.slackId,
+        fullName: user.fullName,
+        addressLine1: user.addressLine1,
+        addressLine2: user.addressLine2,
+        city: user.city,
+        postcode: user.postcode,
+        country: user.country,
+      })
+      .onConflictDoNothing()
+      .returning({ sub: users.sub });
+
+    if (created) {
+      subBySlackId.set(user.slackId, created.sub);
+      counts.usersCreated += 1;
+    }
+  }
+
+  for (const project of plan.projects) {
+    const sub = subBySlackId.get(project.slackId);
+    if (!sub) continue;
+
+    const [existing] = await db
+      .select({ id: projects.id })
+      .from(projects)
+      .where(sql`${projects.userSub} = ${sub} and ${projects.repoUrl} = ${project.repoUrl}`)
+      .limit(1);
+
+    if (existing) {
+      counts.projectsExisting += 1;
+      continue;
+    }
+
+    const submittedAt = new Date(project.submittedAt);
+
+    await db.insert(projects).values({
+      userSub: sub,
+      title: project.title,
+      description: project.description,
+      repoUrl: project.repoUrl,
+      demoUrl: project.demoUrl,
+      thumbnailUrl: null,
+      hackatimeProjects: project.hackatimeProjects,
+      createdAt: submittedAt,
+      submittedAt,
+      decision: project.decision,
+      approvedMinutes: project.approvedMinutes,
+      noteToMaker: project.noteToMaker,
+      decidedAt: project.decision ? submittedAt : null,
+    });
+
+    counts.projectsCreated += 1;
+  }
+
+  return counts;
+}

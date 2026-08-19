@@ -84,6 +84,10 @@ export type Plan = {
   skips: Skip[];
 };
 
+export function looksLikeSlackId(value: string | null): boolean {
+  return /^[UW][A-Z0-9]{7,}$/.test(value?.trim().toUpperCase() ?? "");
+}
+
 export function normaliseRepo(url: string | null): string | null {
   if (!url) return null;
   return url
@@ -167,6 +171,14 @@ export function buildPlan(
   const usable = submissions.filter((submission) => {
     if (!submission.slackId?.trim()) {
       skips.push({ what: "submission", id: submission.id, why: "no slack id, cannot pre-create" });
+      return false;
+    }
+    if (!looksLikeSlackId(submission.slackId)) {
+      skips.push({
+        what: "submission",
+        id: submission.id,
+        why: `slack id is not one: "${submission.slackId.trim()}"`,
+      });
       return false;
     }
     if (!submission.email?.trim()) {
