@@ -63,7 +63,8 @@ async function report() {
 
   console.log(`\nORDERS (${plan.orders.length})`);
   for (const order of plan.orders) {
-    console.log(`  ${order.slackId}  ${order.cost} beans  ${order.itemName}`);
+    const when = order.placedAt?.slice(0, 10) ?? "no date";
+    console.log(`  ${when}  ${order.slackId}  ${order.cost} beans  ${order.itemName}`);
   }
 
   console.log(`\nSKIPPED (${plan.skips.length})`);

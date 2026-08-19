@@ -72,6 +72,7 @@ export type PlannedOrder = {
   slackId: string;
   itemName: string;
   cost: number;
+  placedAt: string | null;
 };
 
 export type Skip = { what: string; id: string; why: string };
@@ -141,6 +142,17 @@ export function decisionFor(submission: Submission): {
 
 export function roundBeans(value: number): number {
   return value < 0 ? -Math.round(Math.abs(value)) : Math.round(value);
+}
+
+export function normaliseItemName(name: string): string {
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/\s*\([^)]*\)\s*$/, "")
+    .replace(/^\$\d+\s+/, "")
+    .replace(/\s*&\s*/g, " and ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export function parseOrderDetails(details: string | null): { itemName: string; cost: number }[] {
@@ -285,6 +297,7 @@ export function buildPlan(
         slackId,
         itemName: line.itemName,
         cost: line.cost,
+        placedAt: order.submittedAt,
       });
     }
   }
