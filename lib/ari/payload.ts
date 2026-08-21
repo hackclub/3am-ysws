@@ -1,3 +1,4 @@
+import { isVideoLink } from "@/lib/links";
 import type { ReviewSubmission } from "@/lib/review/types";
 
 export type IngestPayload = {
@@ -19,26 +20,6 @@ export type ValidationError = { field: string; message: string };
 
 const EVIDENCE = ["commits", "elapsed", "devlog"];
 const MAX_UPDATE_MESSAGE = 2000;
-
-const VIDEO_HOSTS = [
-  "youtube.com",
-  "youtube-nocookie.com",
-  "youtu.be",
-  "vimeo.com",
-  "loom.com",
-  "streamable.com",
-  "twitch.tv",
-  "tiktok.com",
-];
-
-function isVideoLink(value: string): boolean {
-  try {
-    const { hostname } = new URL(value);
-    return VIDEO_HOSTS.some((host) => hostname === host || hostname.endsWith(`.${host}`));
-  } catch {
-    return false;
-  }
-}
 
 function isHttpUrl(value: string): boolean {
   try {

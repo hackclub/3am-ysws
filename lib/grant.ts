@@ -66,8 +66,9 @@ export function missingForGrant(
 ): string[] {
   const missing: string[] = [];
 
-  const problem = validateGrant(readGrant(source));
-  if (problem) missing.push(problem.field === "birthday" ? "date of birth" : "your legal name");
+  const details = readGrant(source);
+  if (!details.firstName || !details.lastName) missing.push("your legal name");
+  if (!details.birthday) missing.push("date of birth");
 
   const parcel: [keyof Address, string][] = [
     ["addressLine1", "street address"],
