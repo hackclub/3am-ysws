@@ -102,6 +102,7 @@ async function readOne(projectId: string): Promise<PendingRow | null> {
     decidedAt: project.decidedAt,
 
     email: maker.email,
+    hackatimeId: maker.hackatimeId,
     firstName: maker.firstName,
     lastName: maker.lastName,
     birthday: maker.birthday,

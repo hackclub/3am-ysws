@@ -11,6 +11,7 @@ export type PendingRow = {
   decidedAt: Date | null;
 
   email: string;
+  hackatimeId: string | null;
   firstName: string | null;
   lastName: string | null;
   birthday: string | null;

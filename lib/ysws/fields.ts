@@ -28,28 +28,44 @@ function screenshot(url: string): { url: string; filename: string }[] {
   return [{ url, filename }];
 }
 
+function section(title: string, lines: (string | null)[]): string | null {
+  const body = lines
+    .map((line) => line?.trim())
+    .filter((line): line is string => Boolean(line))
+    .join("\n");
+  return body ? `[${title}]\n${body}` : null;
+}
+
 export function hoursJustification(row: PendingRow): string {
   if (row.hoursJustification?.trim()) return row.hoursJustification.trim();
 
   const reviewed = row.decidedAt ? ` on ${DAY.format(row.decidedAt)}` : "";
-  const lines = [`Reviewed in 3AM and approved for ${grantHours(row)}h${reviewed}.`];
+  const deflated =
+    row.overrideMinutes !== null &&
+    row.approvedMinutes !== null &&
+    row.overrideMinutes < row.approvedMinutes;
 
-  if (row.overrideMinutes !== null && row.approvedMinutes !== null) {
-    lines.push(
-      `An organiser set the hours by hand. The review had allowed ${row.approvedMinutes / 60}h.`,
-    );
-  }
-  if (row.hackatimeProjects.length > 0) {
-    lines.push(`Hours tracked in Hackatime under ${row.hackatimeProjects.join(", ")}.`);
-  }
-  if (row.repoUrl) {
-    lines.push(`Commit history: ${commitsUrl(row.repoUrl)}`);
-  }
-  if (row.noteToMaker?.trim()) {
-    lines.push(`Reviewer note: ${row.noteToMaker.trim()}`);
-  }
-
-  return lines.join("\n");
+  return [
+    section("HACKATIME", [
+      `Hackatime ID: ${row.hackatimeId ?? "not connected"}`,
+      `Hackatime Projects: ${row.hackatimeProjects.join(", ") || "none picked"}`,
+    ]),
+    section("SPECIFIC TECHNICAL FEATURES", [row.description, row.noteToMaker]),
+    section(
+      "DEFLATION JUSTIFICATION",
+      deflated
+        ? [
+            `An organiser cut this to ${grantHours(row)}h from the ${(row.approvedMinutes ?? 0) / 60}h the review allowed.`,
+          ]
+        : [],
+    ),
+    section("ADDITIONAL JUSTIFICATION", [
+      `Reviewed in 3AM and approved for ${grantHours(row)}h${reviewed}.`,
+      row.repoUrl ? `Commit history: ${commitsUrl(row.repoUrl)}` : null,
+    ]),
+  ]
+    .filter(Boolean)
+    .join("\n\n");
 }
 
 export function toUnifiedFields(row: PendingRow): Record<string, unknown> {
