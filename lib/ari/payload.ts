@@ -20,6 +20,26 @@ export type ValidationError = { field: string; message: string };
 const EVIDENCE = ["commits", "elapsed", "devlog"];
 const MAX_UPDATE_MESSAGE = 2000;
 
+const VIDEO_HOSTS = [
+  "youtube.com",
+  "youtube-nocookie.com",
+  "youtu.be",
+  "vimeo.com",
+  "loom.com",
+  "streamable.com",
+  "twitch.tv",
+  "tiktok.com",
+];
+
+function isVideoLink(value: string): boolean {
+  try {
+    const { hostname } = new URL(value);
+    return VIDEO_HOSTS.some((host) => hostname === host || hostname.endsWith(`.${host}`));
+  } catch {
+    return false;
+  }
+}
+
 function isHttpUrl(value: string): boolean {
   try {
     const url = new URL(value);
@@ -43,12 +63,19 @@ export function validateSubmission(submission: ReviewSubmission): ValidationErro
 
   const urls: [string, string, string][] = [
     ["repo_url", submission.repoUrl, "Add a link to your public repository."],
-    ["demo_url", submission.demoUrl, "Add a demo link. A video works, so does a live link."],
+    ["demo_url", submission.demoUrl, "Add a link people can play or download."],
     ["thumbnail_url", submission.thumbnailUrl, "Add a screenshot of your project."],
   ];
   for (const [field, value, message] of urls) {
     if (!value || value.trim().length === 0) return { field, message };
     if (!isHttpUrl(value)) return { field, message: `${field} has to start with http or https` };
+  }
+
+  if (isVideoLink(submission.demoUrl)) {
+    return {
+      field: "demo_url",
+      message: "That has to be something people can play or download, not a video of it.",
+    };
   }
 
   if (submission.hackatimeProjects.length === 0) {

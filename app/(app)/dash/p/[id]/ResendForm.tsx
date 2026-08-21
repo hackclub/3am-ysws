@@ -105,7 +105,12 @@ export function ResendForm({
         </Field>
 
         <div className={styles.row}>
-          <Field id={`${ids}-demo`} label="demo link" error={errorFor("demo_url")}>
+          <Field
+            id={`${ids}-demo`}
+            label="demo link"
+            help="A live link, or a build people can download and run."
+            error={errorFor("demo_url")}
+          >
             <Input value={demoUrl} onChange={(event) => setDemoUrl(event.target.value)} />
           </Field>
           <Field id={`${ids}-thumb`} label="screenshot" error={errorFor("thumbnail_url")}>

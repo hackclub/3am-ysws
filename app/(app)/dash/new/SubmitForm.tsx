@@ -145,7 +145,7 @@ export function SubmitForm({ projects }: { projects: PickerProject[] }) {
           <Field
             id={`${ids}-demo`}
             label="demo link"
-            help="A video works. So does a live link."
+            help="A live link, or a build people can download and run."
             error={errorFor("demo_url")}
           >
             <Input value={demoUrl} onChange={(event) => setDemoUrl(event.target.value)} />
