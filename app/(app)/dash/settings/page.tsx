@@ -9,9 +9,11 @@ import { StatusWord } from "@/components/ui/StatusWord";
 import { readAddress } from "@/lib/address";
 import { hcaIssuer } from "@/lib/auth/hca";
 import { getCurrentUser } from "@/lib/auth/users";
+import { readGrant } from "@/lib/grant";
 import { getPickerProjects } from "@/lib/hackatime/projects";
 
 import { AddressForm } from "./AddressForm";
+import { GrantForm } from "./GrantForm";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = { title: "settings" };
@@ -24,6 +26,7 @@ export default async function SettingsPage() {
   const projects = await getPickerProjects(user);
   const connected = projects !== null;
   const saved = readAddress(user);
+  const grant = readGrant(user);
 
   return (
     <AppShell title="settings">
@@ -73,6 +76,14 @@ export default async function SettingsPage() {
           it.
         </p>
         <AddressForm address={{ ...saved, fullName: saved.fullName || user.name }} />
+      </Panel>
+
+      <Panel className={styles.panel}>
+        <PanelLabel>for the paperwork</PanelLabel>
+        <p className={styles.help}>
+          Hack Club needs these on file before a grant can be sent out. Nobody else sees them.
+        </p>
+        <GrantForm details={grant} />
       </Panel>
 
       <Panel className={styles.panel}>

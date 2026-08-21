@@ -14,6 +14,7 @@ import { getDb } from "@/lib/db";
 import { projects } from "@/lib/db/schema";
 import type { Project } from "@/lib/db/schema";
 import { livePhaseStatus } from "@/lib/ari/status";
+import { missingForGrant } from "@/lib/grant";
 import { isOpen, projectStatus } from "@/lib/projects/status";
 import { getPickerProjects } from "@/lib/hackatime/projects";
 import { reviewIsExternal } from "@/lib/review";
@@ -90,6 +91,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
     project.decision === "rejected" ||
     project.decision === "withdrawn";
   const options = resendable ? ((await getPickerProjects(user)) ?? []) : [];
+  const missing = project.decision === "approved" ? missingForGrant(user) : [];
 
   return (
     <AppShell title={project.title}>
@@ -101,6 +103,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
       {project.decision === "rejected" ? (
         <Banner tone="bad" title="not approved">
           {project.noteToMaker ?? "You can fix it and send it back."}
+        </Banner>
+      ) : null}
+      {missing.length > 0 ? (
+        <Banner tone="warn" title="we cannot send the grant yet">
+          Still missing {missing.join(", ")}. Add it in settings and this sorts itself out.
         </Banner>
       ) : null}
       <div className={styles.split}>

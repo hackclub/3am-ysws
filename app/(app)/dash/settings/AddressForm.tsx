@@ -48,7 +48,7 @@ export function AddressForm({ address }: { address: Address }) {
   }
 
   return (
-    <div className={styles.addressForm}>
+    <div className={styles.form}>
       {problem && !problem.field ? <Banner tone="bad">{problem.message}</Banner> : null}
 
       <Field id={`${ids}-name`} label="name for the parcel" error={errorFor("fullName")}>
@@ -74,6 +74,12 @@ export function AddressForm({ address }: { address: Address }) {
       <div className={styles.row}>
         <Field id={`${ids}-city`} label="city" error={errorFor("city")}>
           <Input value={form.city} onChange={(event) => set("city", event.target.value)} />
+        </Field>
+        <Field id={`${ids}-state`} label="state or province">
+          <Input
+            value={form.stateProvince}
+            onChange={(event) => set("stateProvince", event.target.value)}
+          />
         </Field>
         <Field id={`${ids}-postcode`} label="postcode" error={errorFor("postcode")}>
           <Input value={form.postcode} onChange={(event) => set("postcode", event.target.value)} />
