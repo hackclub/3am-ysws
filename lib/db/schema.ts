@@ -78,6 +78,38 @@ export const webhookEvents = pgTable(
   (table) => [index("webhook_events_project_id_idx").on(table.projectId)],
 );
 
+export const yswsState = pgEnum("ysws_state", ["held", "queued", "sent", "error"]);
+
+export const yswsSubmissions = pgTable(
+  "ysws_submissions",
+  {
+    projectId: uuid("project_id")
+      .primaryKey()
+      .references(() => projects.id, { onDelete: "cascade" }),
+
+    state: yswsState("state").notNull().default("held"),
+    recordId: text("record_id"),
+    error: text("error"),
+    attempts: integer("attempts").notNull().default(0),
+
+    overrideMinutes: integer("override_minutes"),
+    hoursJustification: text("hours_justification"),
+    ageJustification: text("age_justification"),
+    duplicateJustification: text("duplicate_justification"),
+
+    firstSubmittedAt: timestamp("first_submitted_at", { withTimezone: true }),
+    lastAttemptAt: timestamp("last_attempt_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("ysws_submissions_state_idx").on(table.state),
+    uniqueIndex("ysws_submissions_record_id_idx").on(table.recordId),
+    check(
+      "ysws_submissions_override_minutes_positive",
+      sql`${table.overrideMinutes} is null or ${table.overrideMinutes} > 0`,
+    ),
+  ],
+);
+
 export const beansReason = pgEnum("beans_reason", ["approval", "revert", "purchase", "manual"]);
 
 export const beansLedger = pgTable(
@@ -167,6 +199,8 @@ export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;
 export type WebhookEvent = typeof webhookEvents.$inferSelect;
 export type NewWebhookEvent = typeof webhookEvents.$inferInsert;
+export type YswsSubmission = typeof yswsSubmissions.$inferSelect;
+export type NewYswsSubmission = typeof yswsSubmissions.$inferInsert;
 export type BeansEntry = typeof beansLedger.$inferSelect;
 export type NewBeansEntry = typeof beansLedger.$inferInsert;
 export type Item = typeof items.$inferSelect;
