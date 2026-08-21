@@ -2,6 +2,7 @@ import {
   bigserial,
   boolean,
   check,
+  date,
   index,
   integer,
   jsonb,
@@ -23,9 +24,13 @@ export const users = pgTable("users", {
   hackatimeToken: text("hackatime_token"),
 
   fullName: text("full_name"),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  birthday: date("birthday"),
   addressLine1: text("address_line1"),
   addressLine2: text("address_line2"),
   city: text("city"),
+  stateProvince: text("state_province"),
   postcode: text("postcode"),
   country: text("country"),
 });

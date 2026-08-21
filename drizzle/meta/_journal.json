@@ -71,6 +71,13 @@
       "when": 1787138273329,
       "tag": "0009_foamy_zombie",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1787331437531,
+      "tag": "0010_sloppy_nightshade",
+      "breakpoints": true
     }
   ]
 }
