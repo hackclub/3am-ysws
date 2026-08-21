@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { validateSubmission } from "@/lib/ari/payload";
-import { repoIsReachable } from "@/lib/ari/repo";
+import { repoHasReadme, repoIsReachable } from "@/lib/ari/repo";
 import { getCurrentUser } from "@/lib/auth/users";
 import { getDb } from "@/lib/db";
 import { projects } from "@/lib/db/schema";
@@ -85,6 +85,17 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         error: "invalid",
         field: "repo_url",
         message: "We cannot see that repository. Is it public, and is the link right?",
+      },
+      { status: 422 },
+    );
+  }
+
+  if ((await repoHasReadme(submission.repoUrl)) === false) {
+    return NextResponse.json(
+      {
+        error: "invalid",
+        field: "repo_url",
+        message: "That repository needs a README saying what the project is and how to run it.",
       },
       { status: 422 },
     );
