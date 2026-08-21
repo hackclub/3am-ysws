@@ -133,6 +133,31 @@ async function record(projectId: string, values: Record<string, unknown>): Promi
     .onConflictDoUpdate({ target: yswsSubmissions.projectId, set: values });
 }
 
+export type Overrides = {
+  overrideMinutes: number | null;
+  ageJustification: string | null;
+  duplicateJustification: string | null;
+};
+
+export async function saveOverrides(projectId: string, values: Overrides): Promise<boolean> {
+  const db = getDb();
+
+  const [project] = await db
+    .select({ id: projects.id })
+    .from(projects)
+    .where(and(eq(projects.id, projectId), eq(projects.decision, "approved")))
+    .limit(1);
+
+  if (!project) return false;
+
+  await db
+    .insert(yswsSubmissions)
+    .values({ projectId, ...values })
+    .onConflictDoUpdate({ target: yswsSubmissions.projectId, set: values });
+
+  return true;
+}
+
 export async function sendToUnified(projectId: string): Promise<SendReport> {
   const db = getDb();
 
