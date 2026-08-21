@@ -22,6 +22,7 @@ export type PendingRow = {
   country: string | null;
 
   recordId: string | null;
+  firstSubmittedAt: Date | null;
   overrideMinutes: number | null;
   hoursJustification: string | null;
   ageJustification: string | null;
@@ -32,3 +33,21 @@ export type PendingRow = {
 };
 
 export type GateProblem = { field: string; message: string };
+
+export type UnifiedState = "held" | "queued" | "sent" | "error";
+
+export type ApprovedRow = {
+  projectId: string;
+  title: string;
+  maker: string;
+  email: string;
+  decidedAt: Date | null;
+  approvedMinutes: number | null;
+  overrideMinutes: number | null;
+  state: UnifiedState | null;
+  recordId: string | null;
+  error: string | null;
+  ageJustification: string | null;
+  duplicateJustification: string | null;
+  missing: string[];
+};
