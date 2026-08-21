@@ -1,4 +1,4 @@
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq, ne, sql } from "drizzle-orm";
 
 import { getDb } from "@/lib/db";
 import { users } from "@/lib/db/schema";
@@ -26,11 +26,19 @@ export async function upsertUser(claims: HcaClaims) {
     slackId: claims.slack_id.trim(),
   };
 
+  const firstName = claims.given_name?.trim() || null;
+  const lastName = claims.family_name?.trim() || null;
+
+  const keepLegalName = {
+    ...(firstName ? { firstName: sql`coalesce(${users.firstName}, ${firstName})` } : {}),
+    ...(lastName ? { lastName: sql`coalesce(${users.lastName}, ${lastName})` } : {}),
+  };
+
   const db = getDb();
 
   const adopted = await db
     .update(users)
-    .set(row)
+    .set({ ...row, ...keepLegalName })
     .where(and(eq(users.slackId, row.slackId), ne(users.sub, row.sub)))
     .returning({ sub: users.sub });
 
@@ -41,10 +49,10 @@ export async function upsertUser(claims: HcaClaims) {
 
   await db
     .insert(users)
-    .values(row)
+    .values({ ...row, firstName, lastName })
     .onConflictDoUpdate({
       target: users.sub,
-      set: { email: row.email, name: row.name, slackId: row.slackId },
+      set: { email: row.email, name: row.name, slackId: row.slackId, ...keepLegalName },
     });
 
   return row;
