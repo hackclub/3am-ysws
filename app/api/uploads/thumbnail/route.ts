@@ -6,7 +6,7 @@ import { MAX_UPLOAD_BYTES, uploadToCdn } from "@/lib/cdn";
 export const dynamic = "force-dynamic";
 
 const MESSAGES: Record<string, string> = {
-  wrong_type: "That has to be a png, jpg, webp or gif.",
+  wrong_type: "That has to be a png, jpg or webp, and it cannot be animated.",
   too_big: `That is over ${MAX_UPLOAD_BYTES / (1024 * 1024)}MB. Try a smaller screenshot.`,
   not_configured: "Uploads are not switched on yet. Paste an image link instead.",
   failed: "That did not upload. Try again, or paste an image link instead.",

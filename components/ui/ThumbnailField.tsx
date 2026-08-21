@@ -84,13 +84,13 @@ export function ThumbnailField({
             {busy ? "uploading…" : value ? "change screenshot" : "drop a screenshot"}
           </span>
           <span className={styles.hint}>
-            {value ? value.replace(/^https?:\/\//, "") : "png, jpg, webp or gif, up to 5MB"}
+            {value ? value.replace(/^https?:\/\//, "") : "png, jpg or webp, up to 5MB"}
           </span>
         </span>
         <input
           ref={input}
           type="file"
-          accept="image/png,image/jpeg,image/webp,image/gif"
+          accept="image/png,image/jpeg,image/webp"
           className={styles.input}
           onChange={(event) => {
             const file = event.target.files?.[0];
