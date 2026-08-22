@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { AppShell } from "@/components/app/AppShell";
 import { Panel, PanelLabel } from "@/components/ui/Panel";
 import { requireOrganizer } from "@/lib/auth/organizer";
-import { readApproved } from "@/lib/ysws/submissions";
+import { readApproved, refreshQueued } from "@/lib/ysws/submissions";
 import { yswsIsConfigured } from "@/lib/ysws/config";
 import { Banner } from "@/components/ui/Banner";
 
@@ -17,6 +17,7 @@ export const dynamic = "force-dynamic";
 export default async function UnifiedPage() {
   if (!(await requireOrganizer())) notFound();
 
+  await refreshQueued();
   const rows = await readApproved();
   const waiting = rows.filter((row) => row.state !== "sent").length;
 

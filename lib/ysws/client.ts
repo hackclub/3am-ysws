@@ -1,41 +1,36 @@
 import { toUnifiedFields } from "./fields";
 import { yswsBridgeSecret, yswsBridgeUrl, yswsProgramId } from "./config";
+import { outboxBaseId, outboxTableId } from "./outbox";
+import type { OutboxRow } from "./outbox";
 import type { PendingRow } from "./types";
 
 const TIMEOUT_MS = 20_000;
 
 export type SendOutcome =
-  | { status: "sent"; recordId: string | null }
+  | { status: "accepted" }
   | { status: "refused"; message: string }
   | { status: "unavailable"; message: string };
 
-const RECORD_KEYS = ["yswsRecordId", "recordId", "record_id", "id"];
-
-function readRecordId(body: unknown): string | null {
-  if (!body || typeof body !== "object") return null;
-
-  const source = body as Record<string, unknown>;
-  const nested = source.record ?? source.data;
-  for (const key of RECORD_KEYS) {
-    const value = source[key];
-    if (typeof value === "string" && value.startsWith("rec")) return value;
-  }
-  return nested ? readRecordId(nested) : null;
-}
-
-export function buildPayload(row: PendingRow, programId: string): Record<string, unknown> {
+export function buildPayload(
+  row: PendingRow,
+  programId: string,
+  outbox: OutboxRow | null,
+): Record<string, unknown> {
   return {
     source: "3am",
-    recordId: row.projectId,
-    yswsRecordId: row.recordId,
+    baseId: outboxBaseId(),
+    tableId: outboxTableId(),
+    recordId: outbox?.recordId ?? "(no outbox row yet)",
+    yswsRecordId: outbox?.yswsRecordId ?? row.recordId,
+    firstSubmittedAt: outbox?.firstSubmittedAt ?? null,
     yswsProgramId: programId,
     overrides: { duplicateJustification: row.duplicateJustification },
     fields: toUnifiedFields(row),
   };
 }
 
-export async function send(row: PendingRow): Promise<SendOutcome> {
-  const body = JSON.stringify(buildPayload(row, yswsProgramId()));
+export async function send(row: PendingRow, outbox: OutboxRow): Promise<SendOutcome> {
+  const body = JSON.stringify(buildPayload(row, yswsProgramId(), outbox));
 
   let response: Response;
   try {
@@ -57,18 +52,8 @@ export async function send(row: PendingRow): Promise<SendOutcome> {
   const text = await response.text().catch(() => "");
 
   if (response.status === 200 || response.status === 201 || response.status === 202) {
-    let parsed: unknown = null;
-    try {
-      parsed = text ? JSON.parse(text) : null;
-    } catch {
-      parsed = null;
-    }
-
-    const recordId = readRecordId(parsed);
-    if (!recordId) {
-      console.info(`[ysws] bridge accepted ${row.projectId} without naming a record`);
-    }
-    return { status: "sent", recordId };
+    console.info(`[ysws] bridge accepted ${row.projectId}, waiting on the writeback`);
+    return { status: "accepted" };
   }
 
   console.error(`[ysws] bridge returned ${response.status} for ${row.projectId}: ${text}`);
