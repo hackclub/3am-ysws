@@ -13,6 +13,7 @@ export default function HomePage() {
       <section className={styles.hero}>
         <h1 className={styles.wordmark}>3am</h1>
         <p className={styles.credit}>a Hack Club YSWS</p>
+        <p className={styles.credit}>YSWS by SEBA, Hack Club</p>
 
         <p className={styles.lead}>
           Pick something dark themed to build. A moody website, a cursed little tool, a game, or
