@@ -23,6 +23,7 @@
     "migrate:orders": "tsx --env-file=.env scripts/migrate-orders.ts",
     "migrate:screenshots": "tsx --env-file=.env scripts/migrate-screenshots.ts",
     "migrate:queue": "tsx --env-file=.env scripts/migrate-queue.ts",
+    "migrate:unified": "tsx --env-file=.env scripts/migrate-unified.ts",
     "promote": "tsx --env-file=.env --env-file=.env.prod scripts/promote.ts"
   },
   "dependencies": {

@@ -1,5 +1,5 @@
 export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
-export const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
+export const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
 export type UploadOutcome =
   | { status: "uploaded"; url: string }

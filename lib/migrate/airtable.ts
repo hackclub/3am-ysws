@@ -78,6 +78,8 @@ export async function fetchSubmissions(): Promise<Submission[]> {
     description: text(row.fields, "Description"),
     hackatimeUrl: text(row.fields, "Hackatime URL"),
     overrideHours: num(row.fields, "Optional - Override Hours Spent"),
+    yswsRecordId: text(row.fields, "Automation - YSWS Record ID"),
+    firstSubmittedAt: text(row.fields, "Automation - First Submitted At"),
     rejected: flag(row.fields, "Rejected"),
     rejectionReason: text(row.fields, "Rejection Reason to send to user (If ANY)"),
     reviewerStatus: Array.isArray(row.fields["Status (Internal Reviewer)"])

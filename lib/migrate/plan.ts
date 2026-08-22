@@ -10,6 +10,8 @@ export type Submission = {
   description: string | null;
   hackatimeUrl: string | null;
   overrideHours: number | null;
+  yswsRecordId: string | null;
+  firstSubmittedAt: string | null;
   rejected: boolean | null;
   rejectionReason: string | null;
   reviewerStatus: string[] | null;

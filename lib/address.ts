@@ -3,6 +3,7 @@ export type Address = {
   addressLine1: string;
   addressLine2: string;
   city: string;
+  stateProvince: string;
   postcode: string;
   country: string;
 };
@@ -18,7 +19,15 @@ const REQUIRED: [keyof Address, string][] = [
 ];
 
 export function emptyAddress(): Address {
-  return { fullName: "", addressLine1: "", addressLine2: "", city: "", postcode: "", country: "" };
+  return {
+    fullName: "",
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
+    stateProvince: "",
+    postcode: "",
+    country: "",
+  };
 }
 
 export function readAddress(source: Partial<Record<keyof Address, string | null>>): Address {
@@ -28,6 +37,7 @@ export function readAddress(source: Partial<Record<keyof Address, string | null>
     addressLine1: source.addressLine1?.trim() ?? blank.addressLine1,
     addressLine2: source.addressLine2?.trim() ?? blank.addressLine2,
     city: source.city?.trim() ?? blank.city,
+    stateProvince: source.stateProvince?.trim() ?? blank.stateProvince,
     postcode: source.postcode?.trim() ?? blank.postcode,
     country: source.country?.trim() ?? blank.country,
   };

@@ -1,10 +1,10 @@
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
-import { readAddress, validateAddress } from "@/lib/address";
 import { getCurrentUser } from "@/lib/auth/users";
 import { getDb } from "@/lib/db";
 import { users } from "@/lib/db/schema";
+import { readGrant, validateGrant } from "@/lib/grant";
 
 export const dynamic = "force-dynamic";
 
@@ -19,8 +19,8 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "unreadable" }, { status: 400 });
   }
 
-  const address = readAddress(body);
-  const problem = validateAddress(address);
+  const details = readGrant(body);
+  const problem = validateGrant(details);
   if (problem) {
     return NextResponse.json(
       { error: "invalid", field: problem.field, message: problem.message },
@@ -31,13 +31,9 @@ export async function PUT(request: Request) {
   await getDb()
     .update(users)
     .set({
-      fullName: address.fullName,
-      addressLine1: address.addressLine1,
-      addressLine2: address.addressLine2 || null,
-      city: address.city,
-      stateProvince: address.stateProvince || null,
-      postcode: address.postcode,
-      country: address.country,
+      firstName: details.firstName,
+      lastName: details.lastName,
+      birthday: details.birthday,
     })
     .where(eq(users.sub, user.sub));
 
