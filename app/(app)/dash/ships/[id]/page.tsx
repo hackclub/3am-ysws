@@ -7,6 +7,7 @@ import { Banner } from "@/components/ui/Banner";
 import { ButtonLink } from "@/components/ui/Button";
 import { Panel, PanelLabel } from "@/components/ui/Panel";
 import { ProjectStatusWord } from "@/components/ui/StatusWord";
+import { hoursLabel } from "@/lib/beans";
 import { requireOrganizer } from "@/lib/auth/organizer";
 import { getDb } from "@/lib/db";
 import { projects, users } from "@/lib/db/schema";
@@ -92,7 +93,7 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
           {decided ? (
             <Banner tone={project.decision === "approved" ? "ok" : "warn"}>
               {project.decision === "approved"
-                ? `Approved for ${Math.floor((project.approvedMinutes ?? 0) / 60)} hours.`
+                ? `Approved for ${hoursLabel(project.approvedMinutes)} hours.`
                 : `Recorded as ${project.decision}.`}
               {project.noteToMaker ? ` "${project.noteToMaker}"` : ""}
             </Banner>

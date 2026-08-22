@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 
 import { AppShell } from "@/components/app/AppShell";
 import { Panel, PanelLabel } from "@/components/ui/Panel";
+import { hoursLabel } from "@/lib/beans";
 import { requireOrganizer } from "@/lib/auth/organizer";
 import { getDb } from "@/lib/db";
 import { beansLedger, orders, projects, users } from "@/lib/db/schema";
@@ -105,7 +106,7 @@ export default async function MakersPage({
                     </td>
                     <td>{row.hackatime ? "yes" : "no"}</td>
                     <td>{row.sent}</td>
-                    <td>{Math.floor(row.approvedMinutes / 60)}</td>
+                    <td>{hoursLabel(row.approvedMinutes)}</td>
                     <td className={styles.beans}>{row.beans}</td>
                     <td>{row.orderCount}</td>
                   </tr>

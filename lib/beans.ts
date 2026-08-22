@@ -7,7 +7,12 @@ import { BEANS_PER_HOUR } from "@/lib/rewards";
 
 export function beansForMinutes(minutes: number | null | undefined): number {
   if (!minutes || minutes <= 0) return 0;
-  return Math.floor(minutes / 60) * BEANS_PER_HOUR;
+  return Math.round((minutes / 60) * BEANS_PER_HOUR);
+}
+
+export function hoursLabel(minutes: number | null | undefined): string {
+  if (!minutes || minutes <= 0) return "0";
+  return (minutes / 60).toFixed(1).replace(/\.0$/, "");
 }
 
 export async function balanceFor(userSub: string): Promise<number> {

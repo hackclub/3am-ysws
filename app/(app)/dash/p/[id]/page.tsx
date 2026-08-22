@@ -18,7 +18,7 @@ import { missingForGrant } from "@/lib/grant";
 import { isOpen, projectStatus } from "@/lib/projects/status";
 import { getPickerProjects } from "@/lib/hackatime/projects";
 import { reviewIsExternal } from "@/lib/review";
-import { BEANS_PER_HOUR } from "@/lib/rewards";
+import { beansForMinutes, hoursLabel } from "@/lib/beans";
 
 import { ResendForm } from "./ResendForm";
 import { WithdrawButton } from "./WithdrawButton";
@@ -85,7 +85,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   const stored = projectStatus(project);
   const live = isOpen(project) && reviewIsExternal() ? await livePhaseStatus(project.id) : null;
   const status = live ?? stored;
-  const hours = Math.floor((project.approvedMinutes ?? 0) / 60);
+  const hours = hoursLabel(project.approvedMinutes);
   const resendable =
     project.decision === "changes" ||
     project.decision === "rejected" ||
@@ -155,7 +155,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
                   </div>
                   <div className={styles.fact}>
                     <span>beans</span>
-                    <span className="tabular">{hours * BEANS_PER_HOUR}</span>
+                    <span className="tabular">{beansForMinutes(project.approvedMinutes)}</span>
                   </div>
                 </>
               ) : null}
