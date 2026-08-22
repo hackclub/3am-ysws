@@ -6,11 +6,12 @@ import { projects, users, yswsSubmissions } from "@/lib/db/schema";
 import { missingForGrant } from "@/lib/grant";
 
 import { buildPayload, send } from "./client";
+import { ensureOutbox, findOutbox } from "./outbox";
 import type { ApprovedRow, GateProblem, PendingRow } from "./types";
 import { validate } from "./validate";
 
 export type SendReport =
-  | { status: "sent"; recordId: string | null }
+  | { status: "accepted" }
   | { status: "held"; field: string; message: string }
   | { status: "refused"; message: string }
   | { status: "unavailable"; message: string }
@@ -37,7 +38,11 @@ export async function previewUnified(projectId: string): Promise<Preview> {
   const problem = validate(row);
   return {
     status: problem ? "blocked" : "ready",
-    payload: buildPayload(row, process.env.YSWS_PROGRAM_ID ?? "(YSWS_PROGRAM_ID is not set)"),
+    payload: buildPayload(
+      row,
+      process.env.YSWS_PROGRAM_ID ?? "(YSWS_PROGRAM_ID is not set)",
+      await findOutbox(projectId).catch(() => null),
+    ),
     problem,
   };
 }
@@ -188,25 +193,53 @@ export async function sendToUnified(projectId: string): Promise<SendReport> {
     return { status: "held", field: problem.field, message: problem.message };
   }
 
-  const outcome = await send(row);
+  const outbox = await ensureOutbox(projectId, row.title);
+  const outcome = await send(row, outbox);
   const lastAttemptAt = new Date();
 
-  if (outcome.status === "sent") {
+  if (outcome.status === "accepted") {
+    await record(projectId, { state: "queued", error: null, lastAttemptAt });
+    return { status: "accepted" };
+  }
+
+  await record(projectId, { state: "error", error: outcome.message, lastAttemptAt });
+
+  return outcome;
+}
+
+export async function refreshUnified(projectId: string): Promise<void> {
+  let outbox;
+  try {
+    outbox = await findOutbox(projectId);
+  } catch (error) {
+    console.error("[ysws] could not read the outbox", error);
+    return;
+  }
+
+  if (!outbox) return;
+
+  if (outbox.yswsRecordId) {
     await record(projectId, {
       state: "sent",
       error: null,
-      recordId: outcome.recordId ?? row.recordId,
-      firstSubmittedAt: row.firstSubmittedAt ?? lastAttemptAt,
-      lastAttemptAt,
+      recordId: outbox.yswsRecordId,
+      firstSubmittedAt: outbox.firstSubmittedAt ? new Date(outbox.firstSubmittedAt) : new Date(),
     });
-    return { status: "sent", recordId: outcome.recordId ?? row.recordId };
+    return;
   }
 
-  await record(projectId, {
-    state: outcome.status === "refused" ? "error" : "queued",
-    error: outcome.message,
-    lastAttemptAt,
-  });
+  if (outbox.error) {
+    await record(projectId, { state: "error", error: outbox.error });
+  }
+}
 
-  return outcome;
+export async function refreshQueued(): Promise<void> {
+  const waiting = await getDb()
+    .select({ projectId: yswsSubmissions.projectId })
+    .from(yswsSubmissions)
+    .where(eq(yswsSubmissions.state, "queued"));
+
+  for (const row of waiting) {
+    await refreshUnified(row.projectId);
+  }
 }

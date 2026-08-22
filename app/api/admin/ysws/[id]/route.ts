@@ -41,8 +41,8 @@ export async function POST(request: Request, { params }: Params) {
   const report = await sendToUnified(id);
 
   switch (report.status) {
-    case "sent":
-      return NextResponse.json({ ok: true, recordId: report.recordId });
+    case "accepted":
+      return NextResponse.json({ ok: true, state: "processing" });
     case "held":
       return NextResponse.json(
         { error: "held", field: report.field, message: report.message },

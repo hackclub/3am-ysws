@@ -15,16 +15,18 @@ type Preview = { status: string; payload: unknown; problem: { message: string } 
 
 const WHEN = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" });
 
-const TONE = {
-  sent: "ok",
-  error: "bad",
-  held: "warn",
-  queued: "warn",
+const WORD = {
+  sent: { tone: "ok", text: "sent" },
+  error: { tone: "bad", text: "error" },
+  held: { tone: "warn", text: "held" },
+  queued: { tone: "queued", text: "processing" },
 } as const;
 
-function word(row: ApprovedRow): { tone: "ok" | "bad" | "warn" | "muted"; text: string } {
-  if (!row.state) return { tone: "muted", text: "not sent" };
-  return { tone: TONE[row.state], text: row.state };
+function word(row: ApprovedRow): {
+  tone: "ok" | "bad" | "warn" | "queued" | "muted";
+  text: string;
+} {
+  return row.state ? WORD[row.state] : { tone: "muted", text: "not sent" };
 }
 
 export function Rows({ rows }: { rows: ApprovedRow[] }) {
@@ -142,6 +144,11 @@ export function Rows({ rows }: { rows: ApprovedRow[] }) {
               <StatusWord tone={state.tone}>{state.text}</StatusWord>
             </div>
 
+            {row.state === "queued" ? (
+              <span className={styles.sub}>
+                handed to the bridge, reload this page to pick up the record id
+              </span>
+            ) : null}
             {row.error ? <span className={styles.sub}>{row.error}</span> : null}
             {row.missing.length > 0 ? (
               <span className={styles.sub}>the maker still owes us {row.missing.join(", ")}</span>
@@ -151,7 +158,7 @@ export function Rows({ rows }: { rows: ApprovedRow[] }) {
               <Button variant="quiet" onClick={() => show(row)} loading={working && !showing}>
                 {showing ? "hide" : "preview"}
               </Button>
-              {row.state === "sent" ? null : (
+              {row.state === "sent" || row.state === "queued" ? null : (
                 <Button
                   onClick={() => send(row)}
                   loading={working && showing}
