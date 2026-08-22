@@ -15,7 +15,7 @@ import { getCurrentUser } from "@/lib/auth/users";
 import { getDb } from "@/lib/db";
 import { projects } from "@/lib/db/schema";
 import { isOpen, projectStatus } from "@/lib/projects/status";
-import { beansForMinutes } from "@/lib/beans";
+import { beansForMinutes, hoursLabel } from "@/lib/beans";
 
 import styles from "./page.module.css";
 
@@ -81,7 +81,7 @@ export default async function DashboardPage() {
         <StatCard
           accent
           label="hours approved"
-          value={Math.floor(approvedMinutes / 60)}
+          value={hoursLabel(approvedMinutes)}
           sub={approved.length === 1 ? "across 1 project" : `across ${approved.length} projects`}
         />
         <StatCard label="beans" value={beans} sub="5 per approved hour" />

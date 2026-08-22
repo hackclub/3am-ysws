@@ -6,6 +6,7 @@ import Link from "next/link";
 import { AppShell } from "@/components/app/AppShell";
 import { Panel, PanelLabel } from "@/components/ui/Panel";
 import { ProjectStatusWord } from "@/components/ui/StatusWord";
+import { hoursLabel } from "@/lib/beans";
 import { requireOrganizer } from "@/lib/auth/organizer";
 import { getDb } from "@/lib/db";
 import { projects, users } from "@/lib/db/schema";
@@ -98,7 +99,7 @@ export default async function ShipsPage({
                     <td>
                       {project.approvedMinutes == null
                         ? "—"
-                        : `${Math.floor(project.approvedMinutes / 60)}h`}
+                        : `${hoursLabel(project.approvedMinutes)}h`}
                     </td>
                     <td>
                       <ProjectStatusWord status={projectStatus(project)} size="s" />
