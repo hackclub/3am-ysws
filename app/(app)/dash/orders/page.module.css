@@ -26,6 +26,7 @@
   padding: 11px 14px;
   color: var(--soft);
   border-bottom: 1px solid var(--rule);
+  vertical-align: top;
   font-variant-numeric: tabular-nums;
 }
 
@@ -39,9 +40,23 @@
 
 .where {
   display: block;
+  margin-top: 4px;
   font-family: var(--data);
   font-size: 11.5px;
   color: var(--muted);
+}
+
+.note {
+  display: block;
+  margin-top: 7px;
+  padding: 7px 9px;
+  font-family: var(--data);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--soft);
+  background: rgba(247, 233, 168, 0.06);
+  border-left: 2px solid var(--lamp);
+  border-radius: 0 var(--radius-input) var(--radius-input) 0;
 }
 
 .balance {
