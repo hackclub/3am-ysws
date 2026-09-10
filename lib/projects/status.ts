@@ -23,5 +23,7 @@ export function isOpen(project: Pick<Project, "submittedAt" | "decision">): bool
 }
 
 export function orderStatusOf(status: string): OrderStatus {
-  return status === "needs_address" ? "needsAddress" : (status as OrderStatus);
+  if (status === "needs_address") return "needsAddress";
+  if (status === "ready_to_fulfil") return "readyToFulfil";
+  return status as OrderStatus;
 }
