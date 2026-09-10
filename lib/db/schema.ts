@@ -155,6 +155,7 @@ export const orderStatus = pgEnum("order_status", [
   "placed",
   "needs_address",
   "packing",
+  "ready_to_fulfil",
   "posted",
   "cancelled",
 ]);

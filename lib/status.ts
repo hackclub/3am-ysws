@@ -23,11 +23,18 @@ export const PROJECT_STATUS: Record<ProjectStatus, { word: string; tone: Tone }>
   withdrawn: { word: "withdrawn", tone: "muted" },
 };
 
-export type OrderStatus = "placed" | "packing" | "needsAddress" | "posted" | "cancelled";
+export type OrderStatus =
+  | "placed"
+  | "packing"
+  | "readyToFulfil"
+  | "needsAddress"
+  | "posted"
+  | "cancelled";
 
 export const ORDER_STATUS: Record<OrderStatus, { word: string; tone: Tone }> = {
   placed: { word: "placed", tone: "queued" },
   packing: { word: "being packed", tone: "info" },
+  readyToFulfil: { word: "ready to fulfil", tone: "ok" },
   needsAddress: { word: "we need your address", tone: "warn" },
   posted: { word: "posted", tone: "ok" },
   cancelled: { word: "cancelled", tone: "bad" },

@@ -17,6 +17,7 @@ export const dynamic = "force-dynamic";
 
 const FILTERS: Record<string, { label: string; statuses?: string[] }> = {
   open: { label: "to pack", statuses: ["placed", "needs_address", "packing"] },
+  ready: { label: "ready to fulfil", statuses: ["ready_to_fulfil"] },
   posted: { label: "posted", statuses: ["posted"] },
   cancelled: { label: "cancelled", statuses: ["cancelled"] },
   all: { label: "everything" },
@@ -41,7 +42,10 @@ export default async function FulfilmentPage({
 
   const rows = active.statuses
     ? await query.where(
-        inArray(orders.status, active.statuses as ("placed" | "posted" | "cancelled")[]),
+        inArray(
+          orders.status,
+          active.statuses as ("placed" | "needs_address" | "packing" | "ready_to_fulfil" | "posted" | "cancelled")[],
+        ),
       )
     : await query;
 

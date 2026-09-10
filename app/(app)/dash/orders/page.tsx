@@ -87,6 +87,14 @@ export default async function OrdersPage() {
                     <td>{WHEN.format(order.createdAt)}</td>
                     <td>
                       <OrderStatusWord status={orderStatusOf(order.status)} size="s" />
+                      {order.adminNote ? (
+                        <span className={styles.note}>
+                          <strong>note:</strong> {order.adminNote}
+                        </span>
+                      ) : null}
+                      {order.tracking ? (
+                        <span className={styles.where}>tracking: {order.tracking}</span>
+                      ) : null}
                     </td>
                   </tr>
                 ))}

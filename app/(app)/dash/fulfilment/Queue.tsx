@@ -18,6 +18,8 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
   const [problem, setProblem] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [tracking, setTracking] = useState<Record<string, string>>({});
+  const [canceling, setCanceling] = useState<string | null>(null);
+  const [cancelNote, setCancelNote] = useState("");
 
   async function patch(id: string, payload: Record<string, unknown>) {
     setBusy(id);
@@ -32,12 +34,26 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
     setBusy(null);
 
     if (response.ok) {
+      setCanceling(null);
+      setCancelNote("");
       router.refresh();
       return;
     }
 
     const body = (await response.json().catch(() => ({}))) as { message?: string };
     setProblem(body.message ?? "That did not save.");
+  }
+
+  function startCancel(id: string) {
+    setProblem(null);
+    setCanceling(id);
+    setCancelNote("");
+  }
+
+  function stopCancel() {
+    if (busy) return;
+    setCanceling(null);
+    setCancelNote("");
   }
 
   if (rows.length === 0) return <p className={styles.none}>Nothing here.</p>;
@@ -48,6 +64,7 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
       {rows.map(({ order, maker }) => {
         const hasAddress = Boolean(order.addressLine1 && order.city && order.country);
         const working = busy === order.id;
+        const isCanceling = canceling === order.id;
 
         return (
           <div key={order.id} className={styles.order}>
@@ -81,52 +98,102 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
               </span>
             )}
 
-            <div className={styles.actions}>
-              <input
-                className={styles.tracking}
-                placeholder="tracking, optional"
-                value={tracking[order.id] ?? order.tracking ?? ""}
-                onChange={(event) => setTracking({ ...tracking, [order.id]: event.target.value })}
-              />
-              <Button
-                variant="quiet"
-                loading={working}
-                onClick={() =>
-                  patch(order.id, {
-                    status: "packing",
-                    tracking: tracking[order.id] ?? order.tracking ?? "",
-                  })
-                }
-              >
-                packing
-              </Button>
-              <Button
-                variant="quiet"
-                loading={working}
-                onClick={() =>
-                  patch(order.id, {
-                    status: "posted",
-                    tracking: tracking[order.id] ?? order.tracking ?? "",
-                  })
-                }
-              >
-                mark posted
-              </Button>
-              <Button
-                variant="quiet"
-                loading={working}
-                onClick={() => patch(order.id, { status: "needs_address" })}
-              >
-                needs address
-              </Button>
-              <Button
-                variant="danger"
-                loading={working}
-                onClick={() => patch(order.id, { status: "cancelled" })}
-              >
-                cancel and refund
-              </Button>
-            </div>
+            {order.adminNote ? (
+              <div className={styles.note}>
+                <strong>maker note:</strong> {order.adminNote}
+              </div>
+            ) : null}
+
+            {isCanceling ? (
+              <div className={styles.cancelBox}>
+                <label className={styles.cancelLabel} htmlFor={`cancel-note-${order.id}`}>
+                  cancellation comment — visible to the maker
+                </label>
+                <textarea
+                  id={`cancel-note-${order.id}`}
+                  className={styles.cancelNote}
+                  value={cancelNote}
+                  onChange={(event) => setCancelNote(event.target.value)}
+                  placeholder="Tell the maker why this order is being cancelled..."
+                  rows={3}
+                  autoFocus
+                />
+                <div className={styles.actions}>
+                  <Button variant="quiet" disabled={working} onClick={stopCancel}>
+                    keep order
+                  </Button>
+                  <Button
+                    variant="danger"
+                    loading={working}
+                    disabled={!cancelNote.trim()}
+                    onClick={() =>
+                      patch(order.id, {
+                        status: "cancelled",
+                        adminNote: cancelNote.trim(),
+                      })
+                    }
+                  >
+                    cancel & refund
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className={styles.actions}>
+                <input
+                  className={styles.tracking}
+                  placeholder="tracking, optional"
+                  value={tracking[order.id] ?? order.tracking ?? ""}
+                  onChange={(event) => setTracking({ ...tracking, [order.id]: event.target.value })}
+                />
+                <Button
+                  variant="quiet"
+                  loading={working}
+                  onClick={() =>
+                    patch(order.id, {
+                      status: "ready_to_fulfil",
+                      tracking: tracking[order.id] ?? order.tracking ?? "",
+                    })
+                  }
+                  className={styles.ready}
+                >
+                  ✓ ready to fulfil
+                </Button>
+                <Button
+                  variant="quiet"
+                  loading={working}
+                  onClick={() =>
+                    patch(order.id, {
+                      status: "packing",
+                      tracking: tracking[order.id] ?? order.tracking ?? "",
+                    })
+                  }
+                >
+                  packing
+                </Button>
+                <Button
+                  variant="quiet"
+                  loading={working}
+                  onClick={() =>
+                    patch(order.id, {
+                      status: "posted",
+                      tracking: tracking[order.id] ?? order.tracking ?? "",
+                    })
+                  }
+                >
+                  mark posted
+                </Button>
+                <Button
+                  variant="quiet"
+                  loading={working}
+                  onClick={() => patch(order.id, { status: "needs_address" })}
+                >
+                  needs address
+                </Button>
+                <Button variant="danger" loading={working} onClick={() => startCancel(order.id)}>
+                  cancel & refund
+                </Button>
+              </div>
+            )}
           </div>
         );
       })}
