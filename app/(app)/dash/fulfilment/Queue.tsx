@@ -24,22 +24,18 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
   async function patch(id: string, payload: Record<string, unknown>) {
     setBusy(id);
     setProblem(null);
-
     const response = await fetch(`/api/admin/orders/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-
     setBusy(null);
-
     if (response.ok) {
       setCanceling(null);
       setCancelNote("");
       router.refresh();
       return;
     }
-
     const body = (await response.json().catch(() => ({}))) as { message?: string };
     setProblem(body.message ?? "That did not save.");
   }
@@ -71,38 +67,20 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
             <div className={styles.head}>
               <span>
                 <span className={styles.item}>{order.itemName}</span>
-                <span className={styles.maker}>
-                  {" "}
-                  {maker.name} · {maker.slackId} · {order.cost} beans
-                </span>
+                <span className={styles.maker}>{" "}{maker.name} · {maker.slackId} · {order.cost} beans</span>
               </span>
               <OrderStatusWord status={orderStatusOf(order.status)} size="s" />
             </div>
 
             {hasAddress ? (
               <span className={styles.address}>
-                {[
-                  order.fullName,
-                  order.addressLine1,
-                  order.addressLine2,
-                  `${order.city} ${order.postcode ?? ""}`.trim(),
-                  order.country,
-                  order.email,
-                ]
-                  .filter(Boolean)
-                  .join("\n")}
+                {[order.fullName, order.addressLine1, order.addressLine2, `${order.city} ${order.postcode ?? ""}`.trim(), order.country, order.email].filter(Boolean).join("\n")}
               </span>
             ) : (
-              <span className={[styles.address, styles.missing].join(" ")}>
-                no address on this order, chase the maker
-              </span>
+              <span className={[styles.address, styles.missing].join(" ")}>no address on this order, chase the maker</span>
             )}
 
-            {order.adminNote ? (
-              <div className={styles.note}>
-                <strong>maker note:</strong> {order.adminNote}
-              </div>
-            ) : null}
+            {order.adminNote ? <div className={styles.note}><strong>maker note:</strong> {order.adminNote}</div> : null}
 
             {isCanceling ? (
               <div className={styles.cancelBox}>
@@ -119,19 +97,20 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
                   autoFocus
                 />
                 <div className={styles.actions}>
-                  <Button variant="quiet" disabled={working} onClick={stopCancel}>
-                    keep order
+                  <Button variant="quiet" disabled={working} onClick={stopCancel}>keep order</Button>
+                  <Button
+                    variant="danger"
+                    loading={working}
+                    disabled={!cancelNote.trim()}
+                    onClick={() => patch(order.id, { status: "cancelled", adminNote: cancelNote.trim(), refundBeans: false })}
+                  >
+                    cancel — no refund
                   </Button>
                   <Button
                     variant="danger"
                     loading={working}
                     disabled={!cancelNote.trim()}
-                    onClick={() =>
-                      patch(order.id, {
-                        status: "cancelled",
-                        adminNote: cancelNote.trim(),
-                      })
-                    }
+                    onClick={() => patch(order.id, { status: "cancelled", adminNote: cancelNote.trim(), refundBeans: true })}
                   >
                     cancel & refund
                   </Button>
@@ -145,53 +124,11 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
                   value={tracking[order.id] ?? order.tracking ?? ""}
                   onChange={(event) => setTracking({ ...tracking, [order.id]: event.target.value })}
                 />
-                <Button
-                  variant="quiet"
-                  loading={working}
-                  onClick={() =>
-                    patch(order.id, {
-                      status: "ready_to_fulfil",
-                      tracking: tracking[order.id] ?? order.tracking ?? "",
-                    })
-                  }
-                  className={styles.ready}
-                >
-                  ✓ ready to fulfil
-                </Button>
-                <Button
-                  variant="quiet"
-                  loading={working}
-                  onClick={() =>
-                    patch(order.id, {
-                      status: "packing",
-                      tracking: tracking[order.id] ?? order.tracking ?? "",
-                    })
-                  }
-                >
-                  packing
-                </Button>
-                <Button
-                  variant="quiet"
-                  loading={working}
-                  onClick={() =>
-                    patch(order.id, {
-                      status: "posted",
-                      tracking: tracking[order.id] ?? order.tracking ?? "",
-                    })
-                  }
-                >
-                  mark posted
-                </Button>
-                <Button
-                  variant="quiet"
-                  loading={working}
-                  onClick={() => patch(order.id, { status: "needs_address" })}
-                >
-                  needs address
-                </Button>
-                <Button variant="danger" loading={working} onClick={() => startCancel(order.id)}>
-                  cancel & refund
-                </Button>
+                <Button variant="quiet" loading={working} onClick={() => patch(order.id, { status: "ready_to_fulfil", tracking: tracking[order.id] ?? order.tracking ?? "" })} className={styles.ready}>✓ ready to fulfil</Button>
+                <Button variant="quiet" loading={working} onClick={() => patch(order.id, { status: "packing", tracking: tracking[order.id] ?? order.tracking ?? "" })}>packing</Button>
+                <Button variant="quiet" loading={working} onClick={() => patch(order.id, { status: "posted", tracking: tracking[order.id] ?? order.tracking ?? "" })}>mark posted</Button>
+                <Button variant="quiet" loading={working} onClick={() => patch(order.id, { status: "needs_address" })}>needs address</Button>
+                <Button variant="danger" loading={working} onClick={() => startCancel(order.id)}>cancel</Button>
               </div>
             )}
           </div>
