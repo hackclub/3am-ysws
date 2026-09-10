@@ -1,10 +1,10 @@
-import { and, eq, gt, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { isOrganizer } from "@/lib/auth/organizer";
 import { getCurrentUser } from "@/lib/auth/users";
 import { getDb } from "@/lib/db";
-import { beansLedger, items, orders } from "@/lib/db/schema";
+import { orders } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -58,29 +58,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       })
       .where(eq(orders.id, order.id));
 
-    if (cancelling) {
-      await tx.insert(beansLedger).values({
-        userSub: order.userSub,
-        delta: order.cost,
-        reason: "manual",
-        note: `refund for ${order.itemName}`,
-      });
-
-      if (order.itemId) {
-        await tx
-          .update(items)
-          .set({ stock: sql`${items.stock} + 1` })
-          .where(and(eq(items.id, order.itemId), gt(items.stock, -1)));
-      }
-    }
-
     return "ok" as const;
   });
 
   if (result === "not_found") return NextResponse.json({ error: "not found" }, { status: 404 });
   if (result === "already_cancelled") {
     return NextResponse.json(
-      { error: "already_cancelled", message: "That order was cancelled and refunded." },
+      { error: "already_cancelled", message: "That order is already cancelled." },
       { status: 409 },
     );
   }
