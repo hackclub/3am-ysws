@@ -10,26 +10,39 @@ import { projects, users } from "@/lib/db/schema";
 
 import styles from "./page.module.css";
 
-export default async function HomePage() {
-  const db = getDb();
-  const [makerStats, projectStats, approvedStats] = await Promise.all([
-    db.select({ count: sql<number>`count(*)` }).from(users),
-    db.select({ count: sql<number>`count(*)` }).from(projects),
-    db
-      .select({
-        count: sql<number>`count(*)`,
-        minutes: sql<number>`coalesce(sum(${projects.approvedMinutes}), 0)`,
-      })
-      .from(projects)
-      .where(sql`${projects.decision} = 'approved'`),
-  ]);
+export const dynamic = "force-dynamic";
 
+export default async function HomePage() {
   const stats = {
-    makers: Number(makerStats[0]?.count ?? 0),
-    projects: Number(projectStats[0]?.count ?? 0),
-    approvedProjects: Number(approvedStats[0]?.count ?? 0),
-    hours: Math.floor(Number(approvedStats[0]?.minutes ?? 0) / 60),
+    makers: 0,
+    projects: 0,
+    approvedProjects: 0,
+    hours: 0,
   };
+
+  if (process.env.DATABASE_URL) {
+    try {
+      const db = getDb();
+      const [makerStats, projectStats, approvedStats] = await Promise.all([
+        db.select({ count: sql<number>`count(*)` }).from(users),
+        db.select({ count: sql<number>`count(*)` }).from(projects),
+        db
+          .select({
+            count: sql<number>`count(*)`,
+            minutes: sql<number>`coalesce(sum(${projects.approvedMinutes}), 0)`,
+          })
+          .from(projects)
+          .where(sql`${projects.decision} = 'approved'`),
+      ]);
+
+      stats.makers = Number(makerStats[0]?.count ?? 0);
+      stats.projects = Number(projectStats[0]?.count ?? 0);
+      stats.approvedProjects = Number(approvedStats[0]?.count ?? 0);
+      stats.hours = Math.floor(Number(approvedStats[0]?.minutes ?? 0) / 60);
+    } catch {
+      // Keep the public homepage available if the database is temporarily unavailable.
+    }
+  }
 
   return (
     <>
