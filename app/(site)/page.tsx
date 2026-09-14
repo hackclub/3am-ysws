@@ -44,6 +44,14 @@ export default function HomePage() {
           </ButtonLink>
         </div>
 
+        <div className={styles.policyNotice} role="note">
+          <span className={styles.policyTitle}>0% tolerance for AI slop</span>
+          <span className={styles.policyText}>
+            Submit work you built yourself. Submitting low-effort or AI-generated work may result in
+            removal from 3am and a ban from participating.
+          </span>
+        </div>
+
         <span className={styles.note}>made possible by questionable sleep schedules</span>
       </section>
 
