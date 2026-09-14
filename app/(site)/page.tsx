@@ -1,13 +1,36 @@
 import Image from "next/image";
+import { sql } from "drizzle-orm";
 
 import { Section } from "@/components/site/Section";
 import { Faq } from "@/components/site/Faq";
 import { Steps } from "@/components/site/Steps";
 import { ButtonLink } from "@/components/ui/Button";
+import { getDb } from "@/lib/db";
+import { projects, users } from "@/lib/db/schema";
 
 import styles from "./page.module.css";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const db = getDb();
+  const [makerStats, projectStats, approvedStats] = await Promise.all([
+    db.select({ count: sql<number>`count(*)` }).from(users),
+    db.select({ count: sql<number>`count(*)` }).from(projects),
+    db
+      .select({
+        count: sql<number>`count(*)`,
+        minutes: sql<number>`coalesce(sum(${projects.approvedMinutes}), 0)`,
+      })
+      .from(projects)
+      .where(sql`${projects.decision} = 'approved'`),
+  ]);
+
+  const stats = {
+    makers: Number(makerStats[0]?.count ?? 0),
+    projects: Number(projectStats[0]?.count ?? 0),
+    approvedProjects: Number(approvedStats[0]?.count ?? 0),
+    hours: Math.floor(Number(approvedStats[0]?.minutes ?? 0) / 60),
+  };
+
   return (
     <>
       <section className={styles.hero}>
@@ -42,6 +65,25 @@ export default function HomePage() {
           <ButtonLink href="/#how-it-works" variant="ghost">
             how it works
           </ButtonLink>
+        </div>
+
+        <div className={styles.stats} aria-label="3am stats">
+          <div className={styles.stat}>
+            <strong>{stats.makers.toLocaleString()}</strong>
+            <span>makers</span>
+          </div>
+          <div className={styles.stat}>
+            <strong>{stats.projects.toLocaleString()}</strong>
+            <span>projects</span>
+          </div>
+          <div className={styles.stat}>
+            <strong>{stats.approvedProjects.toLocaleString()}</strong>
+            <span>approved</span>
+          </div>
+          <div className={styles.stat}>
+            <strong>{stats.hours.toLocaleString()}h</strong>
+            <span>hours approved</span>
+          </div>
         </div>
 
         <div className={styles.policyNotice} role="note">
