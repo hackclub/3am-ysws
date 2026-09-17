@@ -76,7 +76,10 @@ export default async function HomePage() {
           </p>
         </div>
 
-        <SubmissionCountdown deadline={config.submissionDeadline?.toISOString() ?? null} />
+        <SubmissionCountdown
+          deadline={config.submissionDeadline?.toISOString() ?? null}
+          submissionsOpen={config.submissionsOpen}
+        />
 
         <div className={styles.actions}>
           <ButtonLink href="/login">start building</ButtonLink>
