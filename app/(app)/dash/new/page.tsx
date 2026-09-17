@@ -6,6 +6,7 @@ import { Banner } from "@/components/ui/Banner";
 import { ButtonLink } from "@/components/ui/Button";
 import { getCurrentUser } from "@/lib/auth/users";
 import { getPickerProjects } from "@/lib/hackatime/projects";
+import { getYswsConfig, submissionsAreOpen } from "@/lib/yswsConfig";
 
 import { SubmitForm } from "./SubmitForm";
 
@@ -16,17 +17,25 @@ export default async function NewProjectPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login?next=%2Fdash%2Fnew");
 
-  const projects = await getPickerProjects(user);
+  const config = await getYswsConfig();
+  const open = submissionsAreOpen(config);
+  const projects = open ? await getPickerProjects(user) : [];
 
   return (
     <AppShell title="send in a project">
-      {projects === null ? (
+      {!open ? (
+        <Banner tone="warn" title="submissions are closed">
+          The 3am YSWS is no longer accepting new projects right now.
+        </Banner>
+      ) : projects === null ? (
         <Banner tone="warn" title="hackatime is not connected">
           Without it you cannot pick your projects, and a name typed by hand that does not match
           counts as zero hours.
         </Banner>
       ) : null}
-      {projects === null ? (
+      {!open ? (
+        <ButtonLink href="/dash">back to dashboard</ButtonLink>
+      ) : projects === null ? (
         <ButtonLink href="/dash/connect">connect Hackatime</ButtonLink>
       ) : (
         <SubmitForm projects={projects} />
