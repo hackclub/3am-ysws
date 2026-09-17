@@ -1,12 +1,14 @@
 import Image from "next/image";
 import { sql } from "drizzle-orm";
 
-import { Section } from "@/components/site/Section";
 import { Faq } from "@/components/site/Faq";
 import { Steps } from "@/components/site/Steps";
+import { SubmissionCountdown } from "@/components/site/SubmissionCountdown";
+import { Section } from "@/components/site/Section";
 import { ButtonLink } from "@/components/ui/Button";
 import { getDb } from "@/lib/db";
 import { projects, users } from "@/lib/db/schema";
+import { getYswsConfig } from "@/lib/yswsConfig";
 
 import styles from "./page.module.css";
 
@@ -19,6 +21,7 @@ export default async function HomePage() {
     approvedProjects: 0,
     hours: 0,
   };
+  const config = await getYswsConfig();
 
   if (process.env.DATABASE_URL) {
     try {
@@ -72,6 +75,8 @@ export default async function HomePage() {
             Finish it, ship it, and get rewarded for the hours you put in.
           </p>
         </div>
+
+        <SubmissionCountdown deadline={config.submissionDeadline?.toISOString() ?? null} />
 
         <div className={styles.actions}>
           <ButtonLink href="/login">start building</ButtonLink>
