@@ -5,9 +5,9 @@
   width: fit-content;
   margin: 18px auto 0;
   padding: 12px 16px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-input);
+  background: var(--surface);
   text-align: center;
 }
 
