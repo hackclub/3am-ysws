@@ -23,16 +23,9 @@ export type ResendDefaults = {
   hackatimeProjects: string[];
 };
 
-export function ResendForm({
-  project,
-  options,
-}: {
-  project: ResendDefaults;
-  options: PickerProject[];
-}) {
+export function ResendForm({ project, options }: { project: ResendDefaults; options: PickerProject[] }) {
   const router = useRouter();
   const ids = useId();
-
   const [title, setTitle] = useState(project.title);
   const [description, setDescription] = useState(project.description);
   const [repoUrl, setRepoUrl] = useState(project.repoUrl);
@@ -48,29 +41,23 @@ export function ResendForm({
   async function resend() {
     setSending(true);
     setProblem(null);
-
-    const response = await fetch(`/api/projects/${project.id}/resend`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title,
-        description,
-        repoUrl,
-        demoUrl,
-        thumbnailUrl,
-        hackatimeProjects: picked,
-        updateMessage,
-      }),
-    });
-
-    if (response.ok) {
-      router.refresh();
-      return;
+    try {
+      const response = await fetch(`/api/projects/${project.id}/resend`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, description, repoUrl, demoUrl, thumbnailUrl, hackatimeProjects: picked, updateMessage }),
+      });
+      if (response.ok) {
+        router.refresh();
+        return;
+      }
+      const body = (await response.json().catch(() => ({}))) as { field?: string; message?: string };
+      setProblem({ field: body.field, message: body.message ?? "That did not send. Try again." });
+    } catch {
+      setProblem({ message: "That did not send. Check your connection and try again." });
+    } finally {
+      setSending(false);
     }
-
-    const body = (await response.json().catch(() => ({}))) as { field?: string; message?: string };
-    setProblem({ field: body.field, message: body.message ?? "That did not send. Try again." });
-    setSending(false);
   }
 
   return (
@@ -78,59 +65,20 @@ export function ResendForm({
       <PanelLabel>fix it and send it back</PanelLabel>
       <div className={styles.form}>
         {problem && !problem.field ? <Banner tone="bad">{problem.message}</Banner> : null}
-
-        <Field
-          id={`${ids}-what`}
-          label="what changed?"
-          help="Goes straight to the reviewer who asked."
-          error={errorFor("update_message")}
-        >
-          <Textarea
-            value={updateMessage}
-            onChange={(event) => setUpdateMessage(event.target.value)}
-          />
+        <Field id={`${ids}-what`} label="what changed?" help="Goes straight to the reviewer who asked." error={errorFor("update_message")}>
+          <Textarea value={updateMessage} onChange={(event) => setUpdateMessage(event.target.value)} />
         </Field>
-
         <div className={styles.row}>
-          <Field id={`${ids}-title`} label="name" error={errorFor("title")}>
-            <Input value={title} onChange={(event) => setTitle(event.target.value)} />
-          </Field>
-          <Field id={`${ids}-repo`} label="repository" error={errorFor("repo_url")}>
-            <Input value={repoUrl} onChange={(event) => setRepoUrl(event.target.value)} />
-          </Field>
+          <Field id={`${ids}-title`} label="name" error={errorFor("title")}><Input value={title} onChange={(event) => setTitle(event.target.value)} /></Field>
+          <Field id={`${ids}-repo`} label="repository" error={errorFor("repo_url")}><Input value={repoUrl} onChange={(event) => setRepoUrl(event.target.value)} /></Field>
         </div>
-
-        <Field id={`${ids}-description`} label="what is it?" error={errorFor("description")}>
-          <Textarea value={description} onChange={(event) => setDescription(event.target.value)} />
-        </Field>
-
+        <Field id={`${ids}-description`} label="what is it?" error={errorFor("description")}><Textarea value={description} onChange={(event) => setDescription(event.target.value)} /></Field>
         <div className={styles.row}>
-          <Field
-            id={`${ids}-demo`}
-            label="demo link"
-            help="A live link, or a build people can download and run."
-            error={errorFor("demo_url")}
-          >
-            <Input value={demoUrl} onChange={(event) => setDemoUrl(event.target.value)} />
-          </Field>
-          <Field id={`${ids}-thumb`} label="screenshot" error={errorFor("thumbnail_url")}>
-            <ThumbnailField value={thumbnailUrl} onChange={setThumbnailUrl} />
-          </Field>
+          <Field id={`${ids}-demo`} label="demo link" help="A live link, or a build people can download and run." error={errorFor("demo_url")}><Input value={demoUrl} onChange={(event) => setDemoUrl(event.target.value)} /></Field>
+          <Field id={`${ids}-thumb`} label="screenshot" error={errorFor("thumbnail_url")}><ThumbnailField value={thumbnailUrl} onChange={setThumbnailUrl} /></Field>
         </div>
-
-        <Field
-          id={`${ids}-projects`}
-          label="hackatime projects"
-          error={errorFor("hackatime_projects")}
-        >
-          <HackatimePicker options={options} value={picked} onChange={setPicked} />
-        </Field>
-
-        <div className={styles.actions}>
-          <Button onClick={resend} loading={sending} loadingLabel="sending…">
-            send it back
-          </Button>
-        </div>
+        <Field id={`${ids}-projects`} label="hackatime projects" error={errorFor("hackatime_projects")}><HackatimePicker options={options} value={picked} onChange={setPicked} /></Field>
+        <div className={styles.actions}><Button onClick={resend} loading={sending} loadingLabel="sending…">send it back</Button></div>
       </div>
     </Panel>
   );

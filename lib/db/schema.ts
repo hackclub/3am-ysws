@@ -78,6 +78,18 @@ export const webhookEvents = pgTable(
   (table) => [index("webhook_events_project_id_idx").on(table.projectId)],
 );
 
+export const yswsConfig = pgTable(
+  "ysws_config",
+  {
+    id: integer("id").primaryKey().default(1),
+    submissionDeadline: timestamp("submission_deadline", { withTimezone: true }),
+    submissionsOpen: boolean("submissions_open").notNull().default(true),
+    resubmissionsOpen: boolean("resubmissions_open").notNull().default(true),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [check("ysws_config_singleton", sql`${table.id} = 1`)],
+);
+
 export const yswsState = pgEnum("ysws_state", ["held", "queued", "sent", "error"]);
 
 export const yswsSubmissions = pgTable(
@@ -200,6 +212,8 @@ export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;
 export type WebhookEvent = typeof webhookEvents.$inferSelect;
 export type NewWebhookEvent = typeof webhookEvents.$inferInsert;
+export type YswsConfig = typeof yswsConfig.$inferSelect;
+export type NewYswsConfig = typeof yswsConfig.$inferInsert;
 export type YswsSubmission = typeof yswsSubmissions.$inferSelect;
 export type NewYswsSubmission = typeof yswsSubmissions.$inferInsert;
 export type BeansEntry = typeof beansLedger.$inferSelect;

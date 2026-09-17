@@ -1,0 +1,82 @@
+.panel {
+  margin-bottom: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-transform: lowercase;
+}
+
+.input {
+  width: 100%;
+  max-width: 420px;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-input);
+  background: var(--night);
+  color: var(--cream);
+  font: inherit;
+}
+
+.help {
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+  max-width: 680px;
+}
+
+.toggle {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.toggle input {
+  margin-top: 3px;
+  width: 17px;
+  height: 17px;
+  accent-color: var(--lilac);
+}
+
+.toggle span {
+  display: grid;
+  gap: 4px;
+}
+
+.toggle small {
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 18px;
+}
+
+.save {
+  border: 1px solid var(--cream);
+  border-radius: var(--radius-input);
+  background: var(--cream);
+  color: var(--night);
+  padding: 11px 15px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.save:hover {
+  opacity: 0.88;
+}
+
+.saved {
+  margin: 0 0 14px;
+  color: var(--muted);
+}

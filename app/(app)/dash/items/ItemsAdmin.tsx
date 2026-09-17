@@ -41,23 +41,25 @@ export function ItemsAdmin({ items }: { items: Item[] }) {
   async function send(url: string, method: string, payload: unknown) {
     setBusy(true);
     setProblem(null);
-
-    const response = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    setBusy(false);
-
-    if (response.ok) {
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) {
+        const body = (await response.json().catch(() => ({}))) as { message?: string };
+        setProblem(body.message ?? "That did not save.");
+        return false;
+      }
       router.refresh();
       return true;
+    } catch {
+      setProblem("That did not save. Check your connection and try again.");
+      return false;
+    } finally {
+      setBusy(false);
     }
-
-    const body = (await response.json().catch(() => ({}))) as { message?: string };
-    setProblem(body.message ?? "That did not save.");
-    return false;
   }
 
   async function create() {
@@ -89,72 +91,34 @@ export function ItemsAdmin({ items }: { items: Item[] }) {
       <div className={styles.grid}>
         <label className={styles.half}>
           <span className={styles.label}>name</span>
-          <input
-            className={styles.input}
-            value={draft.name}
-            onChange={(event) => setDraft({ ...draft, name: event.target.value })}
-          />
+          <input className={styles.input} value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} />
         </label>
         <label className={styles.half}>
           <span className={styles.label}>cost in beans</span>
-          <input
-            className={styles.input}
-            inputMode="numeric"
-            value={draft.cost}
-            onChange={(event) => setDraft({ ...draft, cost: event.target.value })}
-          />
+          <input className={styles.input} inputMode="numeric" value={draft.cost} onChange={(event) => setDraft({ ...draft, cost: event.target.value })} />
         </label>
         <label className={styles.half}>
           <span className={styles.label}>stock</span>
-          <input
-            className={styles.input}
-            inputMode="numeric"
-            placeholder="unlimited"
-            value={draft.stock}
-            onChange={(event) => setDraft({ ...draft, stock: event.target.value })}
-          />
+          <input className={styles.input} inputMode="numeric" placeholder="unlimited" value={draft.stock} onChange={(event) => setDraft({ ...draft, stock: event.target.value })} />
           <span className={styles.help}>Leave empty for unlimited.</span>
         </label>
       </div>
-
       <label className={styles.half} style={{ minWidth: "100%" }}>
         <span className={styles.label}>description</span>
-        <input
-          className={styles.input}
-          value={draft.description}
-          onChange={(event) => setDraft({ ...draft, description: event.target.value })}
-        />
+        <input className={styles.input} value={draft.description} onChange={(event) => setDraft({ ...draft, description: event.target.value })} />
       </label>
-
       <div>
         <span className={styles.label}>image</span>
-        <ThumbnailField
-          value={draft.imageUrl}
-          onChange={(next) => setDraft({ ...draft, imageUrl: next })}
-        />
+        <ThumbnailField value={draft.imageUrl} onChange={(next) => setDraft({ ...draft, imageUrl: next })} />
       </div>
-
       <div className={styles.actions}>
         {editing ? (
           <>
-            <Button onClick={() => save(editing)} loading={busy} loadingLabel="saving…">
-              save changes
-            </Button>
-            <Button
-              variant="quiet"
-              onClick={() => {
-                setEditing(null);
-                setDraft(BLANK);
-                setProblem(null);
-              }}
-            >
-              cancel
-            </Button>
+            <Button onClick={() => save(editing)} loading={busy} loadingLabel="saving…">save changes</Button>
+            <Button variant="quiet" onClick={() => { setEditing(null); setDraft(BLANK); setProblem(null); }}>cancel</Button>
           </>
         ) : (
-          <Button onClick={create} loading={busy} loadingLabel="adding…">
-            add item
-          </Button>
+          <Button onClick={create} loading={busy} loadingLabel="adding…">add item</Button>
         )}
       </div>
     </div>
@@ -166,7 +130,6 @@ export function ItemsAdmin({ items }: { items: Item[] }) {
         <PanelLabel>{editing ? "edit item" : "add an item"}</PanelLabel>
         {form}
       </Panel>
-
       <Panel>
         <PanelLabel>{items.length === 1 ? "1 item" : `${items.length} items`}</PanelLabel>
         {items.length === 0 ? (
@@ -174,37 +137,17 @@ export function ItemsAdmin({ items }: { items: Item[] }) {
         ) : (
           <div className={styles.wrap}>
             {items.map((item) => (
-              <div
-                key={item.id}
-                className={[styles.row, item.hidden ? styles.dim : null].filter(Boolean).join(" ")}
-              >
-                {item.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={item.imageUrl} alt="" className={styles.thumb} />
-                ) : (
-                  <span className={styles.blank} aria-hidden="true">
-                    🌙
-                  </span>
-                )}
+              <div key={item.id} className={[styles.row, item.hidden ? styles.dim : null].filter(Boolean).join(" ")}>
+                {item.imageUrl ? <img src={item.imageUrl} alt="" className={styles.thumb} /> : <span className={styles.blank} aria-hidden="true">🌙</span>}
                 <span className={styles.name}>
                   {item.name}
                   <span className={styles.meta}>
-                    {item.cost} beans · {item.stock === null ? "unlimited" : `${item.stock} left`}
-                    {item.hidden ? " · hidden" : ""}
+                    {item.cost} beans · {item.stock === null ? "unlimited" : `${item.stock} left`}{item.hidden ? " · hidden" : ""}
                   </span>
                 </span>
                 <span className={styles.actions}>
-                  <Button variant="quiet" onClick={() => startEdit(item)}>
-                    edit
-                  </Button>
-                  <Button
-                    variant="quiet"
-                    onClick={() =>
-                      send(`/api/admin/items/${item.id}`, "PATCH", { hidden: !item.hidden })
-                    }
-                  >
-                    {item.hidden ? "show" : "hide"}
-                  </Button>
+                  <Button variant="quiet" onClick={() => startEdit(item)}>edit</Button>
+                  <Button variant="quiet" onClick={() => send(`/api/admin/items/${item.id}`, "PATCH", { hidden: !item.hidden })}>{item.hidden ? "show" : "hide"}</Button>
                 </span>
               </div>
             ))}
