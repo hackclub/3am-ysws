@@ -9,6 +9,7 @@ import { getDb } from "@/lib/db";
 import { projects } from "@/lib/db/schema";
 import { getReviewBackend, reviewIsExternal } from "@/lib/review";
 import type { ReviewSubmission } from "@/lib/review";
+import { getYswsConfig, submissionsAreOpen } from "@/lib/yswsConfig";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +36,14 @@ function invalid(field: string, message: string) {
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "not signed in" }, { status: 401 });
+
+  const config = await getYswsConfig();
+  if (!submissionsAreOpen(config)) {
+    return NextResponse.json(
+      { error: "submissions_closed", message: "Submissions are currently closed." },
+      { status: 403 },
+    );
+  }
 
   if (reviewIsExternal() && !canShip(await checkEligibility({ slackId: user.slackId }))) {
     return NextResponse.json({ error: "not_eligible" }, { status: 403 });
