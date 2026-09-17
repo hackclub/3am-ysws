@@ -18,10 +18,10 @@
   max-width: 420px;
   box-sizing: border-box;
   padding: 11px 12px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--panel);
-  color: var(--ink);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-input);
+  background: var(--night);
+  color: var(--cream);
   font: inherit;
 }
 
@@ -43,7 +43,7 @@
   margin-top: 3px;
   width: 17px;
   height: 17px;
-  accent-color: var(--ink);
+  accent-color: var(--lilac);
 }
 
 .toggle span {
@@ -63,10 +63,10 @@
 }
 
 .save {
-  border: 1px solid var(--ink);
-  border-radius: 8px;
-  background: var(--ink);
-  color: var(--bg);
+  border: 1px solid var(--cream);
+  border-radius: var(--radius-input);
+  background: var(--cream);
+  color: var(--night);
   padding: 11px 15px;
   font: inherit;
   cursor: pointer;
