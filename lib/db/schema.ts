@@ -66,6 +66,14 @@ export const projects = pgTable(
   ],
 );
 
+export const programSettings = pgTable("program_settings", {
+  id: integer("id").primaryKey().default(1),
+  submissionDeadline: timestamp("submission_deadline", { withTimezone: true }),
+  submissionsOpen: boolean("submissions_open").notNull().default(true),
+  resubmissionsOpen: boolean("resubmissions_open").notNull().default(true),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const webhookEvents = pgTable(
   "webhook_events",
   {
@@ -200,6 +208,8 @@ export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;
 export type WebhookEvent = typeof webhookEvents.$inferSelect;
 export type NewWebhookEvent = typeof webhookEvents.$inferInsert;
+export type ProgramSettings = typeof programSettings.$inferSelect;
+export type NewProgramSettings = typeof programSettings.$inferInsert;
 export type YswsSubmission = typeof yswsSubmissions.$inferSelect;
 export type NewYswsSubmission = typeof yswsSubmissions.$inferInsert;
 export type BeansEntry = typeof beansLedger.$inferSelect;
