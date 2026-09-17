@@ -8,6 +8,7 @@ import { getDb } from "@/lib/db";
 import { projects } from "@/lib/db/schema";
 import { getReviewBackend } from "@/lib/review";
 import type { ReviewSubmission } from "@/lib/review";
+import { getYswsConfig, resubmissionsAreOpen } from "@/lib/yswsConfig";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,14 @@ type Body = {
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "not signed in" }, { status: 401 });
+
+  const config = await getYswsConfig();
+  if (!resubmissionsAreOpen(config)) {
+    return NextResponse.json(
+      { error: "resubmissions_closed", message: "Resubmissions are currently closed." },
+      { status: 403 },
+    );
+  }
 
   const { id } = await params;
   const db = getDb();
