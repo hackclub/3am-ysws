@@ -19,6 +19,7 @@ import { isOpen, projectStatus } from "@/lib/projects/status";
 import { getPickerProjects } from "@/lib/hackatime/projects";
 import { reviewIsExternal } from "@/lib/review";
 import { beansForMinutes, hoursLabel } from "@/lib/beans";
+import { getYswsConfig, resubmissionsAreOpen } from "@/lib/yswsConfig";
 
 import { ResendForm } from "./ResendForm";
 import { WithdrawButton } from "./WithdrawButton";
@@ -90,7 +91,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
     project.decision === "changes" ||
     project.decision === "rejected" ||
     project.decision === "withdrawn";
-  const options = resendable ? ((await getPickerProjects(user)) ?? []) : [];
+  const resendOpen = resubmissionsAreOpen(await getYswsConfig());
+  const options = resendable && resendOpen ? ((await getPickerProjects(user)) ?? []) : [];
   const missing = project.decision === "approved" ? missingForGrant(user) : [];
 
   return (
@@ -172,7 +174,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
         </div>
       </div>
 
-      {resendable ? (
+      {resendable && resendOpen ? (
         <ResendForm
           project={{
             id: project.id,
@@ -185,6 +187,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
           }}
           options={options}
         />
+      ) : resendable ? (
+        <Banner tone="warn" title="resubmissions are closed">
+          The organizers are not accepting resubmissions right now.
+        </Banner>
       ) : null}
     </AppShell>
   );
