@@ -18,7 +18,13 @@ function parts(ms: number) {
   };
 }
 
-export function SubmissionCountdown({ deadline }: { deadline: string | null }) {
+export function SubmissionCountdown({
+  deadline,
+  submissionsOpen,
+}: {
+  deadline: string | null;
+  submissionsOpen: boolean;
+}) {
   const target = deadline ? Date.parse(deadline) : NaN;
   const [left, setLeft] = useState(() => (Number.isFinite(target) ? remaining(target) : 0));
   const [mounted, setMounted] = useState(false);
@@ -33,7 +39,23 @@ export function SubmissionCountdown({ deadline }: { deadline: string | null }) {
     return () => window.clearInterval(timer);
   }, [target]);
 
-  if (!Number.isFinite(target)) return null;
+  if (!Number.isFinite(target)) {
+    return submissionsOpen ? null : (
+      <div className={styles.complete} role="status" aria-live="polite">
+        <strong>Submissions Closed</strong>
+        <span>No longer taking projects</span>
+      </div>
+    );
+  }
+
+  if (!submissionsOpen) {
+    return (
+      <div className={styles.complete} role="status" aria-live="polite">
+        <strong>Submissions Closed</strong>
+        <span>No longer taking projects</span>
+      </div>
+    );
+  }
 
   if (mounted && left <= 0) {
     return (
