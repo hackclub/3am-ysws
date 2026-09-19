@@ -120,6 +120,46 @@ export function Rows({ rows }: { rows: ApprovedRow[] }) {
     router.refresh();
   }
 
+  async function resubmit(row: ApprovedRow) {
+    const values = fields(row);
+    setBusy(row.projectId);
+    setProblem(null);
+
+    const savedResponse = await fetch(`/api/admin/ysws/${row.projectId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        overrideHours: values.overrideHours ? Number(values.overrideHours) : null,
+        ageJustification: values.ageJustification,
+        duplicateJustification: values.duplicateJustification,
+      }),
+    });
+
+    if (!savedResponse.ok) {
+      const body = (await savedResponse.json().catch(() => ({}))) as { message?: string };
+      setBusy(null);
+      setProblem(body.message ?? "Those changes did not save, so nothing was resubmitted.");
+      return;
+    }
+
+    const response = await fetch(`/api/admin/ysws/${row.projectId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ resubmit: true }),
+    });
+    setBusy(null);
+
+    if (response.ok) {
+      setOpen(null);
+      router.refresh();
+      return;
+    }
+
+    const body = (await response.json().catch(() => ({}))) as { message?: string; error?: string };
+    setProblem(body.message ?? `That did not resubmit (${body.error ?? "unknown"}).`);
+    router.refresh();
+  }
+
   return (
     <>
       {problem ? <Banner tone="bad">{problem}</Banner> : null}
@@ -158,7 +198,17 @@ export function Rows({ rows }: { rows: ApprovedRow[] }) {
               <Button variant="quiet" onClick={() => show(row)} loading={working && !showing}>
                 {showing ? "hide" : "preview"}
               </Button>
-              {row.state === "sent" || row.state === "queued" ? null : (
+              {row.state === "sent" ? (
+                showing ? (
+                  <Button
+                    onClick={() => resubmit(row)}
+                    loading={working}
+                    loadingLabel="resubmitting…"
+                  >
+                    resubmit to unified
+                  </Button>
+                ) : null
+              ) : row.state === "queued" ? null : (
                 <Button
                   onClick={() => send(row)}
                   loading={working && showing}
