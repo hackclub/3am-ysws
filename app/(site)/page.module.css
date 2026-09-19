@@ -1,11 +1,19 @@
 .hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   max-width: 760px;
   margin: 0 auto;
   padding: 72px 24px 40px;
   text-align: center;
+  background:
+    radial-gradient(circle at 50% 8%, rgba(255, 159, 28, 0.10), transparent 28%),
+    radial-gradient(circle at 10% 55%, rgba(183, 140, 255, 0.08), transparent 24%),
+    radial-gradient(circle at 90% 70%, rgba(255, 107, 53, 0.06), transparent 22%);
 }
 
 .wordmark {
+  position: relative;
   margin: 0;
   font-family: var(--wordmark);
   font-size: clamp(72px, 14vw, 132px);
@@ -13,9 +21,11 @@
   color: var(--lamp);
   text-shadow: 6px 6px 0 var(--glow);
   transform: rotate(-2deg);
+  text-shadow: 6px 6px 0 var(--glow), 0 0 28px rgba(255, 159, 28, 0.22);
 }
 
 .credit {
+  position: relative;
   margin: 16px 0 34px;
   color: var(--muted);
   font-family: var(--display);
@@ -32,6 +42,10 @@
 }
 
 .owlRow {
+  position: relative;
+  border: 1px dashed rgba(255, 159, 28, 0.25);
+  padding: 12px 14px;
+  background: rgba(255, 159, 28, 0.035);
   display: flex;
   align-items: center;
   justify-content: center;
