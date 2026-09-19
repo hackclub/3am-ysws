@@ -15,6 +15,7 @@ async function organizer(): Promise<boolean> {
 type Params = { params: Promise<{ id: string }> };
 
 type Body = {
+  resubmit?: boolean;
   overrideHours?: number | null;
   ageJustification?: string | null;
   duplicateJustification?: string | null;
@@ -38,7 +39,16 @@ export async function POST(request: Request, { params }: Params) {
   if (!(await organizer())) return MISSING;
 
   const { id } = await params;
-  const report = await sendToUnified(id);
+
+  let resubmit = false;
+  try {
+    const body = (await request.json().catch(() => ({}))) as Body;
+    resubmit = body.resubmit === true;
+  } catch {
+    // An empty POST is the normal send action.
+  }
+
+  const report = await sendToUnified(id, resubmit);
 
   switch (report.status) {
     case "accepted":
