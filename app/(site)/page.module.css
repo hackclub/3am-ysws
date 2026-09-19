@@ -2,6 +2,9 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   max-width: 760px;
   margin: 0 auto;
   padding: 72px 24px 40px;
@@ -10,6 +13,33 @@
     radial-gradient(circle at 50% 8%, rgba(255, 159, 28, 0.10), transparent 28%),
     radial-gradient(circle at 10% 55%, rgba(183, 140, 255, 0.08), transparent 24%),
     radial-gradient(circle at 90% 70%, rgba(255, 107, 53, 0.06), transparent 22%);
+}
+
+.hero::before {
+  content: "🎃  HALLOWEEN AFTER DARK  👻";
+  display: inline-block;
+  margin-bottom: 18px;
+  padding: 7px 12px;
+  border: 1px solid rgba(255, 159, 28, 0.38);
+  background: rgba(255, 159, 28, 0.07);
+  color: var(--lamp);
+  font-family: var(--data);
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  transform: rotate(-1deg);
+}
+
+.hero::after {
+  content: "✦";
+  position: absolute;
+  top: 120px;
+  right: 7%;
+  color: var(--orchid);
+  font-size: 28px;
+  opacity: 0.65;
+  text-shadow: 0 0 18px rgba(183, 140, 255, 0.55);
+  z-index: -1;
 }
 
 .wordmark {
