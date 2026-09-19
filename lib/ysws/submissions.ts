@@ -163,7 +163,7 @@ export async function saveOverrides(projectId: string, values: Overrides): Promi
   return true;
 }
 
-export async function sendToUnified(projectId: string): Promise<SendReport> {
+export async function sendToUnified(projectId: string, resubmit = false): Promise<SendReport> {
   const db = getDb();
 
   const [existing] = await db
@@ -172,7 +172,7 @@ export async function sendToUnified(projectId: string): Promise<SendReport> {
     .where(eq(yswsSubmissions.projectId, projectId))
     .limit(1);
 
-  if (existing?.state === "sent") return { status: "already_sent" };
+  if (existing?.state === "sent" && !resubmit) return { status: "already_sent" };
 
   const row = await readOne(projectId);
   if (!row) {
