@@ -94,8 +94,8 @@ export function ItemsAdmin({ items }: { items: Item[] }) {
           <input className={styles.input} value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} />
         </label>
         <label className={styles.half}>
-          <span className={styles.label}>cost in beans</span>
-          <input className={styles.input} inputMode="numeric" value={draft.cost} onChange={(event) => setDraft({ ...draft, cost: event.target.value })} />
+          <span className={styles.label}>cost in beans (decimals allowed)</span>
+          <input className={styles.input} inputMode="decimal" step="0.01" value={draft.cost} onChange={(event) => setDraft({ ...draft, cost: event.target.value })} />
         </label>
         <label className={styles.half}>
           <span className={styles.label}>stock</span>
