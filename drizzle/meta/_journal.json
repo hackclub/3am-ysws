@@ -99,6 +99,13 @@
       "when": 1789666200000,
       "tag": "0013_event_controls",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1789862400000,
+      "tag": "0014_decimal_bean_values",
+      "breakpoints": true
     }
   ]
 }
