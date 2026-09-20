@@ -17,7 +17,7 @@ export function hoursLabel(minutes: number | null | undefined): string {
 
 export async function balanceFor(userSub: string): Promise<number> {
   const [row] = await getDb()
-    .select({ total: sql<number>`coalesce(sum(${beansLedger.delta}), 0)::int` })
+    .select({ total: sql<number>`coalesce(sum(${beansLedger.delta}), 0)` })
     .from(beansLedger)
     .where(eq(beansLedger.userSub, userSub));
   return row?.total ?? 0;

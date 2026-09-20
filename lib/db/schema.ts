@@ -5,6 +5,7 @@ import {
   date,
   index,
   integer,
+  numeric,
   jsonb,
   pgEnum,
   pgTable,
@@ -131,7 +132,7 @@ export const beansLedger = pgTable(
     userSub: text("user_sub")
       .notNull()
       .references(() => users.sub, { onUpdate: "cascade" }),
-    delta: integer("delta").notNull(),
+    delta: numeric("delta", { precision: 12, scale: 2, mode: "number" }).notNull(),
     reason: beansReason("reason").notNull(),
     projectId: uuid("project_id").references(() => projects.id, { onDelete: "set null" }),
     note: text("note"),
@@ -149,7 +150,7 @@ export const items = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     name: text("name").notNull(),
     description: text("description"),
-    cost: integer("cost").notNull(),
+    cost: numeric("cost", { precision: 12, scale: 2, mode: "number" }).notNull(),
     imageUrl: text("image_url"),
     stock: integer("stock"),
     hidden: boolean("hidden").notNull().default(false),
@@ -182,7 +183,7 @@ export const orders = pgTable(
     itemId: uuid("item_id").references(() => items.id),
 
     itemName: text("item_name").notNull(),
-    cost: integer("cost").notNull(),
+    cost: numeric("cost", { precision: 12, scale: 2, mode: "number" }).notNull(),
     status: orderStatus("status").notNull().default("placed"),
 
     fullName: text("full_name"),

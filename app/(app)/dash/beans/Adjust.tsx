@@ -54,7 +54,8 @@ export function Adjust({ userSub, name }: { userSub: string; name: string }) {
         >
           <Input
             value={delta}
-            inputMode="numeric"
+            inputMode="decimal"
+            step="0.01"
             placeholder="10"
             onChange={(event) => setDelta(event.target.value)}
           />

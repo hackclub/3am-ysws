@@ -43,7 +43,7 @@ export default async function MakersPage({
       beans: sql<number>`coalesce((
         select sum(${beansLedger.delta}) from ${beansLedger}
         where ${beansLedger.userSub} = ${users.sub}
-      ), 0)::int`,
+      ), 0)`,
       orderCount: sql<number>`(
         select count(*) from ${orders} where ${orders.userSub} = ${users.sub}
       )::int`,

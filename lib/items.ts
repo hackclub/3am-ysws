@@ -16,11 +16,11 @@ export function validateItem(input: ItemInput, requireName = true): ItemProblem 
   }
 
   if (input.cost !== undefined) {
-    if (!Number.isInteger(input.cost) || input.cost <= 0) {
-      return { field: "cost", message: "Cost has to be a whole number above zero." };
+    if (!Number.isFinite(input.cost) || input.cost <= 0 || Number(input.cost.toFixed(2)) !== input.cost) {
+      return { field: "cost", message: "Cost has to be a positive number with at most 2 decimal places." };
     }
   } else if (requireName) {
-    return { field: "cost", message: "Cost has to be a whole number above zero." };
+    return { field: "cost", message: "Cost has to be a positive number with at most 2 decimal places." };
   }
 
   if (input.stock !== undefined && input.stock !== null) {
