@@ -53,10 +53,6 @@
 }
 
 .owlRow {
-  position: relative;
-  border: 1px dashed rgba(255, 159, 28, 0.25);
-  padding: 12px 14px;
-  background: rgba(255, 159, 28, 0.035);
   display: flex;
   align-items: center;
   justify-content: center;
