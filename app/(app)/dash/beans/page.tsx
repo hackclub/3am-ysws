@@ -40,7 +40,7 @@ export default async function BeansPage({
       balance: sql<number>`coalesce((
         select sum(${beansLedger.delta}) from ${beansLedger}
         where ${beansLedger.userSub} = ${users.sub}
-      ), 0)::int`,
+      ), 0)`,
     })
     .from(users)
     .orderBy(users.name);
