@@ -45,7 +45,7 @@ export default async function HomePage() {
         <p className={styles.lead}>The only rule? It should look like it was built after the sun went down.</p>
         <div className={styles.owlRow}>
           <Image src="/assets/owl.png" alt="" width={52} height={52} className="pixel" unoptimized priority />
-          <p className={styles.lead}>Finish it, ship it, and get rewarded with spooky rewards for the hours you put in.</p>
+          <p className={styles.lead}>Finish it, ship it, and get rewarded for the hours you put in.</p>
         </div>
         <SubmissionCountdown deadline={config.submissionDeadline?.toISOString() ?? null} submissionsOpen={submissionsOpen} />
         <div className={styles.actions}>
