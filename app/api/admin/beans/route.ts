@@ -28,8 +28,8 @@ export async function POST(request: Request) {
   if (!body.userSub) return invalid("userSub", "Pick a maker first.");
 
   const delta = Number(body.delta);
-  if (!Number.isInteger(delta) || delta === 0) {
-    return invalid("delta", "Use a whole number, positive or negative, and not zero.");
+  if (!Number.isFinite(delta) || delta === 0 || Number(delta.toFixed(2)) !== delta) {
+    return invalid("delta", "Use a number with at most 2 decimal places, positive or negative, and not zero.");
   }
 
   const note = body.note?.trim();
