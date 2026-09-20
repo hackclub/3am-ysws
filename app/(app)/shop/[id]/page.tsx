@@ -82,8 +82,7 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
           ) : (
             <>
               <Banner tone="warn" title={`${short} beans short`}>
-                That is {Math.ceil(short / 5)} more approved hours. Ship something else and come
-                back.
+                You need {short} more beans. Ship something else and come back.
               </Banner>
               <ButtonLink href="/dash/new" variant="quiet">
                 send in a project
