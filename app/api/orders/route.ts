@@ -56,7 +56,7 @@ export async function POST(request: Request) {
       if (item.stock !== null && item.stock <= 0) throw new Error("sold_out");
 
       const [balanceRow] = await tx
-        .select({ total: sql<number>`coalesce(sum(${beansLedger.delta}), 0)::int` })
+        .select({ total: sql<number>`coalesce(sum(${beansLedger.delta}), 0)` })
         .from(beansLedger)
         .where(eq(beansLedger.userSub, user.sub));
 
