@@ -41,8 +41,7 @@ export default async function HomePage() {
       <section className={styles.hero}>
         <h1 className={styles.wordmark}>3am</h1>
         <p className={styles.credit}>YSWS by SEBA, Hack Club</p>
-        <p className={styles.lead}>Pick something dark themed to build. A moody website, a cursed little tool, a game, or whatever else you can come up with.</p>
-        <p className={styles.lead}>The only rule? It should look like it was built after the sun went down.</p>
+        <p className={styles.lead}>Make something dark themed like Website, tool, a game or anything that suits your interest, and get some amazing prizes from the #3AM Shop this <span className={styles.spooktober}>Spooktober!!</span></p>
         <div className={styles.owlRow}>
           <Image src="/assets/owl.png" alt="" width={52} height={52} className="pixel" unoptimized priority />
           <p className={styles.lead}>Finish it, ship it, and get rewarded for the hours you put in.</p>
@@ -60,7 +59,7 @@ export default async function HomePage() {
         </div>
         <div className={styles.policyNotice} role="note">
           <span className={styles.policyTitle}>0% tolerance for AI slop</span>
-          <span className={styles.policyText}>Submit work you built yourself. Submitting low-effort or AI-generated work may result in removal from 3am and a ban from participating.</span>
+          <span className={styles.policyText}>Please don't submit low quality or AI-generated work, It may result in removal from 3am and a ban from participating.</span>
         </div>
         <span className={styles.note}>made possible by questionable sleep schedules</span>
       </section>
