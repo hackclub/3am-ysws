@@ -12,18 +12,6 @@
     radial-gradient(circle at 90% 70%, rgba(255, 107, 53, 0.06), transparent 22%);
 }
 
-.hero::after {
-  content: "✦";
-  position: absolute;
-  top: 120px;
-  right: 7%;
-  color: var(--orchid);
-  font-size: 28px;
-  opacity: 0.65;
-  text-shadow: 0 0 18px rgba(183, 140, 255, 0.55);
-  z-index: -1;
-}
-
 .wordmark {
   position: relative;
   margin: 0;
