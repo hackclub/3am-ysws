@@ -33,7 +33,6 @@
   color: var(--lamp);
   text-shadow: 6px 6px 0 var(--glow);
   transform: rotate(-2deg);
-  text-shadow: 6px 6px 0 var(--glow), 0 0 28px rgba(255, 159, 28, 0.22);
 }
 
 .credit {
