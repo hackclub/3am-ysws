@@ -14,7 +14,7 @@ const FAQ: Entry[] = [
   {
     question: "what can I ship?",
     answer:
-      "Pick something dark themed to build. A site, a tool, a game, whatever you're into. Hardware works too, and you get spooky rewards for actually finishing it.",
+      "Pick something dark themed to build. A site, a tool, a game, whatever you're into. Hardware works too, and you get real rewards for actually finishing it.",
   },
   {
     question: "am I eligible?",
