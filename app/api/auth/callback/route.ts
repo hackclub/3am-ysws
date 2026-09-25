@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-
 import { publicUrl } from "@/lib/http";
-
+import { BannedUserError, MissingIdentityError, upsertUser } from "@/lib/auth/users";
 import { exchangeCode } from "@/lib/auth/hca";
 import { verifyIdToken } from "@/lib/auth/id-token";
 import { OAUTH_STATE_COOKIE, parseOAuthState } from "@/lib/auth/oauth-state";
 import { setSession } from "@/lib/auth/session";
-import { MissingIdentityError, upsertUser } from "@/lib/auth/users";
 
 export const dynamic = "force-dynamic";
 
@@ -26,14 +24,13 @@ export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const code = params.get("code");
   const denied = params.get("error");
-
   const expected = request.cookies.get(OAUTH_STATE_COOKIE)?.value;
   const { nonce, returnTo } = parseOAuthState(params.get("state"));
-  const stateMatches = Boolean(expected) && nonce === expected;
 
   if (denied) return failed(request, "denied");
   if (!code) return failed(request, "no_code");
-  if (!stateMatches) {
+
+  if (!Boolean(expected) || nonce !== expected) {
     console.error("[auth] state mismatch on callback, refusing to sign in");
     return failed(request, "state");
   }
@@ -46,23 +43,26 @@ export async function GET(request: NextRequest) {
     return failed(request, "exchange");
   }
 
-  if (!idToken) {
-    console.error("[auth] token response carried no id_token");
-    return failed(request, "no_identity");
-  }
+  if (!idToken) return failed(request, "no_identity");
 
-  let sub: string;
   try {
     const claims = await verifyIdToken(idToken);
-    sub = (await upsertUser(claims)).sub;
+    const user = await upsertUser(claims);
+    const response = NextResponse.redirect(publicUrl(request, returnTo ?? "/dash"));
+    return clearState(await setSession(response, user.sub));
   } catch (error) {
+    if (error instanceof BannedUserError) {
+      const response = NextResponse.redirect(publicUrl(request, "/ban"));
+      response.headers.set("Cache-Control", "no-store");
+      // Keep the banned account identifiable so /ban can show its stored reason.
+      return clearState(await setSession(response, error.sub));
+    }
+
     if (error instanceof MissingIdentityError) {
       return failed(request, `missing_${error.field}`);
     }
+
     console.error("[auth] could not establish identity", error);
     return failed(request, "identity");
   }
-
-  const response = NextResponse.redirect(publicUrl(request, returnTo ?? "/dash"));
-  return clearState(await setSession(response, sub));
 }

@@ -34,6 +34,9 @@ export const users = pgTable("users", {
   stateProvince: text("state_province"),
   postcode: text("postcode"),
   country: text("country"),
+
+  bannedAt: timestamp("banned_at", { withTimezone: true }),
+  banReason: text("ban_reason"),
 });
 
 export const decision = pgEnum("decision", ["approved", "changes", "rejected", "withdrawn"]);
