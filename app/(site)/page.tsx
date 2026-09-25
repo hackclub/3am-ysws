@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 import { Faq } from "@/components/site/Faq";
 import { Steps } from "@/components/site/Steps";
@@ -7,7 +7,7 @@ import { SubmissionCountdown } from "@/components/site/SubmissionCountdown";
 import { Section } from "@/components/site/Section";
 import { ButtonLink } from "@/components/ui/Button";
 import { getDb } from "@/lib/db";
-import { projects, users } from "@/lib/db/schema";
+import { projects, users, yswsSubmissions } from "@/lib/db/schema";
 import { getYswsConfig, submissionsAreOpen } from "@/lib/yswsConfig";
 
 import styles from "./page.module.css";
@@ -25,7 +25,7 @@ export default async function HomePage() {
       const [makerStats, projectStats, approvedStats] = await Promise.all([
         db.select({ count: sql<number>`count(*)` }).from(users),
         db.select({ count: sql<number>`count(*)` }).from(projects),
-        db.select({ count: sql<number>`count(*)`, minutes: sql<number>`coalesce(sum(${projects.approvedMinutes}), 0)` }).from(projects).where(sql`${projects.decision} = 'approved'`),
+        db.select({ count: sql<number>`count(*)`, minutes: sql<number>`coalesce(sum(coalesce(${yswsSubmissions.overrideMinutes}, ${projects.approvedMinutes})), 0)` }).from(projects).leftJoin(yswsSubmissions, eq(yswsSubmissions.projectId, projects.id)).where(sql`${projects.decision} = 'approved'`),
       ]);
       stats.makers = Number(makerStats[0]?.count ?? 0);
       stats.projects = Number(projectStats[0]?.count ?? 0);
