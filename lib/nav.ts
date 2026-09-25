@@ -16,6 +16,7 @@ export const ORGANIZER_NAV: NavItem[] = [
   { href: "/dash/fulfilment", label: "fulfilment" },
   { href: "/dash/beans", label: "beans" },
   { href: "/dash/makers", label: "makers" },
+  { href: "/dash/ban", label: "ban users" },
 ];
 
 export const SITE_NAV: NavItem[] = [
