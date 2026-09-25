@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { SiteNav } from "@/components/site/SiteNav";
 import { getSession } from "@/lib/auth/session";
 import { getDb } from "@/lib/db";
+import { users } from "@/lib/db/schema";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = { title: "access suspended" };
