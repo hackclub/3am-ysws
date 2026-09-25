@@ -143,6 +143,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
           <Panel>
             <PanelLabel>status</PanelLabel>
             <ProjectStatusWord status={status} size="l" />
+            {stored === "draft" ? (
+              <div className={styles.actions}>
+                <ButtonLink href={`/dash/p/${project.id}/edit`}>edit draft</ButtonLink>
+              </div>
+            ) : null}
             {project.noteToMaker ? <p className={styles.note}>{project.noteToMaker}</p> : null}
             <div className={styles.facts}>
               <div className={styles.fact}>
