@@ -15,20 +15,30 @@ import styles from "./SubmitForm.module.css";
 
 type Problem = { field?: string; message: string };
 
-export function SubmitForm({ projects }: { projects: PickerProject[] }) {
+type DraftValues = {
+  id: string;
+  title: string;
+  description: string;
+  repoUrl: string;
+  demoUrl: string;
+  thumbnailUrl: string;
+  hackatimeProjects: string[];
+};
+
+export function SubmitForm({ projects, initial }: { projects: PickerProject[]; initial?: DraftValues }) {
   const router = useRouter();
   const ids = useId();
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [repoUrl, setRepoUrl] = useState("");
-  const [demoUrl, setDemoUrl] = useState("");
-  const [thumbnailUrl, setThumbnailUrl] = useState("");
-  const [picked, setPicked] = useState<string[]>([]);
+  const [title, setTitle] = useState(initial?.title ?? "");
+  const [description, setDescription] = useState(initial?.description ?? "");
+  const [repoUrl, setRepoUrl] = useState(initial?.repoUrl ?? "");
+  const [demoUrl, setDemoUrl] = useState(initial?.demoUrl ?? "");
+  const [thumbnailUrl, setThumbnailUrl] = useState(initial?.thumbnailUrl ?? "");
+  const [picked, setPicked] = useState<string[]>(initial?.hackatimeProjects ?? []);
   const [problem, setProblem] = useState<Problem | null>(null);
   const [sending, setSending] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
-  const draftId = useRef<string | null>(null);
+  const draftId = useRef<string | null>(initial?.id ?? null);
   const saving = useRef(false);
 
   const saveDraft = useCallback(async () => {
