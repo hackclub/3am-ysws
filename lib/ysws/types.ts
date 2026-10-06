@@ -1,3 +1,5 @@
+import type { AriJustification } from "@/lib/ari/inbound";
+
 export type PendingRow = {
   projectId: string;
   title: string;
@@ -9,6 +11,7 @@ export type PendingRow = {
   approvedMinutes: number | null;
   noteToMaker: string | null;
   decidedAt: Date | null;
+  ariJustification: AriJustification | null;
 
   email: string;
   hackatimeId: string | null;

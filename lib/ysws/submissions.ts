@@ -1,8 +1,10 @@
 import { and, desc, eq, inArray, isNotNull } from "drizzle-orm";
 
+import { decisionFromEvent, reviewJustification } from "@/lib/ari/inbound";
+import type { AriDelivery, AriJustification } from "@/lib/ari/inbound";
 import { repoCommitCount } from "@/lib/ari/repo";
 import { getDb } from "@/lib/db";
-import { projects, users, yswsSubmissions } from "@/lib/db/schema";
+import { projects, users, webhookEvents, yswsSubmissions } from "@/lib/db/schema";
 import { missingForGrant } from "@/lib/grant";
 
 import { buildPayload, send } from "./client";
@@ -73,6 +75,27 @@ export async function readApproved(): Promise<ApprovedRow[]> {
   }));
 }
 
+// Ari's structured justification only lives in the raw webhook payload, so read it from the
+// latest decision-shaped delivery for this project. A later revert/requeue or non-approval
+// means the stored justification no longer describes the current approval.
+async function latestAriJustification(projectId: string): Promise<AriJustification | null> {
+  const events = await getDb()
+    .select({ event: webhookEvents.event, payload: webhookEvents.payload })
+    .from(webhookEvents)
+    .where(eq(webhookEvents.projectId, projectId))
+    .orderBy(desc(webhookEvents.receivedAt))
+    .limit(20);
+
+  for (const { event, payload } of events) {
+    if (event === "review.reverted" || event === "review.requeued") return null;
+    const delivery = payload as AriDelivery;
+    const decision = decisionFromEvent(delivery);
+    if (!decision) continue;
+    return decision === "approved" ? reviewJustification(delivery) : null;
+  }
+  return null;
+}
+
 async function readOne(projectId: string): Promise<PendingRow | null> {
   const db = getDb();
 
@@ -105,6 +128,7 @@ async function readOne(projectId: string): Promise<PendingRow | null> {
     approvedMinutes: project.approvedMinutes,
     noteToMaker: project.noteToMaker,
     decidedAt: project.decidedAt,
+    ariJustification: await latestAriJustification(project.id),
 
     email: maker.email,
     hackatimeId: maker.hackatimeId,
