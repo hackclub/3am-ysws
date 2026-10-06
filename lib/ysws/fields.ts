@@ -45,20 +45,28 @@ export function hoursJustification(row: PendingRow): string {
     row.approvedMinutes !== null &&
     row.overrideMinutes < row.approvedMinutes;
 
+  const ari = row.ariJustification;
+
   return [
     section("HACKATIME", [
       `Hackatime ID: ${row.hackatimeId ?? "not connected"}`,
       `Hackatime Projects: ${row.hackatimeProjects.join(", ") || "none picked"}`,
+      ari?.hackatimeProjects.length
+        ? `Reviewer-checked Hackatime projects: ${ari.hackatimeProjects.join(", ")}`
+        : null,
+      ...(ari?.lapseLinks.length ? ["Lapse links:", ...ari.lapseLinks] : []),
     ]),
-    section("SPECIFIC TECHNICAL FEATURES", [row.description, row.noteToMaker]),
+    // noteToMaker is feedback for the participant, never justification. Do not add it here.
     section(
-      "DEFLATION JUSTIFICATION",
-      deflated
-        ? [
-            `An organiser cut this to ${grantHours(row)}h from the ${(row.approvedMinutes ?? 0) / 60}h the review allowed.`,
-          ]
-        : [],
+      "SPECIFIC TECHNICAL FEATURES",
+      ari?.technicalFeatures.length ? ari.technicalFeatures : [row.description],
     ),
+    section("DEFLATION JUSTIFICATION", [
+      ...(ari?.deflationReason ?? []),
+      deflated
+        ? `An organiser cut this to ${grantHours(row)}h from the ${(row.approvedMinutes ?? 0) / 60}h the review allowed.`
+        : null,
+    ]),
     section("ADDITIONAL JUSTIFICATION", [
       `Reviewed in 3AM and approved for ${grantHours(row)}h${reviewed}.`,
       row.repoUrl ? `Commit history: ${commitsUrl(row.repoUrl)}` : null,
