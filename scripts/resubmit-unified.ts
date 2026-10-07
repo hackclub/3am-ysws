@@ -32,9 +32,9 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 async function run() {
   const from = istDay(arg("from"), "from");
   const to = new Date(istDay(arg("to"), "to").getTime() + 24 * 60 * 60 * 1000);
-  const apply = process.argv.includes("--yes");
+  const apply = process.argv.includes("--yes");\n  const fresh = process.argv.includes("--fresh");\n  const list = (name: string) =>\n    new Set(\n      (arg(name) ?? "")\n        .split(",")\n        .map((id) => id.trim())\n        .filter(Boolean),\n    );\n  const skip = list("skip");\n  const only = list("only");
 
-  const rows = await getDb()
+  const picked = await getDb()
     .select({
       projectId: yswsSubmissions.projectId,
       title: projects.title,
@@ -63,8 +63,8 @@ async function run() {
     console.log(
       `── ${row.title.slice(0, 40)}  ${row.projectId}  ${row.state}  ${row.recordId ?? "-"}`,
     );
-    const preview = await previewUnified(row.projectId);
-    if (preview.status === "ready" || preview.status === "blocked") {
+    const preview = await previewUnified(row.projectId, fresh);
+    if (preview.status === "ready" || preview.status === "blocked") {\n      console.log(\n        `   yswsRecordId → ${String(preview.payload.yswsRecordId ?? "(none: new record)")}`,\n      );
       const text = String((preview.payload.fields as Record<string, unknown>)[JUSTIFICATION]);
       console.log(text.replace(/^/gm, "   "));
       if (preview.problem) console.log(`   ! would be held: ${preview.problem.message}`);
@@ -81,7 +81,7 @@ async function run() {
 
   const tally: Record<string, number> = {};
   for (const row of rows) {
-    const report = await sendToUnified(row.projectId, true);
+    const report = await sendToUnified(row.projectId, true, fresh);
     tally[report.status] = (tally[report.status] ?? 0) + 1;
     const detail = "message" in report ? `  ${report.message}` : "";
     console.log(`${report.status.padEnd(12)} ${row.title.slice(0, 40)}${detail}`);

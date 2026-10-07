@@ -8,7 +8,7 @@ import { projects, users, webhookEvents, yswsSubmissions } from "@/lib/db/schema
 import { missingForGrant } from "@/lib/grant";
 
 import { buildPayload, send } from "./client";
-import { ensureOutbox, findOutbox } from "./outbox";
+import { ensureOutbox, findOutbox, unlinkOutbox } from "./outbox";
 import type { ApprovedRow, GateProblem, PendingRow } from "./types";
 import { validate } from "./validate";
 
@@ -27,7 +27,7 @@ export type Preview =
   | { status: "not_approved" };
 
 export async function previewUnified(projectId: string): Promise<Preview> {
-  const row = await readOne(projectId);
+  const found = await readOne(projectId);\n  const row = found && fresh ? { ...found, recordId: null, firstSubmittedAt: null } : found;
   if (!row) {
     const [project] = await getDb()
       .select({ id: projects.id })
@@ -43,7 +43,7 @@ export async function previewUnified(projectId: string): Promise<Preview> {
     payload: buildPayload(
       row,
       process.env.YSWS_PROGRAM_ID ?? "(YSWS_PROGRAM_ID is not set)",
-      await findOutbox(projectId).catch(() => null),
+      await findOutbox(projectId)\n        .then((outbox) =>\n          outbox && fresh ? { ...outbox, yswsRecordId: null, firstSubmittedAt: null } : outbox,\n        )\n        .catch(() => null),
     ),
     problem,
   };
@@ -187,7 +187,7 @@ export async function saveOverrides(projectId: string, values: Overrides): Promi
   return true;
 }
 
-export async function sendToUnified(projectId: string, resubmit = false): Promise<SendReport> {
+// `fresh` forgets the Unified record this project was linked to (outbox row + our DB) and\n// submits it as brand new. Only use it when that Unified record no longer exists, or you\n// will create a duplicate.\nexport async function sendToUnified(\n  projectId: string,\n  resubmit = false,\n  fresh = false,\n): Promise<SendReport> {
   const db = getDb();
 
   const [existing] = await db
@@ -217,7 +217,7 @@ export async function sendToUnified(projectId: string, resubmit = false): Promis
     return { status: "held", field: problem.field, message: problem.message };
   }
 
-  const outbox = await ensureOutbox(projectId, row.title);
+  let outbox = await ensureOutbox(projectId, row.title);\n  if (fresh) {\n    await unlinkOutbox(outbox.recordId);\n    await record(projectId, { recordId: null, firstSubmittedAt: null });\n    outbox = { ...outbox, yswsRecordId: null, firstSubmittedAt: null, error: null };\n  }
   const outcome = await send(row, outbox);
   const lastAttemptAt = new Date();
 
