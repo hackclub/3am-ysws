@@ -79,3 +79,19 @@ export async function ensureOutbox(projectId: string, title: string): Promise<Ou
 
   return toRow(body);
 }
+
+// Drop the outbox's link to a Unified record. Use it when that record was deleted on the
+// Unified side: the bridge treats a stale "Automation - YSWS Record ID" as an update and
+// silently does nothing, so the next send has to look like a first submission.
+export async function unlinkOutbox(recordId: string): Promise<void> {
+  await call(`/${recordId}`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      fields: {
+        "Automation - YSWS Record ID": null,
+        "Automation - First Submitted At": null,
+        "Automation - Error": null,
+      },
+    }),
+  });
+}
