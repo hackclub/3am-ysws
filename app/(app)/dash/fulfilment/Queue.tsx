@@ -94,10 +94,20 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
   const groupedRows = useMemo(() => {
     const groups = new Map<string, { order: Order; maker: User; orders: Order[]; totalCents: number }>();
     for (const { order, maker } of visibleRows) {
+      const normalize = (value: unknown) => String(value ?? "").trim().replace(/\\s+/g, " ").toLocaleLowerCase();
       const key = JSON.stringify([
-        maker.sub, order.itemName, order.status, order.fullName, order.email,
-        order.addressLine1, order.addressLine2, order.city, order.postcode,
-        order.country, order.tracking, order.adminNote,
+        maker.sub,
+        normalize(order.itemName),
+        normalize(order.status),
+        normalize(order.fullName),
+        normalize(order.email),
+        normalize(order.addressLine1),
+        normalize(order.addressLine2),
+        normalize(order.city),
+        normalize(order.postcode),
+        normalize(order.country),
+        normalize(order.tracking),
+        normalize(order.adminNote),
       ]);
       const current = groups.get(key);
       if (current) {
