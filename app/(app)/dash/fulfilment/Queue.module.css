@@ -143,3 +143,184 @@
   font-size: 15px;
   color: var(--muted);
 }
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  padding: var(--s4);
+  margin-bottom: var(--s3);
+  background: var(--night);
+  border: 1px solid var(--edge);
+  border-radius: var(--wobble-sm);
+}
+
+.summaryHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s3);
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--data);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.grandTotal {
+  font-size: clamp(26px, 4vw, 36px);
+  line-height: 1.1;
+  font-weight: 700;
+  color: var(--lamp);
+  font-variant-numeric: tabular-nums;
+}
+
+.grandTotal span {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--soft);
+}
+
+.summaryHint {
+  max-width: 640px;
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.copyAction {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.copyMessage {
+  max-width: 240px;
+  font-size: 11px;
+  line-height: 1.4;
+  text-align: right;
+  color: var(--soft);
+}
+
+.searchLabel {
+  font-family: var(--data);
+  font-size: 12px;
+  color: var(--soft);
+}
+
+.search {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  font-family: var(--data);
+  font-size: 13px;
+  color: var(--cream);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-input);
+}
+
+.search:focus {
+  outline: 2px solid var(--glow);
+  outline-offset: 1px;
+}
+
+.totalsTableWrap {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-input);
+}
+
+.totalsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--data);
+  font-size: 12.5px;
+  text-align: left;
+}
+
+.totalsTable th,
+.totalsTable td {
+  padding: 9px 11px;
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+
+.totalsTable th {
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.totalsTable tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.totalsTable tbody tr:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.makerFilter {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--cream);
+  text-align: left;
+  cursor: pointer;
+}
+
+.makerFilter:hover span {
+  color: var(--lamp);
+  text-decoration: underline;
+}
+
+.makerFilter small {
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+.amount {
+  font-weight: 600;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--lamp);
+}
+
+.totalsTable th:last-child {
+  text-align: right;
+}
+
+@media (max-width: 520px) {
+  .summaryHead {
+    flex-direction: column;
+  }
+
+  .copyAction {
+    align-items: flex-start;
+  }
+
+  .copyMessage {
+    text-align: left;
+  }
+
+  .totalsTable th,
+  .totalsTable td {
+    padding: 8px;
+  }
+}
