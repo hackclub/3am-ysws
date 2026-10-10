@@ -1,3 +1,39 @@
+.circulation {
+  font-family: var(--data);
+  font-size: clamp(28px, 5vw, 42px);
+  color: var(--lamp);
+  font-variant-numeric: tabular-nums;
+}
+
+.circulation span {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.sortOptions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.sortOptions a {
+  color: var(--soft);
+  text-decoration: none;
+  padding: 5px 8px;
+  border: 1px solid var(--rule);
+  border-radius: var(--wobble-sm);
+}
+
+.sortOptions a:hover,
+.sortOptions .sortOn {
+  color: var(--lamp);
+  border-color: var(--lamp);
+}
+
 .list {
   display: flex;
   flex-direction: column;
