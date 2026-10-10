@@ -1,6 +1,7 @@
 import { and, eq, isNotNull, isNull } from "drizzle-orm";
 
 import { reconcileProjectBeans } from "@/lib/beans";
+import { notifyProjectDecision } from "@/lib/email/notify";
 import { getDb } from "@/lib/db";
 import { projects } from "@/lib/db/schema";
 import type { Project } from "@/lib/db/schema";
@@ -43,6 +44,7 @@ export async function applyDecision(input: DecisionInput): Promise<ApplyResult> 
 
   if (updated) {
     await reconcileProjectBeans(updated);
+    await notifyProjectDecision(updated);
     return { status: "applied", project: updated };
   }
 
