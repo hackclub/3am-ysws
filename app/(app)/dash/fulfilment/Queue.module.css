@@ -324,3 +324,15 @@
     padding: 8px;
   }
 }
+
+
+.orderCopyRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+
+.orderCopyRow .copyMessage {
+  text-align: left;
+}
