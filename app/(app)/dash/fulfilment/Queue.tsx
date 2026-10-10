@@ -35,6 +35,7 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
   const [search, setSearch] = useState("");
   const [copyMessage, setCopyMessage] = useState<string | null>(null);
   const [orderCopyMessages, setOrderCopyMessages] = useState<Record<string, string>>({});
+  const [expandedMakers, setExpandedMakers] = useState<Record<string, boolean>>({});
   const [nuclearOpen, setNuclearOpen] = useState(false);
   const [nuclearPhrase, setNuclearPhrase] = useState("");
 
@@ -123,7 +124,7 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
   }, [visibleRows]);
 
   const totals = useMemo(() => {
-    const byMaker = new Map<string, { key: string; name: string; slackId: string; cents: number; count: number }>();
+    const byMaker = new Map<string, { key: string; name: string; slackId: string; email: string; cents: number; count: number; orders: { order: Order; maker: User }[] }>();
     let totalCents = 0;
 
     for (const { order, maker } of visibleRows) {
@@ -343,18 +344,39 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
                 {totals.makers.map((maker) => (
                   <tr key={maker.key}>
                     <td>
-                      <button
-                        type="button"
-                        className={styles.makerFilter}
-                        onClick={() => {
-                          setSearch(maker.slackId || maker.name);
-                          setCopyMessage(null);
-                        }}
-                        title={`Show orders for ${maker.name}`}
-                      >
+                      <button type="button" className={styles.makerFilter}
+                        aria-expanded={Boolean(expandedMakers[maker.key])}
+                        onClick={() => setExpandedMakers((current) => ({ ...current, [maker.key]: !current[maker.key] }))}
+                        title={`Show order breakdown for ${maker.name}`}>
                         <span>{maker.name}</span>
+                        {maker.email ? <small>{maker.email}</small> : <small>email unavailable</small>}
                         {maker.slackId ? <small>{maker.slackId}</small> : null}
+                        <small>{expandedMakers[maker.key] ? "hide breakdown ▲" : "show breakdown ▼"}</small>
                       </button>
+                      {expandedMakers[maker.key] ? (
+                        <div className={styles.makerBreakdown}>
+                          <div className={styles.makerBreakdownHead}><strong>Order breakdown</strong><span>{maker.count} orders · {formatBeans(maker.cents)} beans total</span></div>
+                          {maker.orders.map(({ order }) => (
+                            <div key={order.id} className={styles.makerBreakdownOrder}>
+                              <div className={styles.makerBreakdownDetails}><strong>{order.itemName}</strong><span>{order.email || maker.email || "No email on order"}</span><small>{order.id}</small></div>
+                              <strong className={styles.amount}>{formatBeans(beanCents(order.cost))} beans</strong>
+                              <Button variant="quiet" onClick={() => copyOrderDetails(order, maker)}>copy details</Button>
+                            </div>
+                          ))}
+                          <div className={styles.makerBreakdownFooter}>
+                            <strong>Combined total</strong><strong className={styles.amount}>{formatBeans(maker.cents)} beans</strong>
+                            <Button variant="quiet" onClick={async () => {
+                              try {
+                                await navigator.clipboard.writeText(maker.orders.map(({ order }) => `${order.itemName} — ${formatBeans(beanCents(order.cost))} beans — ${order.email || maker.email || "no email"} — order ${order.id}`).join("\n") + `\nTOTAL: ${formatBeans(maker.cents)} beans`);
+                                setOrderCopyMessages((current) => ({ ...current, [maker.key]: "Copied maker breakdown" }));
+                              } catch {
+                                setOrderCopyMessages((current) => ({ ...current, [maker.key]: "Clipboard unavailable" }));
+                              }
+                            }}>copy breakdown</Button>
+                            {orderCopyMessages[maker.key] ? <small role="status">{orderCopyMessages[maker.key]}</small> : null}
+                          </div>
+                        </div>
+                      ) : null}
                     </td>
                     <td>{maker.count}</td>
                     <td className={styles.amount}>{formatBeans(maker.cents)}</td>
