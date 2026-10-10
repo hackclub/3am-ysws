@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/users";
 import { readAddress, validateAddress } from "@/lib/address";
 import { getDb } from "@/lib/db";
-import { beansLedger, items, orders, users } from "@/lib/db/schema";
+import { beansLedger, items, orders, slackOrderDigestEvents, users } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -106,6 +106,19 @@ export async function POST(request: Request) {
         reason: "purchase",
         note: item.name,
       });
+
+      await tx
+        .insert(slackOrderDigestEvents)
+        .values({
+          orderId: order.id,
+          eventType: "created",
+          payload: {
+            makerName: user.name || "Unknown maker",
+            itemName: item.name,
+            cost: item.cost,
+          },
+        })
+        .onConflictDoNothing();
 
       return order.id;
     });
