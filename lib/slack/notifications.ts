@@ -90,6 +90,28 @@ export async function sendSlackDm(slackId: string, message: string): Promise<boo
   return Boolean(sent?.ts);
 }
 
+export async function notifySlackMemberJoined(slackId: string): Promise<boolean> {
+  const projectsUrl = appUrl("/dash/projects");
+  const ordersUrl = appUrl("/dash/orders");
+  const links = [
+    projectsUrl ? `\n• <${projectsUrl}|Open your project dashboard>` : "",
+    ordersUrl ? `\n• <${ordersUrl}|Check the rewards shop and your orders>` : "",
+  ].filter(Boolean).join("");
+
+  const message =
+    "👋 *Welcome to 3AM!*\n\n" +
+    "Glad you’re here. The goal is simple: build something, ship it, and share your progress.\n\n" +
+    "*Your quick start*\n" +
+    "• Read the current program rules before starting.\n" +
+    "• Pick a small, achievable project and keep your work moving.\n" +
+    "• Track your work as required by the program, then submit when it’s ready.\n" +
+    "• If you’re stuck, ask the team in #3am-coorgs.\n" +
+    links +
+    "\n\nNo pressure to make something huge on day one. Ship the first version. 🚀";
+
+  return sendSlackDm(slackId, message);
+}
+
 export async function notifyProjectDecision(project: Project): Promise<void> {
   try {
     if (!project.decision || project.decision === "withdrawn") return;
@@ -148,4 +170,81 @@ export async function notifyOrderFulfilled(input: {
   } catch {
     console.warn("[slack] could not prepare fulfilment notification; order was updated");
   }
+}
+
+
+export type SlackOrderDigestEvent = {
+  id: number;
+  orderId: string;
+  eventType: "created" | "shipped";
+  payload: Record<string, unknown>;
+  createdAt: Date;
+};
+
+function payloadText(payload: Record<string, unknown>, key: string, fallback: string): string {
+  const value = payload[key];
+  return typeof value === "string" && value.trim() ? value.trim() : fallback;
+}
+
+export async function notifyOrderDigest(
+  slackId: string,
+  events: SlackOrderDigestEvent[],
+): Promise<boolean> {
+  if (events.length === 0) return true;
+
+  const grouped = new Map<
+    string,
+    { makerName: string; itemName: string; cost: string; created: boolean; shipped: boolean; tracking: string | null }
+  >();
+
+  for (const event of events) {
+    const payload = event.payload ?? {};
+    const current = grouped.get(event.orderId) ?? {
+      makerName: payloadText(payload, "makerName", "Unknown maker"),
+      itemName: payloadText(payload, "itemName", "Unknown reward"),
+      cost: String(payload.cost ?? "unknown"),
+      created: false,
+      shipped: false,
+      tracking: null,
+    };
+
+    if (event.eventType === "created") current.created = true;
+    if (event.eventType === "shipped") {
+      current.shipped = true;
+      const tracking = payload.tracking;
+      current.tracking = typeof tracking === "string" && tracking.trim() ? tracking.trim() : null;
+      current.makerName = payloadText(payload, "makerName", current.makerName);
+      current.itemName = payloadText(payload, "itemName", current.itemName);
+      current.cost = String(payload.cost ?? current.cost);
+    }
+    grouped.set(event.orderId, current);
+  }
+
+  const createdCount = events.filter((event) => event.eventType === "created").length;
+  const shippedCount = events.filter((event) => event.eventType === "shipped").length;
+  const url = appUrl("/dash/orders");
+  const orderLink = url ? `\n<${url}|Open orders dashboard>` : "";
+
+  const details = [...grouped.entries()].map(([orderId, order]) => {
+    const statuses = [
+      order.created ? "🛒 New order" : "",
+      order.shipped
+        ? `📦 Shipped${order.tracking ? ` — tracking: ${escapeSlackText(order.tracking)}` : ""}`
+        : "",
+    ].filter(Boolean);
+    return [
+      `• *${escapeSlackText(order.itemName)}* — ${escapeSlackText(order.makerName)} — ${escapeSlackText(order.cost)} beans`,
+      `  Order \`${escapeSlackText(orderId.slice(0, 8))}\` · ${statuses.join(" · ")}`,
+    ].join("\n");
+  });
+
+  const message = [
+    `📬 *3AM order digest* — ${createdCount} new, ${shippedCount} shipped`,
+    ...details,
+    orderLink,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+
+  return sendSlackDm(slackId, message);
 }

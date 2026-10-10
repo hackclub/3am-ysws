@@ -207,6 +207,29 @@ export const orders = pgTable(
   ],
 );
 
+
+export const slackOrderDigestEvents = pgTable(
+  "slack_order_digest_events",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => orders.id, { onDelete: "cascade" }),
+    eventType: text("event_type").notNull(),
+    payload: jsonb("payload").$type<Record<string, unknown>>().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    claimedAt: timestamp("claimed_at", { withTimezone: true }),
+    deliveredAt: timestamp("delivered_at", { withTimezone: true }),
+    attempts: integer("attempts").notNull().default(0),
+    lastError: text("last_error"),
+  },
+  (table) => [
+    uniqueIndex("slack_order_digest_events_order_event_idx").on(table.orderId, table.eventType),
+    index("slack_order_digest_events_pending_idx").on(table.deliveredAt, table.claimedAt, table.createdAt),
+    check("slack_order_digest_events_type_check", sql`${table.eventType} in ('created', 'shipped')`),
+  ],
+);
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Project = typeof projects.$inferSelect;
