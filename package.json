@@ -25,7 +25,8 @@
     "migrate:queue": "tsx --env-file=.env scripts/migrate-queue.ts",
     "migrate:unified": "tsx --env-file=.env scripts/migrate-unified.ts",
     "resubmit:unified": "tsx --env-file=.env scripts/resubmit-unified.ts",
-    "promote": "tsx --env-file=.env --env-file=.env.prod scripts/promote.ts"
+    "promote": "tsx --env-file=.env --env-file=.env.prod scripts/promote.ts",
+    "test:email": "tsx --test lib/email/templates.test.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",
