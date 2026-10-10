@@ -25,11 +25,11 @@ const WHEN = new Intl.DateTimeFormat("en-GB", {
 export default async function BeansPage({
   searchParams,
 }: {
-  searchParams: Promise<{ maker?: string }>;
+  searchParams: Promise<{ maker?: string; sort?: string }>;
 }) {
   if (!(await requireOrganizer())) notFound();
 
-  const { maker } = await searchParams;
+  const { maker, sort } = await searchParams;
   const db = getDb();
 
   const makers = await db
@@ -37,6 +37,7 @@ export default async function BeansPage({
       sub: users.sub,
       name: users.name,
       slackId: users.slackId,
+      email: users.email,
       balance: sql<number>`coalesce((
         select sum(${beansLedger.delta}) from ${beansLedger}
         where ${beansLedger.userSub} = ${users.sub}
@@ -44,6 +45,14 @@ export default async function BeansPage({
     })
     .from(users)
     .orderBy(users.name);
+
+  if (sort === "highest") makers.sort((a, b) => Number(b.balance) - Number(a.balance) || a.name.localeCompare(b.name));
+  else if (sort === "lowest") makers.sort((a, b) => Number(a.balance) - Number(b.balance) || a.name.localeCompare(b.name));
+
+  const [circulationRow] = await db
+    .select({ total: sql<number>`coalesce(sum(${beansLedger.delta}), 0)` })
+    .from(beansLedger);
+  const circulation = Number(circulationRow?.total ?? 0);
 
   const chosen = makers.find((entry) => entry.sub === maker) ?? null;
 
@@ -58,19 +67,30 @@ export default async function BeansPage({
   return (
     <AppShell title="beans">
       <Panel>
+        <PanelLabel>total beans in circulation</PanelLabel>
+        <div className={styles.circulation}>{circulation.toLocaleString("en-US")} <span>beans</span></div>
+      </Panel>
+
+      <Panel>
         <PanelLabel>{makers.length === 1 ? "1 maker" : `${makers.length} makers`}</PanelLabel>
+        <div className={styles.sortOptions} aria-label="sort bean owners">
+          <span>sort by</span>
+          <Link href={`/dash/beans${maker ? `?maker=${encodeURIComponent(maker)}&` : "?"}sort=highest`} className={sort === "highest" ? styles.sortOn : undefined}>highest balance</Link>
+          <Link href={`/dash/beans${maker ? `?maker=${encodeURIComponent(maker)}&` : "?"}sort=lowest`} className={sort === "lowest" ? styles.sortOn : undefined}>lowest balance</Link>
+          <Link href={`/dash/beans${maker ? `?maker=${encodeURIComponent(maker)}&` : "?"}sort=name`} className={!sort || sort === "name" ? styles.sortOn : undefined}>name A–Z</Link>
+        </div>
         <div className={styles.list}>
           {makers.map((entry) => (
             <Link
               key={entry.sub}
-              href={`/dash/beans?maker=${encodeURIComponent(entry.sub)}`}
+              href={`/dash/beans?maker=${encodeURIComponent(entry.sub)}&sort=${sort === "highest" || sort === "lowest" ? sort : "name"}`}
               className={[styles.maker, entry.sub === chosen?.sub ? styles.on : null]
                 .filter(Boolean)
                 .join(" ")}
             >
               <span>
                 <span className={styles.name}>{entry.name}</span>
-                <span className={styles.sub}>{entry.slackId}</span>
+                <span className={styles.sub}>{entry.email || "email unavailable"}{entry.slackId ? ` · ${entry.slackId}` : ""}</span>
               </span>
               <span className={styles.balance}>{entry.balance}</span>
             </Link>
