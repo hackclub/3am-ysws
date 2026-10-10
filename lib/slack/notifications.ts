@@ -44,10 +44,10 @@ async function slackApi<T extends SlackApiResponse>(method: string, body: Record
   }
 
   try {
-    const response = await fetch(`https://slack.com/api/${method}`, {
+    const response = await fetch(\`https://slack.com/api/\${method}\`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: \`Bearer \${token}\`,
         "Content-Type": "application/json; charset=utf-8",
       },
       body: JSON.stringify(body),
@@ -55,18 +55,18 @@ async function slackApi<T extends SlackApiResponse>(method: string, body: Record
       signal: AbortSignal.timeout(5_000),
     });
     if (!response.ok) {
-      console.warn(`[slack] ${method} failed with HTTP ${response.status}`);
+      console.warn(\`[slack] \${method} failed with HTTP \${response.status}\`);
       return null;
     }
 
     const result = (await response.json()) as T;
     if (!result.ok) {
-      console.warn(`[slack] ${method} failed: ${result.error ?? "unknown_error"}`);
+      console.warn(\`[slack] \${method} failed: \${result.error ?? "unknown_error"}\`);
       return null;
     }
     return result;
   } catch {
-    console.warn(`[slack] ${method} request failed`);
+    console.warn(\`[slack] \${method} request failed\`);
     return null;
   }
 }
@@ -107,7 +107,7 @@ export async function notifyProjectDecision(project: Project): Promise<void> {
     const name = escapeSlackText(maker.name || "there");
     const title = escapeSlackText(project.title);
     const url = appUrl("/dash/projects");
-    const link = url ? `\\n\\n<${url}|Open your projects>` : "";
+    const link = url ? \`\\n\\n<\${url}|Open your projects>\` : "";
 
     let message: string;
     switch (project.decision) {
@@ -115,15 +115,15 @@ export async function notifyProjectDecision(project: Project): Promise<void> {
         const hours =
           project.approvedMinutes == null
             ? ""
-            : `\\nApproved time: *${(project.approvedMinutes / 60).toFixed(2)} hours*.`;
-        message = `🌟 *Your 3AM project was approved!*\\nHey ${name} — *${title}* has been approved.${hours}${link}\\n\\nKeep shipping, Team #3AM.`;
+            : \`\\nApproved time: *\${(project.approvedMinutes / 60).toFixed(2)} hours*.\`;
+        message = \`🌟 *Your 3AM project was approved!*\\nHey \${name} — *\${title}* has been approved.\${hours}\${link}\\n\\nKeep shipping, Team #3AM.\`;
         break;
       }
       case "changes":
-        message = `🛠️ *Changes requested on your 3AM project*\\nHey ${name} — we need a few changes to *${title}*.\\n\\n*Reviewer feedback*\\n${escapeSlackText(project.noteToMaker?.trim() || "Please open your project dashboard for details.")}${link}\\n\\nYou’ve got this, Team #3AM.`;
+        message = \`🛠️ *Changes requested on your 3AM project*\\nHey \${name} — we need a few changes to *\${title}*.\\n\\n*Reviewer feedback*\\n\${escapeSlackText(project.noteToMaker?.trim() || "Please open your project dashboard for details.")}\${link}\\n\\nYou’ve got this, Team #3AM.\`;
         break;
       case "rejected":
-        message = `📋 *Update on your 3AM project*\\nHey ${name} — *${title}* wasn’t approved this time.\\n\\n*Reviewer feedback*\\n${escapeSlackText(project.noteToMaker?.trim() || "Please open your project dashboard for details.")}${link}\\n\\nThanks for building with 3AM, Team #3AM.`;
+        message = \`📋 *Update on your 3AM project*\\nHey \${name} — *\${title}* wasn’t approved this time.\\n\\n*Reviewer feedback*\\n\${escapeSlackText(project.noteToMaker?.trim() || "Please open your project dashboard for details.")}\${link}\\n\\nThanks for building with 3AM, Team #3AM.\`;
         break;
       default:
         return;
@@ -144,8 +144,8 @@ export async function notifyOrderFulfilled(input: {
   const name = escapeSlackText(input.makerName || "there");
   const item = escapeSlackText(input.itemName);
   const url = appUrl("/dash/orders");
-  const link = url ? `\\n\\n<${url}|View your orders>` : "";
-  const message = `📦 *Your 3AM fulfilment is marked complete!*\\nHey ${name} — *${item}* has been marked as fulfilled.${link}\\n\\nIf you have questions, DM the 3AM team in Hack Club Slack.`;
+  const link = url ? \`\\n\\n<\${url}|View your orders>\` : "";
+  const message = \`📦 *Your 3AM fulfilment is marked complete!*\\nHey \${name} — *\${item}* has been marked as fulfilled.\${link}\\n\\nIf you have questions, DM the 3AM team in Hack Club Slack.\`;
 
   try {
     await sendSlackDm(input.slackId, message);
