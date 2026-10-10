@@ -35,6 +35,8 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
   const [search, setSearch] = useState("");
   const [copyMessage, setCopyMessage] = useState<string | null>(null);
   const [orderCopyMessages, setOrderCopyMessages] = useState<Record<string, string>>({});
+  const [nuclearOpen, setNuclearOpen] = useState(false);
+  const [nuclearPhrase, setNuclearPhrase] = useState("");
 
   async function patch(id: string, payload: Record<string, unknown>) {
     setBusy(id);
@@ -146,6 +148,82 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
     };
   }, [visibleRows]);
 
+  const eligibleOrders = useMemo(
+    () => rows.filter(({ order }) => order.status !== "cancelled" && order.status !== "posted"),
+    [rows],
+  );
+
+  function csvCell(value: string | number | boolean) {
+    return `"${String(value).replace(/"/g, '""')}"`;
+  }
+
+  function downloadHcbCsv() {
+    const headers = [
+      "email", "amount_cents", "purpose", "instructions", "one_time_use",
+      "pre_authorization_required", "invite_message", "merchant_lock",
+      "category_lock", "keyword_lock", "banned_merchants", "banned_categories",
+    ];
+    const lines = [
+      headers.map(csvCell).join(","),
+      ...eligibleOrders.map(({ order, maker }) => {
+        const email = (order.email || maker.email || "").trim();
+        const cents = Math.round(Number(order.cost) * 100);
+        const purpose = order.itemName.trim().slice(0, 30);
+        return [
+          email, cents, purpose, "", false, false, "", "", "", "", "", "",
+        ].map(csvCell).join(",");
+      }),
+    ];
+    if (eligibleOrders.some(({ order, maker }) => !(order.email || maker.email || "").trim())) {
+      setProblem("CSV not downloaded: at least one active order has no recipient email. Fix the order data first.");
+      return;
+    }
+    if (eligibleOrders.some(({ order }) => !Number.isFinite(Number(order.cost)) || Number(order.cost) < 0)) {
+      setProblem("CSV not downloaded: an order has an invalid price.");
+      return;
+    }
+    const blob = new Blob(["\uFEFF", lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "3am-hcb-card-grants.csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    setProblem(null);
+  }
+
+  async function markEverythingFulfilled() {
+    if (nuclearPhrase !== "fulfilment complete" || eligibleOrders.length === 0 || busy) return;
+    setBusy("bulk-fulfilment");
+    setProblem(null);
+    let completed = 0;
+    try {
+      for (const { order } of eligibleOrders) {
+        const response = await fetch(`/api/admin/orders/${order.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "posted", tracking: order.tracking ?? "" }),
+        });
+        if (!response.ok) {
+          const body = (await response.json().catch(() => ({}))) as { message?: string };
+          setProblem(`Stopped after ${completed} of ${eligibleOrders.length} orders. ${body.message ?? "An order failed to update."} Refresh and verify the remaining orders.`);
+          router.refresh();
+          return;
+        }
+        completed += 1;
+      }
+      setNuclearOpen(false);
+      setNuclearPhrase("");
+      router.refresh();
+    } catch {
+      setProblem(`Stopped after ${completed} of ${eligibleOrders.length} orders. Network error; refresh and verify order statuses before retrying.`);
+    } finally {
+      setBusy(null);
+    }
+  }
+
   async function copyTotals() {
     const lines = [
       `Fulfilment total: ${formatBeans(totals.totalCents)} beans across ${visibleRows.length} orders`,
@@ -200,6 +278,30 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
   return (
     <>
       {problem ? <Banner tone="bad">{problem}</Banner> : null}
+
+      <section className={styles.summary} aria-label="bulk fulfilment tools">
+        <div className={styles.actions}>
+          <Button variant="quiet" onClick={downloadHcbCsv} disabled={eligibleOrders.length === 0}>
+            download HCB grants CSV ({eligibleOrders.length})
+          </Button>
+          <Button variant="danger" onClick={() => { setNuclearOpen((open) => !open); setNuclearPhrase(""); }} disabled={eligibleOrders.length === 0 || Boolean(busy)}>
+            mark all active orders fulfilled
+          </Button>
+        </div>
+        <p className={styles.summaryHint}>CSV uses 1 bean = $1 (100 cents per bean), exact HCB columns, and excludes already-posted or cancelled orders. Purpose is capped at 30 characters.</p>
+        {nuclearOpen ? (
+          <div className={styles.cancelBox}>
+            <strong>Nuclear action: mark {eligibleOrders.length} active orders as posted</strong>
+            <p className={styles.summaryHint}>This updates order statuses only. It does not issue refunds or change bean balances. Cancelled and already-posted orders are excluded. If an update fails, the operation stops and reports how many were completed.</p>
+            <label className={styles.cancelLabel} htmlFor="bulk-fulfilment-confirm">Type exactly: fulfilment complete</label>
+            <input id="bulk-fulfilment-confirm" className={styles.search} value={nuclearPhrase} onChange={(event) => setNuclearPhrase(event.target.value)} autoComplete="off" />
+            <div className={styles.actions}>
+              <Button variant="quiet" onClick={() => { setNuclearOpen(false); setNuclearPhrase(""); }} disabled={Boolean(busy)}>keep orders unchanged</Button>
+              <Button variant="danger" loading={busy === "bulk-fulfilment"} disabled={nuclearPhrase !== "fulfilment complete" || Boolean(busy)} onClick={markEverythingFulfilled}>confirm bulk fulfilment</Button>
+            </div>
+          </div>
+        ) : null}
+      </section>
 
       <section className={styles.summary} aria-label="fulfilment totals">
         <div className={styles.summaryHead}>
