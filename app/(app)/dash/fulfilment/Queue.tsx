@@ -382,11 +382,11 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
                       {expandedMakers[maker.key] ? (
                         <div className={styles.makerBreakdown}>
                           <div className={styles.makerBreakdownHead}><strong>Order breakdown</strong><span>{maker.count} orders · {formatBeans(maker.cents)} beans total</span></div>
-                          {maker.orders.map(({ order }) => (
+                          {maker.orders.map(({ order, maker: orderMaker }) => (
                             <div key={order.id} className={styles.makerBreakdownOrder}>
                               <div className={styles.makerBreakdownDetails}><strong>{order.itemName}</strong><span>{order.email || maker.email || "No email on order"}</span><small>{order.id}</small></div>
                               <strong className={styles.amount}>{formatBeans(beanCents(order.cost))} beans</strong>
-                              <Button variant="quiet" onClick={() => copyOrderDetails(order, maker)}>copy details</Button>
+                              <Button variant="quiet" onClick={() => copyOrderDetails(order, orderMaker)}>copy details</Button>
                             </div>
                           ))}
                           <div className={styles.makerBreakdownFooter}>
