@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 
 import { notifySlackMemberJoined } from "@/lib/slack/notifications";
 
@@ -70,10 +70,10 @@ export async function POST(request: Request) {
     payload.event.user &&
     /^[UW][A-Z0-9]+$/.test(payload.event.user)
   ) {
-    // Acknowledge quickly; Slack retries callbacks that take too long.
     const userId = payload.event.user;
-    void notifySlackMemberJoined(userId).catch(() => {
-      console.warn("[slack] onboarding DM failed");
+    after(async () => {
+      const sent = await notifySlackMemberJoined(userId);
+      if (!sent) console.warn("[slack] onboarding DM could not be delivered");
     });
     return NextResponse.json({ ok: true });
   }
