@@ -34,6 +34,7 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
   const [cancelNote, setCancelNote] = useState("");
   const [search, setSearch] = useState("");
   const [copyMessage, setCopyMessage] = useState<string | null>(null);
+  const [orderCopyMessages, setOrderCopyMessages] = useState<Record<string, string>>({});
 
   async function patch(id: string, payload: Record<string, unknown>) {
     setBusy(id);
@@ -128,6 +129,25 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
       setCopyMessage("Totals copied");
     } catch {
       setCopyMessage("Clipboard unavailable — select and copy the totals manually");
+    }
+  }
+
+  async function copyOrderDetails(order: Order, maker: User) {
+    const details = [
+      `Maker: ${maker.name}`,
+      `Slack: ${maker.slackId}`,
+      `Email: ${maker.email || "not provided"}`,
+      `Order email: ${order.email || "not provided"}`,
+      `Purpose/item: ${order.itemName}`,
+      `Price: ${formatBeans(beanCents(order.cost))} beans`,
+      `Order ID: ${order.id}`,
+    ].join("\n");
+
+    try {
+      await navigator.clipboard.writeText(details);
+      setOrderCopyMessages((current) => ({ ...current, [order.id]: "Copied order details" }));
+    } catch {
+      setOrderCopyMessages((current) => ({ ...current, [order.id]: "Clipboard unavailable" }));
     }
   }
 
@@ -263,6 +283,11 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
                   </div>
                 </div>
               ) : (
+                <>
+                <div className={styles.orderCopyRow}>
+                  <Button variant="quiet" onClick={() => copyOrderDetails(order, maker)}>copy email + purpose + price</Button>
+                  {orderCopyMessages[order.id] ? <span className={styles.copyMessage} role="status">{orderCopyMessages[order.id]}</span> : null}
+                </div>
                 <div className={styles.actions}>
                   <input
                     className={styles.tracking}
@@ -276,6 +301,7 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
                   <Button variant="quiet" loading={working} disabled={working} onClick={() => patch(order.id, { status: "needs_address" })}>needs address</Button>
                   <Button variant="danger" loading={working} disabled={working} onClick={() => startCancel(order.id)}>cancel</Button>
                 </div>
+                </>
               )}
             </div>
           );
