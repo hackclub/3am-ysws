@@ -4,6 +4,7 @@ import { reconcileProjectBeans } from "@/lib/beans";
 import { getDb } from "@/lib/db";
 import { projects } from "@/lib/db/schema";
 import type { Project } from "@/lib/db/schema";
+import { notifyProjectDecision } from "@/lib/slack/notifications";
 
 export type DecisionKind = "approved" | "changes" | "rejected";
 
@@ -43,6 +44,7 @@ export async function applyDecision(input: DecisionInput): Promise<ApplyResult> 
 
   if (updated) {
     await reconcileProjectBeans(updated);
+    await notifyProjectDecision(updated);
     return { status: "applied", project: updated };
   }
 
