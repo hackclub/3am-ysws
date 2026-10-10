@@ -164,16 +164,24 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
       "pre_authorization_required", "invite_message", "merchant_lock",
       "category_lock", "keyword_lock", "banned_merchants", "banned_categories",
     ];
+    // HCB accepts one grant per recipient + purpose. Combine matching orders
+    // so duplicate line items become a single grant for their summed value.
+    const grants = new Map<string, { email: string; purpose: string; cents: number }>();
+    for (const { order, maker } of eligibleOrders) {
+      const email = (order.email || maker.email || "").trim();
+      const purpose = order.itemName.trim().slice(0, 30);
+      const key = JSON.stringify([email.toLocaleLowerCase(), purpose.toLocaleLowerCase()]);
+      const cents = Math.round(Number(order.cost) * 100);
+      const existing = grants.get(key);
+      if (existing) existing.cents += cents;
+      else grants.set(key, { email, purpose, cents });
+    }
+
     const lines = [
       headers.map(csvCell).join(","),
-      ...eligibleOrders.map(({ order, maker }) => {
-        const email = (order.email || maker.email || "").trim();
-        const cents = Math.round(Number(order.cost) * 100);
-        const purpose = order.itemName.trim().slice(0, 30);
-        return [
-          email, cents, purpose, "", false, false, "", "", "", "", "", "",
-        ].map(csvCell).join(",");
-      }),
+      ...[...grants.values()].map(({ email, cents, purpose }) => [
+        email, cents, purpose, "", true, true, "", "", "", "", "", "",
+      ].map(csvCell).join(",")),
     ];
     if (eligibleOrders.some(({ order, maker }) => !(order.email || maker.email || "").trim())) {
       setProblem("CSV not downloaded: at least one active order has no recipient email. Fix the order data first.");
@@ -289,7 +297,7 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
             mark all active orders fulfilled
           </Button>
         </div>
-        <p className={styles.summaryHint}>CSV uses 1 bean = $1 (100 cents per bean), exact HCB columns, and excludes already-posted or cancelled orders. Purpose is capped at 30 characters.</p>
+        <p className={styles.summaryHint}>CSV uses 1 bean = $1 (100 cents per bean), combines matching recipient + purpose pairs, sets one-time use and pre-authorization to true, and excludes already-posted or cancelled orders. Purpose is capped at 30 characters.</p>
         {nuclearOpen ? (
           <div className={styles.cancelBox}>
             <strong>Nuclear action: mark {eligibleOrders.length} active orders as posted</strong>
