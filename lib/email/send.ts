@@ -43,6 +43,7 @@ export async function sendTransactionalEmail({ to, idempotencyKey, email }: Send
           : {}),
       }),
       cache: "no-store",
+      signal: AbortSignal.timeout(5_000),
     });
 
     if (!response.ok) {
