@@ -74,13 +74,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         userSub: order.userSub,
         delta: order.cost,
         reason: "manual",
-        note: \`refund for \${order.itemName}\`,
+        note: `refund for ${order.itemName}`,
       });
 
       if (order.itemId) {
         await tx
           .update(items)
-          .set({ stock: sql\`\${items.stock} + 1\` })
+          .set({ stock: sql`${items.stock} + 1` })
           .where(and(eq(items.id, order.itemId), gt(items.stock, -1)));
       }
     }
@@ -124,7 +124,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     );
   }
 
-  // Notify only on the first transition into "posted"; notification failure never undoes fulfilment.
   if (result.notification) {
     await notifyOrderFulfilled(result.notification);
   }
