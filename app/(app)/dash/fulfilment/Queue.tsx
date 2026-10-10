@@ -251,6 +251,21 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
     }
   }
 
+  async function copyOrderDetails(order: Order, maker: User) {
+    const details = [
+      `Email: ${order.email || maker.email || "not provided"}`,
+      `Purpose: ${order.itemName}`,
+      `Price: ${formatBeans(beanCents(order.cost))} beans`,
+      `Order ID: ${order.id}`,
+    ].join("\n");
+    try {
+      await navigator.clipboard.writeText(details);
+      setOrderCopyMessages((current) => ({ ...current, [order.id]: "Copied order details" }));
+    } catch {
+      setOrderCopyMessages((current) => ({ ...current, [order.id]: "Clipboard unavailable" }));
+    }
+  }
+
   async function copyField(key: string, value: string, label: string) {
     try {
       await navigator.clipboard.writeText(value);
