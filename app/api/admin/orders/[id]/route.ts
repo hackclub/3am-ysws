@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { isOrganizer } from "@/lib/auth/organizer";
 import { getCurrentUser } from "@/lib/auth/users";
 import { getDb } from "@/lib/db";
-import { beansLedger, items, orders, users } from "@/lib/db/schema";
+import { beansLedger, items, orders, slackOrderDigestEvents, users } from "@/lib/db/schema";
 import { notifyOrderFulfilled } from "@/lib/slack/notifications";
 
 export const dynamic = "force-dynamic";
@@ -95,6 +95,20 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         .from(users)
         .where(eq(users.sub, order.userSub))
         .limit(1);
+
+      await tx
+        .insert(slackOrderDigestEvents)
+        .values({
+          orderId: order.id,
+          eventType: "shipped",
+          payload: {
+            makerName: maker?.name || order.fullName?.trim() || "Unknown maker",
+            itemName: order.itemName,
+            cost: order.cost,
+            tracking: body.tracking !== undefined ? body.tracking.trim() || null : order.tracking,
+          },
+        })
+        .onConflictDoNothing();
 
       if (maker?.slackId) {
         notification = {
