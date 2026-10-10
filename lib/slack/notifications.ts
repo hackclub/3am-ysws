@@ -90,6 +90,28 @@ export async function sendSlackDm(slackId: string, message: string): Promise<boo
   return Boolean(sent?.ts);
 }
 
+export async function notifySlackMemberJoined(slackId: string): Promise<boolean> {
+  const projectsUrl = appUrl("/dash/projects");
+  const ordersUrl = appUrl("/dash/orders");
+  const links = [
+    projectsUrl ? `\n• <${projectsUrl}|Open your project dashboard>` : "",
+    ordersUrl ? `\n• <${ordersUrl}|Check the rewards shop and your orders>` : "",
+  ].filter(Boolean).join("");
+
+  const message =
+    "👋 *Welcome to 3AM!*\n\n" +
+    "Glad you’re here. The goal is simple: build something, ship it, and share your progress.\n\n" +
+    "*Your quick start*\n" +
+    "• Read the current program rules before starting.\n" +
+    "• Pick a small, achievable project and keep your work moving.\n" +
+    "• Track your work as required by the program, then submit when it’s ready.\n" +
+    "• If you’re stuck, ask the team in #3am-coorgs.\n" +
+    links +
+    "\n\nNo pressure to make something huge on day one. Ship the first version. 🚀";
+
+  return sendSlackDm(slackId, message);
+}
+
 export async function notifyProjectDecision(project: Project): Promise<void> {
   try {
     if (!project.decision || project.decision === "withdrawn") return;
