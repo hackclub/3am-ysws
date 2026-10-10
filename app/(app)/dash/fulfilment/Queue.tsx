@@ -91,6 +91,25 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
     [rows, needle],
   );
 
+  const groupedRows = useMemo(() => {
+    const groups = new Map<string, { order: Order; maker: User; orders: Order[]; totalCents: number }>();
+    for (const { order, maker } of visibleRows) {
+      const key = JSON.stringify([
+        maker.sub, order.itemName, order.status, order.fullName, order.email,
+        order.addressLine1, order.addressLine2, order.city, order.postcode,
+        order.country, order.tracking, order.adminNote,
+      ]);
+      const current = groups.get(key);
+      if (current) {
+        current.orders.push(order);
+        current.totalCents += beanCents(order.cost);
+      } else {
+        groups.set(key, { order, maker, orders: [order], totalCents: beanCents(order.cost) });
+      }
+    }
+    return [...groups.values()];
+  }, [visibleRows]);
+
   const totals = useMemo(() => {
     const byMaker = new Map<string, { key: string; name: string; slackId: string; cents: number; count: number }>();
     let totalCents = 0;
@@ -132,22 +151,39 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
     }
   }
 
-  async function copyOrderDetails(order: Order, maker: User) {
-    const details = [
-      `Maker: ${maker.name}`,
-      `Slack: ${maker.slackId}`,
-      `Email: ${maker.email || "not provided"}`,
-      `Order email: ${order.email || "not provided"}`,
-      `Purpose/item: ${order.itemName}`,
-      `Price: ${formatBeans(beanCents(order.cost))} beans`,
-      `Order ID: ${order.id}`,
-    ].join("\n");
-
+  async function copyField(key: string, value: string, label: string) {
     try {
-      await navigator.clipboard.writeText(details);
-      setOrderCopyMessages((current) => ({ ...current, [order.id]: "Copied order details" }));
+      await navigator.clipboard.writeText(value);
+      setOrderCopyMessages((current) => ({ ...current, [key]: `Copied ${label.toLowerCase()}` }));
     } catch {
-      setOrderCopyMessages((current) => ({ ...current, [order.id]: "Clipboard unavailable" }));
+      setOrderCopyMessages((current) => ({ ...current, [key]: "Clipboard unavailable" }));
+    }
+  }
+
+  async function patchGroup(ids: string[], payload: Record<string, unknown>) {
+    setBusy(ids[0]);
+    setProblem(null);
+    try {
+      for (const id of ids) {
+        const response = await fetch(`/api/admin/orders/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!response.ok) {
+          const body = (await response.json().catch(() => ({}))) as { message?: string };
+          setProblem(body.message ?? "An order did not save. Refresh and check the group before retrying.");
+          router.refresh();
+          return;
+        }
+      }
+      setCanceling(null);
+      setCancelNote("");
+      router.refresh();
+    } catch {
+      setProblem("Network error — some orders may not have updated. Refresh and verify the group before retrying.");
+    } finally {
+      setBusy(null);
     }
   }
 
@@ -223,17 +259,18 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
       {visibleRows.length === 0 ? (
         <p className={styles.none}>No orders to show. Try another search or switch the status tab.</p>
       ) : (
-        visibleRows.map(({ order, maker }) => {
+        groupedRows.map(({ order, maker, orders: groupedOrders, totalCents }) => {
           const hasAddress = Boolean(order.addressLine1 && order.city && order.country);
-          const working = busy === order.id;
-          const isCanceling = canceling === order.id;
+          const working = busy === groupedOrders[0].id;
+          const groupKey = groupedOrders.map((entry) => entry.id).join(",");
+          const isCanceling = canceling === groupKey;
 
           return (
             <div key={order.id} className={styles.order}>
               <div className={styles.head}>
                 <span>
                   <span className={styles.item}>{order.itemName}</span>
-                  <span className={styles.maker}>{" "}{maker.name} · {maker.slackId} · {formatBeans(beanCents(order.cost))} beans</span>
+                  <span className={styles.maker}>{" "}{maker.name} · {maker.slackId} · {formatBeans(totalCents)} beans{groupedOrders.length > 1 ? ` · ${groupedOrders.length} matching orders` : ""}</span>
                 </span>
                 <OrderStatusWord status={orderStatusOf(order.status)} size="s" />
               </div>
@@ -268,7 +305,7 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
                       variant="danger"
                       loading={working}
                       disabled={!cancelNote.trim() || working}
-                      onClick={() => patch(order.id, { status: "cancelled", adminNote: cancelNote.trim(), refundBeans: false })}
+                      onClick={() => patchGroup(groupedOrders.map((entry) => entry.id), { status: "cancelled", adminNote: cancelNote.trim(), refundBeans: false })}
                     >
                       cancel — no refund
                     </Button>
@@ -276,7 +313,7 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
                       variant="danger"
                       loading={working}
                       disabled={!cancelNote.trim() || working}
-                      onClick={() => patch(order.id, { status: "cancelled", adminNote: cancelNote.trim(), refundBeans: true })}
+                      onClick={() => patchGroup(groupedOrders.map((entry) => entry.id), { status: "cancelled", adminNote: cancelNote.trim(), refundBeans: true })}
                     >
                       cancel & refund
                     </Button>
@@ -285,8 +322,10 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
               ) : (
                 <>
                 <div className={styles.orderCopyRow}>
-                  <Button variant="quiet" onClick={() => copyOrderDetails(order, maker)}>copy email + purpose + price</Button>
-                  {orderCopyMessages[order.id] ? <span className={styles.copyMessage} role="status">{orderCopyMessages[order.id]}</span> : null}
+                  <Button variant="quiet" onClick={() => copyField(groupKey, order.email || maker.email || "", "Email")}>copy email</Button>
+                  <Button variant="quiet" onClick={() => copyField(groupKey, order.itemName, "Purpose")}>copy purpose</Button>
+                  <Button variant="quiet" onClick={() => copyField(groupKey, `${formatBeans(totalCents)} beans`, "Total price")}>copy total price</Button>
+                  {orderCopyMessages[groupKey] ? <span className={styles.copyMessage} role="status">{orderCopyMessages[groupKey]}</span> : null}
                 </div>
                 <div className={styles.actions}>
                   <input
@@ -295,11 +334,11 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
                     value={tracking[order.id] ?? order.tracking ?? ""}
                     onChange={(event) => setTracking({ ...tracking, [order.id]: event.target.value })}
                   />
-                  <Button variant="quiet" loading={working} disabled={working} onClick={() => patch(order.id, { status: "ready_to_fulfil", tracking: tracking[order.id] ?? order.tracking ?? "" })} className={styles.ready}>✓ ready to fulfil</Button>
-                  <Button variant="quiet" loading={working} disabled={working} onClick={() => patch(order.id, { status: "packing", tracking: tracking[order.id] ?? order.tracking ?? "" })}>packing</Button>
-                  <Button variant="quiet" loading={working} disabled={working} onClick={() => patch(order.id, { status: "posted", tracking: tracking[order.id] ?? order.tracking ?? "" })}>mark posted</Button>
-                  <Button variant="quiet" loading={working} disabled={working} onClick={() => patch(order.id, { status: "needs_address" })}>needs address</Button>
-                  <Button variant="danger" loading={working} disabled={working} onClick={() => startCancel(order.id)}>cancel</Button>
+                  <Button variant="quiet" loading={working} disabled={working} onClick={() => patchGroup(groupedOrders.map((entry) => entry.id), { status: "ready_to_fulfil", tracking: tracking[order.id] ?? order.tracking ?? "" })} className={styles.ready}>✓ ready to fulfil</Button>
+                  <Button variant="quiet" loading={working} disabled={working} onClick={() => patchGroup(groupedOrders.map((entry) => entry.id), { status: "packing", tracking: tracking[order.id] ?? order.tracking ?? "" })}>packing</Button>
+                  <Button variant="quiet" loading={working} disabled={working} onClick={() => patchGroup(groupedOrders.map((entry) => entry.id), { status: "posted", tracking: tracking[order.id] ?? order.tracking ?? "" })}>mark posted</Button>
+                  <Button variant="quiet" loading={working} disabled={working} onClick={() => patchGroup(groupedOrders.map((entry) => entry.id), { status: "needs_address" })}>needs address</Button>
+                  <Button variant="danger" loading={working} disabled={working} onClick={() => { setProblem(null); setCanceling(groupKey); setCancelNote(""); }}>cancel</Button>
                 </div>
                 </>
               )}
