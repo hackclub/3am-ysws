@@ -336,3 +336,75 @@
 .orderCopyRow .copyMessage {
   text-align: left;
 }
+
+
+.makerBreakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-input);
+  background: rgba(255, 255, 255, 0.018);
+  white-space: normal;
+}
+
+.makerBreakdownHead,
+.makerBreakdownFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.makerBreakdownHead span,
+.makerBreakdownDetails span,
+.makerBreakdownDetails small,
+.makerBreakdownFooter small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.makerBreakdownOrder {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--rule);
+}
+
+.makerBreakdownDetails {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 3px;
+}
+
+.makerBreakdownDetails strong,
+.makerBreakdownDetails span,
+.makerBreakdownDetails small {
+  overflow-wrap: anywhere;
+}
+
+.makerBreakdownDetails strong {
+  color: var(--cream);
+  font-size: 12px;
+}
+
+.makerBreakdownDetails small {
+  font-family: var(--data);
+}
+
+@media (max-width: 600px) {
+  .makerBreakdownOrder {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .makerBreakdownOrder > :last-child {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
