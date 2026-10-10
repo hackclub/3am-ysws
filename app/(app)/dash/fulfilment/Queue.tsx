@@ -135,11 +135,14 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
         key,
         name: maker.name || "Unknown maker",
         slackId: maker.slackId || "",
+        email: maker.email || "",
         cents: 0,
         count: 0,
+        orders: [] as { order: Order; maker: User }[],
       };
       current.cents += cents;
       current.count += 1;
+      current.orders.push({ order, maker });
       byMaker.set(key, current);
     }
 
