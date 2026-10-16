@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm";
 
 import { getDb } from "@/lib/db";
-import { users } from "@/lib/db/schema";
+import { projects, users } from "@/lib/db/schema";
+import { missingForGrant } from "@/lib/grant";
 import type { Project } from "@/lib/db/schema";
 
 type SlackApiResponse = {
@@ -247,4 +248,53 @@ export async function notifyOrderDigest(
     .join("\n\n");
 
   return sendSlackDm(slackId, message);
+}
+
+
+export async function sendMissingDetailsReminder(projectId: string): Promise<boolean> {
+  const [row] = await getDb()
+    .select({ project: projects, maker: users })
+    .from(projects)
+    .innerJoin(users, eq(users.sub, projects.userSub))
+    .where(eq(projects.id, projectId))
+    .limit(1);
+
+  if (!row || row.project.decision !== "approved") return false;
+  const missing = missingForGrant(row.maker);
+  if (missing.length === 0 || !row.maker.slackId) return false;
+
+  const opened = await slackApi("conversations.open", { users: row.maker.slackId });
+  const channel = opened?.channel?.id;
+  if (!channel) return false;
+
+  const settingsUrl = appUrl("/dash/settings");
+  const missingText = missing.join(", ");
+  const message = "We are unable to send your project to HQ as you did not fill all the details in https://3am.hackclub.com/dash/settings please do it asap all the details mentioned in the image thanks :)";
+  const sent = await slackApi("chat.postMessage", {
+    channel,
+    text: `⚠️ Missing details for *${escapeSlackText(row.project.title)}*. Please complete: ${escapeSlackText(missingText)}. ${settingsUrl ?? "https://3am.hackclub.com/dash/settings"}`,
+    mrkdwn: true,
+    unfurl_links: false,
+    unfurl_media: false,
+    blocks: [
+      { type: "section", text: { type: "mrkdwn", text: `Hey ${escapeSlackText(row.maker.name || "there")}! 👋\n\nWe are unable to send your project *${escapeSlackText(row.project.title)}* to HQ because some required details are missing.\n\n*Still needed:* ${escapeSlackText(missingText)}\n\nPlease fill these in ASAP in your <${settingsUrl ?? "https://3am.hackclub.com/dash/settings"}|3AM settings>.` } },
+      { type: "actions", elements: [{ type: "button", action_id: "missing_details_done", text: { type: "plain_text", text: "Done — I've submitted my details" }, style: "primary", value: row.project.id }] },
+    ],
+    metadata: { event_type: "missing_details_reminder", event_payload: { projectId: row.project.id } },
+  });
+  return Boolean(sent?.ts);
+}
+
+export async function notifyMissingDetailsAcknowledged(input: {
+  projectId: string;
+  projectTitle: string;
+  makerName: string;
+  slackId: string;
+}): Promise<void> {
+  const recipients = (process.env.ORGANIZER_SLACK_IDS ?? "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter((value) => /^[UW][A-Z0-9]+$/.test(value));
+  const message = `✅ *Maker says their details are submitted*\n*${escapeSlackText(input.makerName)}* clicked Done for *${escapeSlackText(input.projectTitle)}* (project \`${input.projectId}\`).\n\nThis is an acknowledgement only — please verify the details before sending to HQ.`;
+  await Promise.all(recipients.map((slackId) => sendSlackDm(slackId, message)));
 }
