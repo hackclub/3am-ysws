@@ -102,6 +102,19 @@ export function Rows({ rows }: { rows: ApprovedRow[] }) {
     router.refresh();
   }
 
+  async function remind(row: ApprovedRow) {
+    setBusy(row.projectId);
+    setProblem(null);
+    const response = await fetch(`/api/admin/ysws/${row.projectId}/remind`, { method: "POST" });
+    setBusy(null);
+    if (response.ok) {
+      setSaved(`reminded:${row.projectId}`);
+      return;
+    }
+    const body = (await response.json().catch(() => ({}))) as { message?: string };
+    setProblem(body.message ?? "Could not send the Slack reminder.");
+  }
+
   async function send(row: ApprovedRow) {
     setBusy(row.projectId);
     setProblem(null);
