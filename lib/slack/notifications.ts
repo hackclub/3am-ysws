@@ -269,7 +269,6 @@ export async function sendMissingDetailsReminder(projectId: string): Promise<boo
 
   const settingsUrl = appUrl("/dash/settings");
   const missingText = missing.join(", ");
-  const message = "We are unable to send your project to HQ as you did not fill all the details in https://3am.hackclub.com/dash/settings please do it asap all the details mentioned in the image thanks :)";
   const sent = await slackApi("chat.postMessage", {
     channel,
     text: `⚠️ Missing details for *${escapeSlackText(row.project.title)}*. Please complete: ${escapeSlackText(missingText)}. ${settingsUrl ?? "https://3am.hackclub.com/dash/settings"}`,
