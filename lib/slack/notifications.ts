@@ -192,7 +192,7 @@ function organizerSlackIds(): string[] {
     process.env.SLACK_ORDER_DIGEST_USER_ID,
     ...(process.env.ORGANIZER_SLACK_IDS ?? "").split(","),
   ];
-  return [...new Set(configured.map((value) => value?.trim()).filter((value): value is string => Boolean(value) && /^[UW][A-Z0-9]+$/.test(value)))];
+  return [...new Set(configured.map((value) => value?.trim()).filter((value): value is string => typeof value === "string" && /^[UW][A-Z0-9]+$/.test(value)))];
 }
 
 export async function notifyUnifiedProjectApproved(projectId: string): Promise<void> {
