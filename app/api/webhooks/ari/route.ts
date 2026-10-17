@@ -9,6 +9,7 @@ import { getDb } from "@/lib/db";
 import { projects, webhookEvents } from "@/lib/db/schema";
 import { applyDecision, clearDecision } from "@/lib/review/decisions";
 import { syncReviewerLedgerSafely } from "@/lib/reviewers";
+import { notifyUnifiedProjectApproved } from "@/lib/slack/notifications";
 
 export const dynamic = "force-dynamic";
 
@@ -97,6 +98,10 @@ export async function POST(request: Request) {
       console.error(
         `[ari] delivery ${check.deliveryId} could not be applied to ${projectId}: ${result.status}`,
       );
+    }
+
+    if (result.status === "applied" && decision === "approved") {
+      await notifyUnifiedProjectApproved(projectId);
     }
 
     return NextResponse.json({ ok: true, applied: result.status === "applied" });
