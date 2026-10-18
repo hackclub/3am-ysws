@@ -10,6 +10,7 @@ import { Field, Input, Textarea } from "@/components/ui/Field";
 import { ThumbnailField } from "@/components/ui/ThumbnailField";
 import { Panel, PanelLabel } from "@/components/ui/Panel";
 import type { PickerProject } from "@/lib/hackatime/projects";
+import type { ProjectTrack } from "@/lib/review/types";
 
 import styles from "./ResendForm.module.css";
 
@@ -21,6 +22,7 @@ export type ResendDefaults = {
   demoUrl: string;
   thumbnailUrl: string;
   hackatimeProjects: string[];
+  track: ProjectTrack;
 };
 
 export function ResendForm({ project, options }: { project: ResendDefaults; options: PickerProject[] }) {
@@ -32,6 +34,7 @@ export function ResendForm({ project, options }: { project: ResendDefaults; opti
   const [demoUrl, setDemoUrl] = useState(project.demoUrl);
   const [thumbnailUrl, setThumbnailUrl] = useState(project.thumbnailUrl);
   const [picked, setPicked] = useState<string[]>(project.hackatimeProjects);
+  const [track, setTrack] = useState<ProjectTrack>(project.track);
   const [updateMessage, setUpdateMessage] = useState("");
   const [problem, setProblem] = useState<{ field?: string; message: string } | null>(null);
   const [sending, setSending] = useState(false);
@@ -45,7 +48,7 @@ export function ResendForm({ project, options }: { project: ResendDefaults; opti
       const response = await fetch(`/api/projects/${project.id}/resend`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, description, repoUrl, demoUrl, thumbnailUrl, hackatimeProjects: picked, updateMessage }),
+        body: JSON.stringify({ title, description, repoUrl, demoUrl, thumbnailUrl, hackatimeProjects: picked, track, updateMessage }),
       });
       if (response.ok) {
         router.refresh();
@@ -67,6 +70,12 @@ export function ResendForm({ project, options }: { project: ResendDefaults; opti
         {problem && !problem.field ? <Banner tone="bad">{problem.message}</Banner> : null}
         <Field id={`${ids}-what`} label="what changed?" help="Goes straight to the reviewer who asked." error={errorFor("update_message")}>
           <Textarea value={updateMessage} onChange={(event) => setUpdateMessage(event.target.value)} />
+        </Field>
+        <Field id={`${ids}-track`} label="project type" help="Choose Hardware or Software." error={errorFor("track")}>
+          <select id={`${ids}-track`} className={styles.select} value={track} required onChange={(event) => setTrack(event.target.value as ProjectTrack)}>
+            <option value="software">Software — website, game, app, or tool</option>
+            <option value="hardware">Hardware — physical build or electronics</option>
+          </select>
         </Field>
         <div className={styles.row}>
           <Field id={`${ids}-title`} label="name" error={errorFor("title")}><Input value={title} onChange={(event) => setTitle(event.target.value)} /></Field>
