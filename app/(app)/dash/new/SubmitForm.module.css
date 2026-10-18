@@ -23,8 +23,8 @@
   padding: 12px 18px;
   border: 1px solid var(--line);
   border-radius: var(--r2);
-  background: var(--raised);
-  color: var(--ink);
+  background: #24202e;
+  color: #f4e9a2;
   font: inherit;
   font-weight: 700;
   cursor: pointer;
@@ -32,15 +32,16 @@
 }
 
 .trackButton:hover {
-  border-color: var(--accent);
+  border-color: #f3e58b;
+  background: #302a3b;
   transform: translateY(-1px);
 }
 
 .trackButtonSelected {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--accent-ink, #17130a);
-  box-shadow: 0 3px 0 color-mix(in srgb, var(--accent) 65%, #000);
+  border-color: #f3e58b;
+  background: #f3e58b;
+  color: #211a2b;
+  box-shadow: 0 3px 0 #9a8a4b;
 }
 
 .trackButton:focus-visible {
