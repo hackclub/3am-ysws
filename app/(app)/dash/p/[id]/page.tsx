@@ -189,6 +189,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
             demoUrl: project.demoUrl ?? "",
             thumbnailUrl: project.thumbnailUrl ?? "",
             hackatimeProjects: project.hackatimeProjects,
+            track: project.track,
           }}
           options={options}
         />
