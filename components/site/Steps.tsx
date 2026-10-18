@@ -27,24 +27,24 @@ const STEPS: Step[] = [
     note: "come say hi, lurk silently, or accidentally make friends. your choice!",
   },
   {
-    title: "build something",
-    body: "Website, game, tool, app, whatever.",
-    note: "the only requirement? it has to be dark.",
+    title: "build something spooky",
+    body: "Make a dark-themed hardware or software project: a website, game, tool, app, physical build, or electronics project.",
+    note: "pick Hardware or Software when you submit. spooky vibes encouraged; originality required.",
   },
   {
     title: "track your time",
     body: "Use Hackatime while you build.",
-    note: "yes, we need proof you actually made the thing and didn't just stare at VS Code for 6 hours.",
+    note: "give your first session a few minutes to appear, and make sure it is attached to the right project.",
   },
   {
     title: "send it in",
     body: "Submit it once it runs.",
-    note: "show us what you built, how long it took, and hopefully something that actually works.",
+    note: "include a public repo, a working demo or downloadable build, a still screenshot, and the correct Hackatime share link.",
   },
   {
     title: "get your prize",
-    body: "Spend your beans on real stuff.",
-    note: "sleep schedule not included.",
+    body: "Spend your beans on rewards in the #3AM Shop.",
+    note: "ship real work, don't double-dip, and keep the spooky season fun.",
   },
 ];
 
