@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/users";
 import { getDb } from "@/lib/db";
 import { projects } from "@/lib/db/schema";
+import type { ProjectTrack } from "@/lib/review/types";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,7 @@ type Body = {
   demoUrl?: string;
   thumbnailUrl?: string;
   hackatimeProjects?: string[];
+  track?: ProjectTrack;
 };
 
 export async function POST(request: Request) {
@@ -30,6 +32,7 @@ export async function POST(request: Request) {
 
   const title = body.title?.trim();
   if (!title) return NextResponse.json({ error: "no_title" }, { status: 422 });
+  const track = body.track === "hardware" ? "hardware" : "software";
 
   const db = getDb();
   const values = {
@@ -39,6 +42,7 @@ export async function POST(request: Request) {
     demoUrl: body.demoUrl?.trim() || null,
     thumbnailUrl: body.thumbnailUrl?.trim() || null,
     hackatimeProjects: body.hackatimeProjects ?? [],
+    track,
   };
 
   try {
