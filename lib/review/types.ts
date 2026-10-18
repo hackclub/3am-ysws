@@ -1,3 +1,5 @@
+export type ProjectTrack = "hardware" | "software";
+
 export type ReviewSubmission = {
   externalId: string;
   title: string;
@@ -6,6 +8,7 @@ export type ReviewSubmission = {
   demoUrl: string;
   thumbnailUrl: string;
   hackatimeProjects: string[];
+  track: ProjectTrack;
   maker: { email: string; name: string; slackId: string };
   isUpdate?: boolean;
   updateMessage?: string;
