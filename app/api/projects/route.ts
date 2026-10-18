@@ -8,7 +8,7 @@ import { getCurrentUser } from "@/lib/auth/users";
 import { getDb } from "@/lib/db";
 import { projects } from "@/lib/db/schema";
 import { getReviewBackend, reviewIsExternal } from "@/lib/review";
-import type { ReviewSubmission } from "@/lib/review";
+import type { ReviewSubmission, ProjectTrack } from "@/lib/review";
 import { getYswsConfig, submissionsAreOpen } from "@/lib/yswsConfig";
 
 export const dynamic = "force-dynamic";
@@ -21,6 +21,7 @@ type Body = {
   demoUrl?: string;
   thumbnailUrl?: string;
   hackatimeProjects?: string[];
+  track?: ProjectTrack;
   updateMessage?: string;
 };
 
@@ -58,6 +59,9 @@ export async function POST(request: Request) {
 
   const title = body.title?.trim() ?? "";
   if (!title) return invalid("title", "Give it a name.");
+  if (body.track !== "hardware" && body.track !== "software") {
+    return invalid("track", "Choose Hardware or Software.");
+  }
 
   const candidate: ReviewSubmission = {
     externalId: "pending",
@@ -67,6 +71,7 @@ export async function POST(request: Request) {
     demoUrl: body.demoUrl?.trim() ?? "",
     thumbnailUrl: body.thumbnailUrl?.trim() ?? "",
     hackatimeProjects: body.hackatimeProjects ?? [],
+    track: body.track,
     maker: { email: user.email, name: user.name, slackId: user.slackId },
     updateMessage: body.updateMessage,
   };
@@ -93,6 +98,7 @@ export async function POST(request: Request) {
   const values = {
     title,
     description: body.description?.trim() ?? null,
+    track: body.track,
     repoUrl: body.repoUrl?.trim() ?? null,
     demoUrl: body.demoUrl?.trim() ?? null,
     thumbnailUrl: body.thumbnailUrl?.trim() ?? null,
