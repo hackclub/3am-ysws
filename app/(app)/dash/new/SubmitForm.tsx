@@ -10,6 +10,7 @@ import { Field, Input, Textarea } from "@/components/ui/Field";
 import { ThumbnailField } from "@/components/ui/ThumbnailField";
 import { Panel, PanelLabel } from "@/components/ui/Panel";
 import type { PickerProject } from "@/lib/hackatime/projects";
+import type { ProjectTrack } from "@/lib/review/types";
 
 import styles from "./SubmitForm.module.css";
 
@@ -23,6 +24,7 @@ type DraftValues = {
   demoUrl: string;
   thumbnailUrl: string;
   hackatimeProjects: string[];
+  track: ProjectTrack;
 };
 
 export function SubmitForm({ projects, initial }: { projects: PickerProject[]; initial?: DraftValues }) {
@@ -35,6 +37,7 @@ export function SubmitForm({ projects, initial }: { projects: PickerProject[]; i
   const [demoUrl, setDemoUrl] = useState(initial?.demoUrl ?? "");
   const [thumbnailUrl, setThumbnailUrl] = useState(initial?.thumbnailUrl ?? "");
   const [picked, setPicked] = useState<string[]>(initial?.hackatimeProjects ?? []);
+  const [track, setTrack] = useState<ProjectTrack>(initial?.track ?? "software");
   const [problem, setProblem] = useState<Problem | null>(null);
   const [sending, setSending] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
@@ -56,6 +59,7 @@ export function SubmitForm({ projects, initial }: { projects: PickerProject[]; i
           demoUrl,
           thumbnailUrl,
           hackatimeProjects: picked,
+          track,
         }),
       });
       if (!response.ok) return;
@@ -65,7 +69,7 @@ export function SubmitForm({ projects, initial }: { projects: PickerProject[]; i
     } finally {
       saving.current = false;
     }
-  }, [title, description, repoUrl, demoUrl, thumbnailUrl, picked]);
+  }, [title, description, repoUrl, demoUrl, thumbnailUrl, picked, track]);
 
   const errorFor = (field: string) => (problem?.field === field ? problem.message : undefined);
 
@@ -84,6 +88,7 @@ export function SubmitForm({ projects, initial }: { projects: PickerProject[]; i
         demoUrl,
         thumbnailUrl,
         hackatimeProjects: picked,
+        track,
       }),
     });
 
@@ -114,6 +119,19 @@ export function SubmitForm({ projects, initial }: { projects: PickerProject[]; i
       <PanelLabel>your project</PanelLabel>
       <div className={styles.form} onBlur={saveDraft}>
         {problem && !problem.field ? <Banner tone="bad">{problem.message}</Banner> : null}
+
+        <Field id={`${ids}-track`} label="project type" help="Choose the track that best describes what you built." error={errorFor("track")}>
+          <select
+            id={`${ids}-track`}
+            className={styles.select}
+            value={track}
+            required
+            onChange={(event) => setTrack(event.target.value as ProjectTrack)}
+          >
+            <option value="software">Software — website, game, app, or tool</option>
+            <option value="hardware">Hardware — physical build or electronics</option>
+          </select>
+        </Field>
 
         <div className={styles.row}>
           <Field id={`${ids}-title`} label="what is it called?" error={errorFor("title")}>
