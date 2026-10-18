@@ -11,15 +11,47 @@
   gap: var(--s4);
 }
 
-.select {
-  width: 100%;
-  min-height: 44px;
-  padding: 10px 12px;
+.trackOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3);
+}
+
+.trackButton {
+  flex: 1 1 180px;
+  min-height: 48px;
+  padding: 12px 18px;
   border: 1px solid var(--line);
   border-radius: var(--r2);
   background: var(--raised);
   color: var(--ink);
   font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease, border-color 140ms ease, transform 140ms ease;
+}
+
+.trackButton:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.trackButtonSelected {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink, #17130a);
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--accent) 65%, #000);
+}
+
+.trackButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trackButton {
+    transition: none;
+  }
 }
 
 .actions {
