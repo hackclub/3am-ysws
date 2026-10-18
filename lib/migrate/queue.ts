@@ -33,6 +33,7 @@ export async function readQueued(): Promise<QueuedRow[]> {
       demoUrl: projects.demoUrl,
       thumbnailUrl: projects.thumbnailUrl,
       hackatimeProjects: projects.hackatimeProjects,
+      track: projects.track,
       submittedAt: projects.submittedAt,
       email: users.email,
       name: users.name,
@@ -52,6 +53,7 @@ export async function readQueued(): Promise<QueuedRow[]> {
       demoUrl: row.demoUrl ?? "",
       thumbnailUrl: row.thumbnailUrl ?? "",
       hackatimeProjects: row.hackatimeProjects,
+      track: row.track,
       maker: { email: row.email, name: row.name, slackId: row.slackId },
     };
 
