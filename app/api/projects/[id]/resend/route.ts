@@ -7,7 +7,7 @@ import { getCurrentUser } from "@/lib/auth/users";
 import { getDb } from "@/lib/db";
 import { projects } from "@/lib/db/schema";
 import { getReviewBackend } from "@/lib/review";
-import type { ReviewSubmission } from "@/lib/review";
+import type { ReviewSubmission, ProjectTrack } from "@/lib/review";
 import { getYswsConfig, resubmissionsAreOpen } from "@/lib/yswsConfig";
 
 export const dynamic = "force-dynamic";
@@ -21,6 +21,7 @@ type Body = {
   demoUrl?: string;
   thumbnailUrl?: string;
   hackatimeProjects?: string[];
+  track?: ProjectTrack;
   updateMessage?: string;
 };
 
@@ -58,6 +59,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     body = {};
   }
 
+  const track = body.track ?? project.track;
+  if (track !== "hardware" && track !== "software") {
+    return NextResponse.json({ error: "invalid", field: "track", message: "Choose Hardware or Software." }, { status: 422 });
+  }
+
   const values = {
     title: body.title?.trim() || project.title,
     description: body.description?.trim() ?? project.description,
@@ -65,6 +71,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     demoUrl: body.demoUrl?.trim() ?? project.demoUrl,
     thumbnailUrl: body.thumbnailUrl?.trim() ?? project.thumbnailUrl,
     hackatimeProjects: body.hackatimeProjects ?? project.hackatimeProjects,
+    track,
   };
 
   const submission: ReviewSubmission = {
@@ -75,6 +82,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     demoUrl: values.demoUrl ?? "",
     thumbnailUrl: values.thumbnailUrl ?? "",
     hackatimeProjects: values.hackatimeProjects,
+    track: values.track,
     maker: { email: user.email, name: user.name, slackId: user.slackId },
     isUpdate: true,
     updateMessage: body.updateMessage,
