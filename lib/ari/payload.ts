@@ -11,7 +11,7 @@ export type IngestPayload = {
   thumbnail_url: string;
   hackatime_projects: string[];
   evidence: string[];
-  track: "software";
+  track: "hardware" | "software";
   is_update?: boolean;
   update_message?: string;
 };
@@ -40,6 +40,10 @@ export function validateSubmission(submission: ReviewSubmission): ValidationErro
   ];
   for (const [field, value] of text) {
     if (!value || value.trim().length === 0) return { field, message: `${field} is required` };
+  }
+
+  if (submission.track !== "hardware" && submission.track !== "software") {
+    return { field: "track", message: "Choose Hardware or Software." };
   }
 
   const urls: [string, string, string][] = [
@@ -88,7 +92,7 @@ export function buildIngestPayload(submission: ReviewSubmission): IngestPayload 
     thumbnail_url: submission.thumbnailUrl.trim(),
     hackatime_projects: submission.hackatimeProjects.map((name) => name.trim()).filter(Boolean),
     evidence: EVIDENCE,
-    track: "software",
+    track: submission.track,
   };
 
   if (submission.updateMessage?.trim()) {
