@@ -41,6 +41,7 @@ export default async function EditDraftPage({ params }: { params: Promise<{ id: 
           demoUrl: project.demoUrl ?? "",
           thumbnailUrl: project.thumbnailUrl ?? "",
           hackatimeProjects: project.hackatimeProjects,
+          track: project.track,
         }}
       />
     </AppShell>
