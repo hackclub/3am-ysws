@@ -134,6 +134,13 @@
       "when": 1792108800000,
       "tag": "0018_reviewer_email_access",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1792281600000,
+      "tag": "0019_spooktober_project_tracks",
+      "breakpoints": true
     }
   ]
 }
