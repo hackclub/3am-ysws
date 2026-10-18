@@ -121,16 +121,24 @@ export function SubmitForm({ projects, initial }: { projects: PickerProject[]; i
         {problem && !problem.field ? <Banner tone="bad">{problem.message}</Banner> : null}
 
         <Field id={`${ids}-track`} label="project type" help="Choose the track that best describes what you built." error={errorFor("track")}>
-          <select
-            id={`${ids}-track`}
-            className={styles.select}
-            value={track}
-            required
-            onChange={(event) => setTrack(event.target.value as ProjectTrack)}
-          >
-            <option value="software">Software — website, game, app, or tool</option>
-            <option value="hardware">Hardware — physical build or electronics</option>
-          </select>
+          <div className={styles.trackOptions} role="group" aria-labelledby={`${ids}-track`}>
+            <button
+              type="button"
+              className={`${styles.trackButton} ${track === "software" ? styles.trackButtonSelected : ""}`}
+              aria-pressed={track === "software"}
+              onClick={() => setTrack("software")}
+            >
+              Software
+            </button>
+            <button
+              type="button"
+              className={`${styles.trackButton} ${track === "hardware" ? styles.trackButtonSelected : ""}`}
+              aria-pressed={track === "hardware"}
+              onClick={() => setTrack("hardware")}
+            >
+              Hardware
+            </button>
+          </div>
         </Field>
 
         <div className={styles.row}>
