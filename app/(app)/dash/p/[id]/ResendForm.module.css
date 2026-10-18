@@ -10,6 +10,17 @@
   gap: var(--s4);
 }
 
+.select {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r2);
+  background: var(--raised);
+  color: var(--ink);
+  font: inherit;
+}
+
 .actions {
   display: flex;
   align-items: center;
