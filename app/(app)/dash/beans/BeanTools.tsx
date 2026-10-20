@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 
 import { Banner } from "@/components/ui/Banner";
 import { Adjust } from "./Adjust";
@@ -10,7 +9,6 @@ import styles from "./BeanTools.module.css";
 type Maker = { sub: string; name: string; email: string; slackId: string; balance: number };
 
 export function BeanTools({ makers }: { makers: Maker[] }) {
-  const router = useRouter();
   const [query, setQuery] = useState("");
   const [selectedSub, setSelectedSub] = useState("");
   const [message, setMessage] = useState("");
