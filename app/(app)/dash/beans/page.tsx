@@ -9,6 +9,7 @@ import { requireOrganizer } from "@/lib/auth/organizer";
 import { getDb } from "@/lib/db";
 import { beansLedger, users } from "@/lib/db/schema";
 
+import { BeanTools } from "./BeanTools";
 import { Adjust } from "./Adjust";
 import styles from "./Adjust.module.css";
 
@@ -72,6 +73,11 @@ export default async function BeansPage({
       </Panel>
 
       <Panel>
+        <PanelLabel>find a maker · adjust beans · send a Slack DM</PanelLabel>
+        <BeanTools makers={makers.map((entry) => ({ sub: entry.sub, name: entry.name, email: entry.email, slackId: entry.slackId, balance: Number(entry.balance) }))} />
+      </Panel>
+
+      <Panel>
         <PanelLabel>{makers.length === 1 ? "1 maker" : `${makers.length} makers`}</PanelLabel>
         <div className={styles.sortOptions} aria-label="sort bean owners">
           <span>sort by</span>
@@ -100,11 +106,6 @@ export default async function BeansPage({
 
       {chosen ? (
         <>
-          <Panel>
-            <PanelLabel>adjust {chosen.name}</PanelLabel>
-            <Adjust userSub={chosen.sub} name={chosen.name} />
-          </Panel>
-
           <Panel>
             <PanelLabel>their ledger</PanelLabel>
             {entries.length === 0 ? (
