@@ -10,7 +10,6 @@ import { getDb } from "@/lib/db";
 import { beansLedger, users } from "@/lib/db/schema";
 
 import { BeanTools } from "./BeanTools";
-import { Adjust } from "./Adjust";
 import styles from "./Adjust.module.css";
 
 export const metadata: Metadata = { title: "beans" };
