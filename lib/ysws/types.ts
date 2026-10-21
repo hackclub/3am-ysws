@@ -1,4 +1,5 @@
 import type { AriJustification } from "@/lib/ari/inbound";
+import type { LastNameFlag } from "./lastName";
 
 export type PendingRow = {
   projectId: string;
@@ -31,6 +32,7 @@ export type PendingRow = {
   hoursJustification: string | null;
   ageJustification: string | null;
   duplicateJustification: string | null;
+  nameJustification: string | null;
 
   commits: number | null;
   sharedCodeUrl: boolean;
@@ -44,6 +46,11 @@ export type ApprovedRow = {
   projectId: string;
   title: string;
   maker: string;
+  makerSub: string;
+  slackId: string;
+  firstName: string | null;
+  lastName: string | null;
+  lastNameFlag: LastNameFlag | null;
   email: string;
   decidedAt: Date | null;
   approvedMinutes: number | null;
