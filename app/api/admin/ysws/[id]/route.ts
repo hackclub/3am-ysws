@@ -19,6 +19,7 @@ type Body = {
   overrideHours?: number | null;
   ageJustification?: string | null;
   duplicateJustification?: string | null;
+  nameJustification?: string | null;
 };
 
 export async function GET(request: Request, { params }: Params) {
@@ -99,6 +100,7 @@ export async function PATCH(request: Request, { params }: Params) {
     overrideMinutes: hours ? Math.round(hours * 60) : null,
     ageJustification: body.ageJustification?.trim() || null,
     duplicateJustification: body.duplicateJustification?.trim() || null,
+    nameJustification: body.nameJustification?.trim() || null,
   });
 
   return saved ? NextResponse.json({ ok: true }) : MISSING;
