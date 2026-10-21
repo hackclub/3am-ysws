@@ -9,6 +9,7 @@ import { missingForGrant } from "@/lib/grant";
 
 import { buildPayload, send } from "./client";
 import { ensureOutbox, findOutbox } from "./outbox";
+import { lastNameFlag } from "./lastName";
 import type { ApprovedRow, GateProblem, PendingRow } from "./types";
 import { validate } from "./validate";
 
@@ -62,6 +63,11 @@ export async function readApproved(): Promise<ApprovedRow[]> {
     projectId: project.id,
     title: project.title,
     maker: maker.name,
+    makerSub: maker.sub,
+    slackId: maker.slackId,
+    firstName: maker.firstName,
+    lastName: maker.lastName,
+    lastNameFlag: lastNameFlag(maker.firstName, maker.lastName),
     email: maker.email,
     decidedAt: project.decidedAt,
     approvedMinutes: project.approvedMinutes,
@@ -71,6 +77,7 @@ export async function readApproved(): Promise<ApprovedRow[]> {
     error: submission?.error ?? null,
     ageJustification: submission?.ageJustification ?? null,
     duplicateJustification: submission?.duplicateJustification ?? null,
+    nameJustification: submission?.nameJustification ?? null,
     missing: missingForGrant(maker),
   }));
 }
