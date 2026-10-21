@@ -81,3 +81,17 @@
   font-size: 13.5px;
   color: var(--ok);
 }
+
+.nameOk {
+  color: var(--cream);
+}
+
+.nameBad {
+  color: var(--bad);
+  text-decoration: underline wavy;
+}
+
+.nameWarn {
+  font-size: 13px;
+  color: var(--warn);
+}
