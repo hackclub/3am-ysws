@@ -37,6 +37,12 @@ function section(title: string, lines: (string | null)[]): string | null {
 }
 
 export function hoursJustification(row: PendingRow): string {
+  const name = section("LAST NAME", [row.nameJustification]);
+  const base = generatedJustification(row);
+  return name ? `${base}\n\n${name}` : base;
+}
+
+function generatedJustification(row: PendingRow): string {
   if (row.hoursJustification?.trim()) return row.hoursJustification.trim();
 
   const reviewed = row.decidedAt ? ` on ${DAY.format(row.decidedAt)}` : "";
