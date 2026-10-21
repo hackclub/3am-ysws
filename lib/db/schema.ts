@@ -112,6 +112,7 @@ export const yswsSubmissions = pgTable(
     hoursJustification: text("hours_justification"),
     ageJustification: text("age_justification"),
     duplicateJustification: text("duplicate_justification"),
+    nameJustification: text("name_justification"),
 
     firstSubmittedAt: timestamp("first_submitted_at", { withTimezone: true }),
     lastAttemptAt: timestamp("last_attempt_at", { withTimezone: true }),
