@@ -60,5 +60,6 @@ export type ApprovedRow = {
   error: string | null;
   ageJustification: string | null;
   duplicateJustification: string | null;
+  nameJustification: string | null;
   missing: string[];
 };
