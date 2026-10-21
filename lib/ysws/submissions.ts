@@ -155,6 +155,7 @@ async function readOne(projectId: string): Promise<PendingRow | null> {
     hoursJustification: submission?.hoursJustification ?? null,
     ageJustification: submission?.ageJustification ?? null,
     duplicateJustification: submission?.duplicateJustification ?? null,
+    nameJustification: submission?.nameJustification ?? null,
 
     commits: project.repoUrl ? await repoCommitCount(project.repoUrl) : null,
     sharedCodeUrl: shared.length > 1,
@@ -173,6 +174,7 @@ export type Overrides = {
   overrideMinutes: number | null;
   ageJustification: string | null;
   duplicateJustification: string | null;
+  nameJustification: string | null;
 };
 
 export async function saveOverrides(projectId: string, values: Overrides): Promise<boolean> {
