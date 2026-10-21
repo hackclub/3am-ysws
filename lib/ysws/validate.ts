@@ -2,6 +2,7 @@ import { ageOn, MIN_AGE, missingForGrant } from "@/lib/grant";
 import { isMovingImage, isVideoLink } from "@/lib/links";
 
 import { grantMinutes } from "./fields";
+import { lastNameFlag } from "./lastName";
 import type { GateProblem, PendingRow } from "./types";
 
 const THIN_HISTORY_MINUTES = 120;
@@ -10,6 +11,11 @@ export function validate(row: PendingRow, now = new Date()): GateProblem | null 
   const missing = missingForGrant(row);
   if (missing.length > 0) {
     return { field: "maker", message: `The maker still owes us ${missing.join(", ")}.` };
+  }
+
+  const nameFlag = lastNameFlag(row.firstName, row.lastName);
+  if (nameFlag && !row.nameJustification?.trim()) {
+    return { field: "last_name", message: `${nameFlag.message} Get the real legal last name from the maker, or, if they genuinely have none, add a name note with the Slack link where they confirmed it.` };
   }
 
   const project: [string, string | null, string][] = [
