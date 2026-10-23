@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 
 import { AppShell } from "@/components/app/AppShell";
+import { Banner } from "@/components/ui/Banner";
+import { isOrganizer } from "@/lib/auth/organizer";
 import { Panel, PanelLabel } from "@/components/ui/Panel";
 import { StatCard } from "@/components/ui/StatCard";
 import { getCurrentUser } from "@/lib/auth/users";
@@ -23,10 +25,36 @@ import styles from "../reviewers/reviewers.module.css";
 export const metadata: Metadata = { title: "my payout" };
 export const dynamic = "force-dynamic";
 
+function NotOnTeam({ slackId, email }: { slackId: string; email: string }) {
+  return (
+    <AppShell title="my payout">
+      <Banner tone="warn" title="we couldn't find you on the reviewer team">
+        Payouts are matched to the reviewer list by Slack ID (or, failing that, email). Neither
+        matched the account you're signed in with.
+      </Banner>
+      <Panel>
+        <PanelLabel>send this to an organizer</PanelLabel>
+        <p className={styles.none}>
+          Signed in as Slack ID <code>{slackId}</code> · <code>{email}</code>
+        </p>
+        <p className={styles.none}>
+          If you review in Ari, ask an organizer in the reviewers channel to add exactly this Slack
+          ID on the reviewers page. Your past reviews are credited as soon as you're matched.
+        </p>
+      </Panel>
+    </AppShell>
+  );
+}
+
 export default async function PayoutPage({ searchParams }: { searchParams: Promise<{ period?: string }> }) {
   const user = await getCurrentUser();
-  const me = await reviewerForIdentity(user?.slackId, user?.email);
-  if (!me) notFound();
+  if (!user) redirect("/login?next=%2Fdash%2Fpayout");
+
+  const me = await reviewerForIdentity(user.slackId, user.email);
+  if (!me) {
+    if (isOrganizer(user)) redirect("/dash/reviewers");
+    return <NotOnTeam slackId={user.slackId} email={user.email} />;
+  }
 
   const period = parsePeriod((await searchParams).period);
   await syncReviewerLedgerSafely("reviewer payout page");
@@ -38,7 +66,7 @@ export default async function PayoutPage({ searchParams }: { searchParams: Promi
     leaderboard(period),
     payoutsStart(),
   ]);
-  if (!summary) notFound();
+  if (!summary) return <NotOnTeam slackId={user.slackId} email={user.email} />;
 
   const open = invoices.find((invoice) => invoice.status === "requested");
   const rank = board.findIndex((row) => row.id === me.id);
