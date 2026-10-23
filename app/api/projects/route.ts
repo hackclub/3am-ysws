@@ -46,8 +46,30 @@ export async function POST(request: Request) {
     );
   }
 
-  if (reviewIsExternal() && !canShip(await checkEligibility({ slackId: user.slackId }))) {
-    return NextResponse.json({ error: "not_eligible" }, { status: 403 });
+  if (reviewIsExternal()) {
+    const eligibility = await checkEligibility({ slackId: user.slackId });
+    if (eligibility === null) {
+      // Lookup failed (usually a timeout reaching auth.hackclub.com). Don't tell
+      // an eligible maker they're ineligible — ask them to retry instead.
+      return NextResponse.json(
+        {
+          error: "unavailable",
+          message:
+            "We couldn't confirm your eligibility with Hack Club Auth just now. Your draft is saved — try shipping again in a minute.",
+        },
+        { status: 503 },
+      );
+    }
+    if (!canShip(eligibility)) {
+      return NextResponse.json(
+        {
+          error: "not_eligible",
+          message:
+            "Your Hack Club account isn't verified as eligible to ship yet. Finish verification at auth.hackclub.com, then try again.",
+        },
+        { status: 403 },
+      );
+    }
   }
 
   let body: Body;
