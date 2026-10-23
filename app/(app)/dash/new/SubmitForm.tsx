@@ -77,41 +77,55 @@ export function SubmitForm({ projects, initial }: { projects: PickerProject[]; i
     setSending(true);
     setProblem(null);
 
-    const response = await fetch("/api/projects", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: draftId.current,
-        title,
-        description,
-        repoUrl,
-        demoUrl,
-        thumbnailUrl,
-        hackatimeProjects: picked,
-        track,
-      }),
-    });
+    try {
+      const response = await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: draftId.current,
+          title,
+          description,
+          repoUrl,
+          demoUrl,
+          thumbnailUrl,
+          hackatimeProjects: picked,
+          track,
+        }),
+      });
 
-    if (response.ok) {
-      router.push("/dash");
-      router.refresh();
-      return;
+      const body = (await response.json().catch(() => ({}))) as {
+        field?: string;
+        message?: string;
+        error?: string;
+      };
+
+      if (response.ok) {
+        router.push("/dash");
+        router.refresh();
+        return;
+      }
+
+      const knownMessages: Record<string, string> = {
+        duplicate_repo: "You already have a project on that repository.",
+        already_queued: "This project is already in the review queue. You don't need to ship it again.",
+        not_eligible: "Your account isn't eligible to ship yet. Check the program requirements or ask an organizer for help.",
+        "not signed in": "Your session may have expired. Sign in again, then retry.",
+        submissions_closed: "Submissions are currently closed.",
+        unavailable: "The reviewer service is temporarily unavailable. Your draft is saved; please try again shortly.",
+      };
+
+      setProblem({
+        field: body.field,
+        message: body.message ?? (body.error ? knownMessages[body.error] : undefined) ??
+          "The submission failed unexpectedly. Your draft should still be available; please try again or contact an organizer.",
+      });
+    } catch {
+      setProblem({
+        message: "Couldn't reach the server. Check your connection and try again; your draft should still be available.",
+      });
+    } finally {
+      setSending(false);
     }
-
-    const body = (await response.json().catch(() => ({}))) as {
-      field?: string;
-      message?: string;
-      error?: string;
-    };
-    setProblem({
-      field: body.field,
-      message:
-        body.message ??
-        (body.error === "duplicate_repo"
-          ? "You already have a project on that repository."
-          : "That did not send. Try again in a moment."),
-    });
-    setSending(false);
   }
 
   return (
