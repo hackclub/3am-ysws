@@ -1,6 +1,10 @@
 import type { User } from "@/lib/db/schema";
 
-const EXTRA_ORGANIZER_EMAILS = ["khanalaastha88@gmail.com"];
+const EXTRA_ORGANIZER_EMAILS = [
+  "khanalaastha88@gmail.com",
+  "study.hridhaan@gmail.com",
+  "hi@hridhaan.me",
+];
 
 export function organizerSlackIds(): string[] {
   return (process.env.ORGANIZER_SLACK_IDS ?? "")
