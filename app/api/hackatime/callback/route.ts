@@ -14,6 +14,7 @@ import {
   HACKATIME_STATE_COOKIE,
   exchangeHackatimeCode,
   getHackatimeProfile,
+  getHackatimeProjects,
 } from "@/lib/hackatime/client";
 
 export const dynamic = "force-dynamic";
@@ -47,6 +48,19 @@ export async function GET(request: NextRequest) {
   try {
     const token = await exchangeHackatimeCode(code, appUrl());
     const profile = await getHackatimeProfile(token);
+
+    // Hackatime lets restricted accounts (trust level "red" or pending deletion)
+    // read /me but answers 401 on /projects. Check now so we don't show
+    // "connected" and then silently drop the token on the next page load.
+    try {
+      await getHackatimeProjects(token);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("401")) {
+        console.warn(`[hackatime] account ${profile.id ?? "?"} is API-restricted on Hackatime`);
+        return back(request, "restricted");
+      }
+      throw error;
+    }
 
     await getDb()
       .update(users)
