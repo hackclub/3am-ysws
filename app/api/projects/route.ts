@@ -115,7 +115,10 @@ export async function POST(request: Request) {
         .limit(1);
       if (existing.length === 0) return NextResponse.json({ error: "not found" }, { status: 404 });
       if (existing[0].submittedAt && !existing[0].decision) {
-        return NextResponse.json({ error: "already_queued" }, { status: 409 });
+        return NextResponse.json(
+          { error: "already_queued", message: "This project is already in the review queue." },
+          { status: 409 },
+        );
       }
       [row] = await db.update(projects).set(values).where(eq(projects.id, body.id)).returning();
     } else {
@@ -138,7 +141,15 @@ export async function POST(request: Request) {
 
   if (outcome.status === "rejected") return invalid(outcome.field ?? "body", outcome.message);
   if (outcome.status === "already_queued") {
-    return NextResponse.json({ error: "already_queued" }, { status: 409 });
+    // ARI may have accepted this project during an earlier attempt even if the
+    // browser never received the success response. Reconcile our local state
+    // instead of leaving the maker stuck retrying the same submission forever.
+    await db
+      .update(projects)
+      .set({ submittedAt: new Date(), decision: null, noteToMaker: null, decidedAt: null })
+      .where(and(eq(projects.id, row.id), isNull(projects.decidedAt)));
+
+    return NextResponse.json({ ok: true, id: row.id, status: "queued", deduplicated: true });
   }
   if (outcome.status === "unavailable") {
     return NextResponse.json({ error: "unavailable", message: outcome.message }, { status: 503 });
