@@ -176,7 +176,8 @@ export async function reviewerSummaries(): Promise<ReviewerSummary[]> {
       paidOut: sql<string>`coalesce(-sum(${reviewerLedger.delta}) filter (where ${reviewerLedger.kind} = 'payout'), 0)`,
       reviews: sql<number>`count(${reviewerLedger.id}) filter (where ${reviewerLedger.kind} = 'review')::int`,
       paidReviews: sql<number>`count(${reviewerLedger.id}) filter (where ${reviewerLedger.kind} = 'review' and ${reviewerLedger.delta} > 0)::int`,
-      lastPaidAt: sql<Date | null>`max(${reviewerLedger.createdAt}) filter (where ${reviewerLedger.kind} = 'payout')`,
+      // drizzle's postgres-js driver returns raw sql timestamps as strings, not Dates.
+      lastPaidAt: sql<string | null>`max(${reviewerLedger.createdAt}) filter (where ${reviewerLedger.kind} = 'payout')`,
     })
     .from(reviewers)
     .leftJoin(reviewerLedger, eq(reviewerLedger.reviewerId, reviewers.id))
@@ -188,7 +189,7 @@ export async function reviewerSummaries(): Promise<ReviewerSummary[]> {
     owed: roundCents(Number(row.owed)),
     earned: roundCents(Number(row.earned)),
     paidOut: roundCents(Number(row.paidOut)),
-    lastPaidAt: row.lastPaidAt,
+    lastPaidAt: row.lastPaidAt ? new Date(row.lastPaidAt) : null,
   }));
 }
 
