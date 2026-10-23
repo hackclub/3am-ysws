@@ -20,6 +20,10 @@ const STATUS: Record<string, { tone: "ok" | "warn" | "bad"; text: string }> = {
     tone: "ok",
     text: "Hackatime is connected. Your projects will show up when you ship.",
   },
+  restricted: {
+    tone: "bad",
+    text: "Hackatime connected you, but it won't share your projects: your Hackatime account is restricted (flagged or pending deletion). Sort it out with the Hackatime team in #hackatime-help, then connect again.",
+  },
   denied: { tone: "warn", text: "You said no on Hackatime's screen, so nothing was connected." },
   failed: {
     tone: "bad",
@@ -36,9 +40,11 @@ export default async function ConnectPage({
   if (!user) redirect("/login?next=%2Fdash%2Fconnect");
 
   const { status } = await searchParams;
-  const banner = status ? STATUS[status] : undefined;
   const projects = await getPickerProjects(user);
   const connected = projects !== null;
+  // Never claim "connected" if the token didn't survive a real projects fetch.
+  const banner =
+    status === "connected" && !connected ? STATUS.failed : status ? STATUS[status] : undefined;
 
   return (
     <AppShell
