@@ -5,27 +5,51 @@ import { orders, users } from "@/lib/db/schema";
 import { isCertificateOrder } from "@/lib/certificates";
 
 export const dynamic = "force-dynamic";
-function esc(v: string) { return v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;"); }
+function esc(v: string) { return v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/’/g, "&apos;"); }
 function appUrl(path: string): string | null {
   try { const base = new URL(process.env.APP_URL ?? ""); if (base.protocol !== "https:" && !(base.protocol === "http:" && ["localhost", "127.0.0.1"].includes(base.hostname))) return null; const url = new URL(path, base); return url.origin === base.origin ? url.toString() : null; } catch { return null; }
 }
-export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+
+ // Returns the organizer’s display name from the env, with a safe fallback.
+function signerName(): { cursive: string; caps: string } {
+  const raw = process.env.CERTIFICATE_SIGNER_NAME?.trim();
+  const name = raw && raw.length > 0 ? raw : "Hack Club";
+  return { cursive: esc(name), caps: esc(name.toUpperCase()) };
+}
+async function fetchQrDataUri(data: string): Promise<string | null> {
+  try {
+    const qrUrl = new URL("https://api.qrserver.com/v1/create-qr-code/");
+    qrUrl.searchParams.set("size", "240x240");
+    qrUrl.searchParams.set("format", "png");
+    qrUrl.searchParams.set("data", data);
+    const response = await fetch(qrUrl, { cache: "no-store", signal: AbortSignal.timeout(5000) });
+    if (!response.ok) return null;
+    return "data:image/png;base64," + Buffer.from(await response.arrayBuffer()).toString("base64");
+  } catch { return null; }
+}
+function qrFallbackSvg(verifyUrl: string): string {
+  const short = esc(verifyUrl.replace(/^https?:\/\//, "").slice(0, 40));
+  return [
+    `<rect width="76" height="76" rx="3" fill="#fff" stroke="#f7edcf" stroke-width="3"/>`,
+    `<rect x="6" y="6" width="20" height="20" fill="#050505"/><rect x="9" y="9" width="14" height="14" fill="#fff"/><rect x="12" y="12" width="8" height="8" fill="#050505"/>`,
+    `<rect x="50" y="6" width="20" height="20" fill="#050505"/><rect x="53" y="9" width="14" height="14" fill="#fff"/><rect x="56" y="12" width="8" height="8" fill="#050505"/>`,
+    `<rect x="6" y="50" width="20" height="20" fill="#050505"/><rect x="9" y="53" width="14" height="14" fill="#fff"/><rect x="12" y="56" width="8" height="8" fill="#050505"/>`,
+    `<text x="38" y="42" text-anchor="middle" font-family="Arial,sans-serif" font-size="5" fill="#050505">${short}</text>`,
+  ].join("");
+}
+\nexport async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [row] = await getDb().select({ order: orders, user: users }).from(orders).innerJoin(users, eq(users.sub, orders.userSub)).where(eq(orders.id, id)).limit(1);
   if (!row || row.order.status !== "posted" || !isCertificateOrder(row.order.itemName)) return NextResponse.json({ error: "certificate_not_found" }, { status: 404 });
   const verifyUrl = appUrl("/certificates/verify/" + row.order.id);
   if (!verifyUrl) return NextResponse.json({ error: "app_url_not_configured" }, { status: 503 });
-  let qrDataUri = "";
-  try {
-    const qrUrl = new URL("https://api.qrserver.com/v1/create-qr-code/");
-    qrUrl.searchParams.set("size", "240x240"); qrUrl.searchParams.set("format", "png"); qrUrl.searchParams.set("data", verifyUrl);
-    const response = await fetch(qrUrl, { cache: "no-store", signal: AbortSignal.timeout(5000) });
-    if (!response.ok) throw new Error("QR provider failed");
-    qrDataUri = "data:image/png;base64," + Buffer.from(await response.arrayBuffer()).toString("base64");
-  } catch { return NextResponse.json({ error: "qr_generation_failed" }, { status: 503 }); }
+  const qrDataUri = await fetchQrDataUri(verifyUrl);
+  const qrBlock = qrDataUri
+    ? `<rect width="76" height="76" rx="3" fill="#fff" stroke="#f7edcf" stroke-width="3"/><image x="3" y="3" width="70" height="70" xlink:href="${qrDataUri}"/>`
+    : qrFallbackSvg(verifyUrl);
   const recipient = esc(row.order.fullName?.trim() || row.user.name || "3AM Maker");
   const date = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(row.order.fulfilledAt ?? row.order.createdAt);
-  const certId = "3AM-" + row.order.id.slice(0, 8).toUpperCase();
+  const certId = "3AM-" + row.order.id.slice(0, 8).toUpperCase();\n  const signer = signerName();
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1536" height="1152" viewBox="0 0 1024 768">
 <rect width="1024" height="768" fill="#050505"/>
@@ -45,9 +69,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 <text x="512" y="373" text-anchor="middle" font-family="Georgia,serif" font-size="22" fill="#f7edcf">in recognition of submitting projects to 3AM and enthusiastic</text>
 <text x="512" y="408" text-anchor="middle" font-family="Georgia,serif" font-size="22" fill="#f7edcf">participation to Hack Club’s worldwide community of</text>
 <text x="512" y="441" text-anchor="middle" font-family="Georgia,serif" font-size="22" fill="#f7edcf">developers.</text>
-<text x="512" y="489" text-anchor="middle" font-family="cursive" font-size="36" fill="#d8b7b6">Hridhaan Sahay</text><path d="M398 497 H626" stroke="#d8b7b6" stroke-width="1.5"/>
-<text x="512" y="526" text-anchor="middle" font-family="Georgia,serif" font-size="23" fill="#ffdf35">HRIDHAAN SAHAY</text><text x="512" y="549" text-anchor="middle" font-family="Georgia,serif" font-size="14" fill="#f7edcf">ORGANIZER</text>
-<g transform="translate(846 555)"><rect width="76" height="76" rx="3" fill="#fff" stroke="#f7edcf" stroke-width="3"/><image x="3" y="3" width="70" height="70" xlink:href="${qrDataUri}"/></g>
+<text x="512" y="489" text-anchor="middle" font-family="cursive" font-size="36" fill="#d8b7b6">${signer.cursive}</text><path d="M398 497 H626" stroke="#d8b7b6" stroke-width="1.5"/>
+<text x="512" y="526" text-anchor="middle" font-family="Georgia,serif" font-size="23" fill="#ffdf35">${signer.caps}</text><text x="512" y="549" text-anchor="middle" font-family="Georgia,serif" font-size="14" fill="#f7edcf">ORGANIZER</text>
+<g transform="translate(846 555)">${qrBlock}</g>
 <text x="884" y="647" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#f7edcf">SCAN TO VERIFY</text>
 <text x="510" y="650" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#e8cfc6">Issued ${esc(date)} • ${certId}</text>
 <g fill="#d62e35"><ellipse cx="900" cy="260" rx="13" ry="22" transform="rotate(28 900 260)"/><ellipse cx="142" cy="532" rx="13" ry="22" transform="rotate(-50 142 532)"/><ellipse cx="830" cy="650" rx="13" ry="22" transform="rotate(35 830 650)"/></g>
