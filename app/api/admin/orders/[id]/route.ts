@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { isOrganizer } from "@/lib/auth/organizer";
 import { getCurrentUser } from "@/lib/auth/users";
 import { getDb } from "@/lib/db";
+import { notifyCertificateReady } from "@/lib/certificates";
 import { beansLedger, items, orders, users } from "@/lib/db/schema";
 import { notifyOrderFulfilled } from "@/lib/slack/notifications";
 import { notifyOrderEventInstant } from "@/lib/slack/instant-order-notifications";
@@ -109,7 +110,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       }
     }
 
-    return { status: "ok" as const, notification };
+    return { status: "ok" as const, notification, newlyPosted, orderId: order.id };
   });
 
   if (result.status === "not_found") {
@@ -126,6 +127,11 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       { error: "missing_cancel_note", message: "Add a comment so the maker knows why the order was cancelled." },
       { status: 422 },
     );
+  }
+
+  if (result.newlyPosted) {
+    try { await notifyCertificateReady(result.orderId); }
+    catch { console.warn("[certificates] order posted but certificate Slack DM failed"); }
   }
 
   if (result.notification) {
