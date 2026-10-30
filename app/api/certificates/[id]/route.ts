@@ -56,7 +56,7 @@ async function createCertificatePdf(input: {
   const nameWidth = nameFont.widthOfTextAtSize(cleanedName, nameSize);
   page.drawText(cleanedName, {
     x: (page.getWidth() - nameWidth) / 2,
-    y: 322,
+    y: 336,
     size: nameSize,
     font: nameFont,
     color: cream,
@@ -77,7 +77,7 @@ async function createCertificatePdf(input: {
   // Keep the QR in the lower-right clear area, away from the existing beans and signature.
   const qrSize = 48;
   const qrX = page.getWidth() - 72 - qrSize;
-  const qrY = 66;
+  const qrY = 85;
   page.drawRectangle({
     x: qrX - 2,
     y: qrY - 2,
@@ -92,7 +92,7 @@ async function createCertificatePdf(input: {
   const captionSize = 5.2;
   page.drawText(caption, {
     x: qrX + (qrSize - detailsFont.widthOfTextAtSize(caption, captionSize)) / 2,
-    y: 60,
+    y: 79,
     size: captionSize,
     font: detailsFont,
     color: cream,
@@ -109,7 +109,7 @@ async function createCertificatePdf(input: {
   const detailsWidth = detailsFont.widthOfTextAtSize(details, detailsSize);
   page.drawText(details, {
     x: 400 - detailsWidth / 2,
-    y: 62,
+    y: 79,
     size: detailsSize,
     font: detailsFont,
     color: cream,
