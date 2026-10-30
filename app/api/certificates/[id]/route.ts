@@ -37,7 +37,8 @@ function qrFallbackSvg(verifyUrl: string): string {
     `<text x="38" y="42" text-anchor="middle" font-family="Arial,sans-serif" font-size="5" fill="#050505">${short}</text>`,
   ].join("");
 }
-\nexport async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [row] = await getDb().select({ order: orders, user: users }).from(orders).innerJoin(users, eq(users.sub, orders.userSub)).where(eq(orders.id, id)).limit(1);
   if (!row || row.order.status !== "posted" || !isCertificateOrder(row.order.itemName)) return NextResponse.json({ error: "certificate_not_found" }, { status: 404 });
@@ -49,7 +50,8 @@ function qrFallbackSvg(verifyUrl: string): string {
     : qrFallbackSvg(verifyUrl);
   const recipient = esc(row.order.fullName?.trim() || row.user.name || "3AM Maker");
   const date = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(row.order.fulfilledAt ?? row.order.createdAt);
-  const certId = "3AM-" + row.order.id.slice(0, 8).toUpperCase();\n  const signer = signerName();
+  const certId = "3AM-" + row.order.id.slice(0, 8).toUpperCase();
+  const signer = signerName();
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1536" height="1152" viewBox="0 0 1024 768">
 <rect width="1024" height="768" fill="#050505"/>
