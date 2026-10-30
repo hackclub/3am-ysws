@@ -38,5 +38,7 @@ export function submissionsAreOpen(config: YswsEventConfig, now = new Date()): b
 }
 
 export function resubmissionsAreOpen(config: YswsEventConfig, now = new Date()): boolean {
-  return submissionsAreOpen(config, now) && config.resubmissionsOpen;
+  // Resubmissions have their own toggle, independent of whether new submissions are allowed.
+  // The shared deadline still closes both flows.
+  return config.resubmissionsOpen && !deadlineHasPassed(config, now);
 }
