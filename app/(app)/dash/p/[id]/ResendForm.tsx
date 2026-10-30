@@ -65,10 +65,10 @@ export function ResendForm({ project, options }: { project: ResendDefaults; opti
 
   return (
     <Panel>
-      <PanelLabel>fix it and send it back</PanelLabel>
+      <PanelLabel>send an update</PanelLabel>
       <div className={styles.form}>
         {problem && !problem.field ? <Banner tone="bad">{problem.message}</Banner> : null}
-        <Field id={`${ids}-what`} label="what changed?" help="Goes straight to the reviewer who asked." error={errorFor("update_message")}>
+        <Field id={`${ids}-what`} label="what changed?" help="Tell the reviewers what changed in this version. This is required for an update." error={errorFor("update_message")}>
           <Textarea value={updateMessage} onChange={(event) => setUpdateMessage(event.target.value)} />
         </Field>
         <Field id={`${ids}-track`} label="project type" help="Choose Hardware or Software." error={errorFor("track")}>
@@ -87,7 +87,7 @@ export function ResendForm({ project, options }: { project: ResendDefaults; opti
           <Field id={`${ids}-thumb`} label="screenshot" error={errorFor("thumbnail_url")}><ThumbnailField value={thumbnailUrl} onChange={setThumbnailUrl} /></Field>
         </div>
         <Field id={`${ids}-projects`} label="hackatime projects" error={errorFor("hackatime_projects")}><HackatimePicker options={options} value={picked} onChange={setPicked} /></Field>
-        <div className={styles.actions}><Button onClick={resend} loading={sending} loadingLabel="sending…">send it back</Button></div>
+        <div className={styles.actions}><Button onClick={resend} loading={sending} loadingLabel="sending…">send update</Button></div>
       </div>
     </Panel>
   );
