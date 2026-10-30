@@ -41,11 +41,11 @@ export async function notifyCertificateReady(orderId: string): Promise<void> {
 
   const recipient = row.order.fullName?.trim() || row.user.name || "3AM maker";
   const message =
-    "🏅 *Your 3AM Certificate is ready!*\\n\\n" +
-    `Issued to: *${recipient.replace(/[&<>]/g, "")}*\\n` +
-    `Certificate ID: ` + "`3AM-" + row.order.id.slice(0, 8).toUpperCase() + "`\\n\\n" +
-    `<${downloadUrl}|Download your certificate (SVG)>\\n` +
-    `<${verifyUrl}|Verify certificate authenticity>\\n\\n` +
+    "🏅 *Your 3AM Certificate is ready!*\n\n" +
+    `Issued to: *${recipient.replace(/[&<>]/g, "")}*\n` +
+    `Certificate ID: ` + "`3AM-" + row.order.id.slice(0, 8).toUpperCase() + "`\n\n" +
+    `<${downloadUrl}|Download your certificate (SVG)>\n` +
+    `<${verifyUrl}|Verify certificate authenticity>\n\n` +
     "Keep the original download; the verification page checks the certificate against the 3AM order record.";
 
   const sent = await sendSlackDm(row.user.slackId, message);
