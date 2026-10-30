@@ -27,15 +27,30 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const date = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(row.order.fulfilledAt ?? row.order.createdAt);
   const certId = "3AM-" + row.order.id.slice(0, 8).toUpperCase();
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="1100" viewBox="0 0 1600 1100">
-<defs><linearGradient id="paper"><stop stop-color="#fffdf6"/><stop offset="1" stop-color="#f2eddf"/></linearGradient></defs>
-<rect width="1600" height="1100" fill="#11101d"/><rect x="28" y="28" width="1544" height="1044" fill="url(#paper)"/><rect x="48" y="48" width="1504" height="1004" fill="none" stroke="#17203c" stroke-width="3"/><rect x="62" y="62" width="1476" height="976" fill="none" stroke="#c8a65b" stroke-width="2"/>
-<path d="M48 220 L220 48 M48 260 L260 48 M1552 840 L1380 1012 M1552 800 L1340 1012" stroke="#c8a65b" stroke-width="5"/>
-<text x="800" y="180" text-anchor="middle" font-family="Georgia,serif" font-size="30" letter-spacing="10" fill="#17203c">3AM • HACK CLUB</text><text x="800" y="330" text-anchor="middle" font-family="Georgia,serif" font-size="72" fill="#17203c">Certificate of Completion</text><path d="M510 370 H1090" stroke="#c8a65b" stroke-width="3"/>
-<text x="800" y="430" text-anchor="middle" font-family="Arial,sans-serif" font-size="28" fill="#4b4a51">This certificate is proudly presented to</text><text x="800" y="535" text-anchor="middle" font-family="Georgia,serif" font-size="64" font-weight="bold" fill="#17203c">${recipient}</text>
-<text x="800" y="600" text-anchor="middle" font-family="Arial,sans-serif" font-size="25" fill="#4b4a51">In recognition of being part of the 3AM maker community.</text><text x="800" y="648" text-anchor="middle" font-family="Arial,sans-serif" font-size="25" fill="#4b4a51">Keep building, keep learning, and keep shipping.</text>
-<circle cx="290" cy="790" r="64" fill="#c8a65b" stroke="#9d7a32" stroke-width="4"/><circle cx="290" cy="790" r="51" fill="none" stroke="#f7edc9" stroke-width="2"/><text x="290" y="782" text-anchor="middle" font-family="Georgia,serif" font-size="18" fill="#17203c">3AM</text><text x="290" y="808" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" fill="#17203c">VERIFIED</text>
-<path d="M520 800 H770" stroke="#17203c" stroke-width="2"/><text x="645" y="840" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" fill="#17203c">3AM Team</text><text x="645" y="870" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" fill="#777">Authorized issuer</text>
-<image x="1240" y="730" width="180" height="180" xlink:href="${qrDataUri}"/><text x="1330" y="935" text-anchor="middle" font-family="Arial,sans-serif" font-size="17" fill="#17203c">SCAN TO VERIFY</text><text x="800" y="980" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" fill="#4b4a51">Issued ${esc(date)} • ${certId}</text></svg>`;
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1536" height="1152" viewBox="0 0 1024 768">
+<rect width="1024" height="768" fill="#050505"/>
+<g fill="#fff8dc"><circle cx="52" cy="38" r="1.6"/><circle cx="170" cy="24" r="1.2"/><circle cx="220" cy="34" r="1.5"/><circle cx="878" cy="28" r="1.6"/><circle cx="970" cy="140" r="1.7"/><circle cx="28" cy="500" r="1.4"/><circle cx="990" cy="540" r="1.4"/><circle cx="180" cy="730" r="1.5"/><circle cx="940" cy="720" r="1.5"/><circle cx="320" cy="14" r="1"/><circle cx="700" cy="24" r="1"/></g>
+<g fill="#ffdf35"><path d="M68 0 Q70 42 110 50 Q70 55 68 100 Q62 56 22 50 Q62 42 68 0Z"/><path d="M266 748 Q268 765 286 768 Q268 770 266 786 Q264 770 248 768 Q264 765 266 748Z"/><path d="M990 650 Q992 667 1008 670 Q992 672 990 689 Q988 672 972 670 Q988 667 990 650Z"/></g>
+<rect x="74" y="61" width="878" height="630" rx="12" fill="#430e0d" stroke="#f7f2e7" stroke-width="3"/>
+<rect x="80" y="67" width="866" height="618" rx="8" fill="none" stroke="#f7f2e7" stroke-width="1"/>
+<g fill="#fff"><path d="M140 24 l3 10 10 3 -10 3 -3 10 -3 -10 -10 -3 10 -3Z"/><path d="M916 35 l3 10 10 3 -10 3 -3 10 -3 -10 -10 -3 10 -3Z"/><path d="M40 610 l3 10 10 3 -10 3 -3 10 -3 -10 -10 -3 10 -3Z"/><path d="M984 380 l3 10 10 3 -10 3 -3 10 -3 -10 -10 -3 10 -3Z"/></g>
+<g transform="translate(352 92)"><path d="M0 0 Q22 -18 46 -2 Q70 10 96 -5 L90 28 Q66 42 44 26 Q20 12 0 30Z" fill="#f7edcf"/><text x="48" y="20" text-anchor="middle" font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="#151515" transform="rotate(-4 48 20)">HACK CLUB</text></g>
+<text x="510" y="124" font-family="Georgia,serif" font-size="32" font-weight="bold" fill="#f7edcf">| 3am</text>
+<text x="512" y="190" text-anchor="middle" font-family="Georgia,serif" font-size="29" letter-spacing="4" fill="#f7edcf">CERTIFICATE OF APPRECIATION</text>
+<path d="M130 185 A40 40 0 1 1 174 225 A31 31 0 0 0 130 185Z" fill="#f2d447"/>
+<text x="512" y="240" text-anchor="middle" font-family="Georgia,serif" font-size="22" letter-spacing="3" fill="#f7edcf">This certificate is proudly presented to</text>
+<rect x="230" y="265" width="564" height="62" fill="#430e0d"/>
+<text x="512" y="315" text-anchor="middle" font-family="Arial,sans-serif" font-size="36" fill="#f7f3ee">${recipient}</text>
+<path d="M206 329 H818" stroke="#f7f2e7" stroke-width="2"/>
+<text x="512" y="373" text-anchor="middle" font-family="Georgia,serif" font-size="22" fill="#f7edcf">in recognition of submitting projects to 3AM and enthusiastic</text>
+<text x="512" y="408" text-anchor="middle" font-family="Georgia,serif" font-size="22" fill="#f7edcf">participation to Hack Club’s worldwide community of</text>
+<text x="512" y="441" text-anchor="middle" font-family="Georgia,serif" font-size="22" fill="#f7edcf">developers.</text>
+<text x="512" y="489" text-anchor="middle" font-family="cursive" font-size="36" fill="#d8b7b6">Hridhaan Sahay</text><path d="M398 497 H626" stroke="#d8b7b6" stroke-width="1.5"/>
+<text x="512" y="526" text-anchor="middle" font-family="Georgia,serif" font-size="23" fill="#ffdf35">HRIDHAAN SAHAY</text><text x="512" y="549" text-anchor="middle" font-family="Georgia,serif" font-size="14" fill="#f7edcf">ORGANIZER</text>
+<g transform="translate(846 555)"><rect width="76" height="76" rx="3" fill="#fff" stroke="#f7edcf" stroke-width="3"/><image x="3" y="3" width="70" height="70" xlink:href="${qrDataUri}"/></g>
+<text x="884" y="647" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#f7edcf">SCAN TO VERIFY</text>
+<text x="510" y="650" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#e8cfc6">Issued ${esc(date)} • ${certId}</text>
+<g fill="#d62e35"><ellipse cx="900" cy="260" rx="13" ry="22" transform="rotate(28 900 260)"/><ellipse cx="142" cy="532" rx="13" ry="22" transform="rotate(-50 142 532)"/><ellipse cx="830" cy="650" rx="13" ry="22" transform="rotate(35 830 650)"/></g>
+</svg>`;
   return new NextResponse(svg, { headers: { "Content-Type": "image/svg+xml; charset=utf-8", "Content-Disposition": `attachment; filename="3AM-${row.order.id.slice(0, 8)}.svg"`, "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff" } });
 }
