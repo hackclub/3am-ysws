@@ -12,7 +12,7 @@ import { getYswsConfig, resubmissionsAreOpen } from "@/lib/yswsConfig";
 
 export const dynamic = "force-dynamic";
 
-const RESENDABLE = ["changes", "rejected", "withdrawn"] as const;
+const RESENDABLE = ["changes", "rejected", "withdrawn", "approved"] as const;
 
 type Body = {
   title?: string;
@@ -49,7 +49,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   if (!project) return NextResponse.json({ error: "not found" }, { status: 404 });
   if (!project.decision) return NextResponse.json({ error: "still_open" }, { status: 409 });
   if (!RESENDABLE.includes(project.decision as (typeof RESENDABLE)[number])) {
-    return NextResponse.json({ error: "already_approved" }, { status: 409 });
+    return NextResponse.json({ error: "not_resendable" }, { status: 409 });
   }
 
   let body: Body = {};
