@@ -31,7 +31,7 @@ async function uploadSvgToDmChannel(token: string, channelId: string, svgBytes: 
     if (!urlRes.ok) return false;
     const { ok: urlOk, upload_url, file_id } = await urlRes.json() as { ok?: boolean; upload_url?: string; file_id?: string };
     if (!urlOk || !upload_url || !file_id) return false;
-    const putRes = await fetch(upload_url, { method: "POST", headers: { "Content-Type": "application/octet-stream" }, body: svgBytes, signal: AbortSignal.timeout(15000) });
+    const putRes = await fetch(upload_url, { method: "POST", headers: { "Content-Type": "application/octet-stream" }, body: new Uint8Array(svgBytes), signal: AbortSignal.timeout(15000) });
     if (!putRes.ok) return false;
     const doneRes = await fetch("https://slack.com/api/files.completeUploadExternal", {
       method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json; charset=utf-8" },
