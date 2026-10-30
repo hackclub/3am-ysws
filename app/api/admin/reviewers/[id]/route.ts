@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { isOrganizer } from "@/lib/auth/organizer";
 import { getCurrentUser } from "@/lib/auth/users";
 import { getDb } from "@/lib/db";
-import { reviewerInvoices, reviewerLedger, reviewers } from "@/lib/db/schema";
+import { beansLedger, reviewerInvoices, reviewerLedger, reviewers, users } from "@/lib/db/schema";
 import {
   declinedMessage,
   paidMessage,
@@ -104,12 +104,29 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         note: note ?? `paid ${usd(owed)}`,
         createdBy: by,
       });
+
+      // Credit the matching 3AM account by Slack ID in the same transaction.
+      // The zeroed reviewer balance prevents a retry from crediting beans twice.
+      const [account] = await tx
+        .select({ sub: users.sub })
+        .from(users)
+        .where(sql`upper(${users.slackId}) = ${reviewer.slackId.toUpperCase()}`)
+        .limit(1);
+      if (account) {
+        await tx.insert(beansLedger).values({
+          userSub: account.sub,
+          delta: owed,
+          reason: "manual",
+          note: `Reviewer payout: ${usd(owed)} USD → ${owed} beans`,
+        });
+      }
+
       // The tick also settles their open invoice, if they sent one.
       await tx
         .update(reviewerInvoices)
         .set({ status: "paid", closedAt: new Date(), closedBy: by, paidAmount: owed })
         .where(and(eq(reviewerInvoices.reviewerId, id), eq(reviewerInvoices.status, "requested")));
-      return { status: "paid" as const, owed };
+      return { status: "paid" as const, owed, beansCredited: Boolean(account) };
     });
 
     if (outcome.status === "nothing") {
@@ -123,7 +140,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       );
     }
     await tellReviewer(reviewer, paidMessage(outcome.owed));
-    return NextResponse.json({ ok: true, paid: outcome.owed });
+    return NextResponse.json({
+      ok: true,
+      paid: outcome.owed,
+      beansCredited: outcome.beansCredited,
+      ...(outcome.beansCredited ? {} : { warning: "Payout recorded, but no 3AM account matched this reviewer's Slack ID. Beans were not credited." }),
+    });
   }
 
   if (body.action === "decline" || body.action === "resend") {
