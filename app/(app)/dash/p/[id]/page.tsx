@@ -87,10 +87,12 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   const live = isOpen(project) && reviewIsExternal() ? await livePhaseStatus(project.id) : null;
   const status = live ?? stored;
   const hours = hoursLabel(project.approvedMinutes);
+  // Approved projects can also be updated for a later version (v2, v3, etc.).
   const resendable =
     project.decision === "changes" ||
     project.decision === "rejected" ||
-    project.decision === "withdrawn";
+    project.decision === "withdrawn" ||
+    project.decision === "approved";
   const resendOpen = resubmissionsAreOpen(await getYswsConfig());
   const options = resendable && resendOpen ? ((await getPickerProjects(user)) ?? []) : [];
   const missing = project.decision === "approved" ? missingForGrant(user) : [];
