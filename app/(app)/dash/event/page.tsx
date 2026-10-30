@@ -42,7 +42,7 @@ export default async function EventControlsPage({
     }
 
     const submissionsOpen = formData.get("submissionsOpen") === "on";
-    const resubmissionsOpen = submissionsOpen && formData.get("resubmissionsOpen") === "on";
+    const resubmissionsOpen = formData.get("resubmissionsOpen") === "on";
     const now = new Date();
 
     await getDb()
@@ -106,7 +106,6 @@ export default async function EventControlsPage({
               type="checkbox"
               name="resubmissionsOpen"
               defaultChecked={config.resubmissionsOpen}
-              disabled={!config.submissionsOpen}
             />
             <span>
               <strong>allow resubmissions</strong>
