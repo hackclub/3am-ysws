@@ -94,7 +94,7 @@ export default async function EventControlsPage({
             <input type="checkbox" name="submissionsOpen" defaultChecked={config.submissionsOpen} />
             <span>
               <strong>allow new submissions</strong>
-              <small>Turn this off to stop both new submissions and resubmissions.</small>
+              <small>Controls whether makers can submit new projects. Resubmissions have a separate toggle.</small>
             </span>
           </label>
         </Panel>
