@@ -42,6 +42,15 @@ export default async function HomePage() {
         <h1 className={styles.wordmark}>3am</h1>
         <p className={styles.credit}>YSWS by SEBA and Hridhaan, Hack Club</p>
         <p className={styles.lead}>Make something dark themed like Website, tool, a game or anything that suits your interest, and get some amazing prizes from the #3AM Shop</p>
+        <aside className={styles.weekendChallenge} aria-label="Weekend challenge">
+          <div className={styles.challengeMeta}>
+            <span className={styles.challengeBadge}>Weekend challenge</span>
+            <span className={styles.challengeDeadline}>Returns through 17 November</span>
+          </div>
+          <h2 className={styles.challengeTitle}>Three days. Three hours. One custom cap.</h2>
+          <p className={styles.challengeText}>Ship on at least 3 days and earn 3 or more approved hours each day to receive a custom Hack Club × 3AM cap.</p>
+          <p className={styles.challengeReward}>You still earn <strong>5 Beans per approved hour</strong> to spend in the Shop.</p>
+        </aside>
         <div className={styles.owlRow}>
           <Image src="/assets/owl.png" alt="" width={52} height={52} className="pixel" unoptimized priority />
           <p className={styles.lead}>Finish it, ship it, and get rewarded for the hours you put in.</p>
