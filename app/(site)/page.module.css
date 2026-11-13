@@ -217,3 +217,103 @@
     gap: 8px;
   }
 }
+
+
+/* Weekend challenge motion: restrained, decorative, and motion-safe. */
+.weekendChallenge {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  animation: challenge-enter 650ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.weekendChallenge::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -1px;
+  left: -38%;
+  width: 32%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--lamp), transparent);
+  opacity: 0.85;
+  animation: challenge-scan 5.5s ease-in-out 900ms infinite;
+  pointer-events: none;
+}
+
+.challengeBadge {
+  position: relative;
+  gap: 7px;
+  transition: color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+}
+
+.challengeBadge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  border-radius: 50%;
+  background: var(--lamp);
+  box-shadow: 0 0 0 0 rgba(216, 194, 139, 0.38);
+  animation: challenge-pulse 2.4s ease-out infinite;
+}
+
+.weekendChallenge:hover .challengeBadge {
+  background: rgba(216, 194, 139, 0.08);
+  box-shadow: 0 0 18px rgba(216, 194, 139, 0.08);
+}
+
+.challengeTitle {
+  transition: transform 220ms ease;
+}
+
+.weekendChallenge:hover .challengeTitle {
+  transform: translateX(3px);
+}
+
+@keyframes challenge-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes challenge-scan {
+  0%, 22% {
+    left: -38%;
+    opacity: 0;
+  }
+  32% {
+    opacity: 0.85;
+  }
+  62%, 100% {
+    left: 108%;
+    opacity: 0;
+  }
+}
+
+@keyframes challenge-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(216, 194, 139, 0.38);
+  }
+  65%, 100% {
+    box-shadow: 0 0 0 7px rgba(216, 194, 139, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weekendChallenge,
+  .weekendChallenge::before,
+  .challengeBadge::before {
+    animation: none;
+  }
+
+  .challengeTitle,
+  .challengeBadge {
+    transition: none;
+  }
+}
