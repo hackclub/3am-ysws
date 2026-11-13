@@ -10,7 +10,7 @@ const FAQ: Entry[] = [
   {
     question: "what is 3am?",
     answer:
-      "3AM is a Hack Club YSWS (You Ship We Ship) event. Build a dark-themed hardware or software project, track your build time with Hackatime, and ship your work to earn beans you can spend on rewards in the #3AM Shop this Spooktober.",
+      "3AM is a Hack Club YSWS (You Ship We Ship) event. Build a dark-themed hardware or software project, track your build time with Hackatime, and ship your work to earn beans you can spend on rewards in the #3AM Shop.",
   },
   {
     question: "who can participate?",
@@ -19,12 +19,12 @@ const FAQ: Entry[] = [
   {
     question: "what can I ship?",
     answer:
-      "Make something dark themed like Website, tool, a game or anything that suits your interest, and get some amazing prizes from the #3AM Shop this Spooktober!!",
+      "Make something dark themed like Website, tool, a game or anything that suits your interest, and get some amazing prizes from the #3AM Shop",
   },
   {
     question: "does it have to be hardware or software?",
     answer:
-      "Either! Choose Hardware for a physical build or electronics project, or Software for a website, game, app, tool, or other digital project. Your project should fit the dark, spooky Spooktober theme.",
+      "Either! Choose Hardware for a physical build or electronics project, or Software for a website, game, app, tool, or other digital project. Your project should have a dark-themed aesthetic.",
   },
   {
     question: "do I have to build at exactly 3am?",
