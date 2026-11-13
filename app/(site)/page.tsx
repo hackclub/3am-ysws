@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { eq, sql } from "drizzle-orm";
+import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
 
 import { Faq } from "@/components/site/Faq";
 import { Steps } from "@/components/site/Steps";
@@ -16,6 +16,7 @@ export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const stats = { makers: 0, projects: 0, approvedProjects: 0, hours: 0 };
+  let exploreProjects: { id: string; thumbnailUrl: string; makerName: string; repoUrl: string }[] = [];
   const config = await getYswsConfig();
   const submissionsOpen = submissionsAreOpen(config);
 
@@ -31,6 +32,27 @@ export default async function HomePage() {
       stats.projects = Number(projectStats[0]?.count ?? 0);
       stats.approvedProjects = Number(approvedStats[0]?.count ?? 0);
       stats.hours = Math.floor(Number(approvedStats[0]?.minutes ?? 0) / 60);
+      const recentShips = await db
+        .select({
+          id: projects.id,
+          thumbnailUrl: projects.thumbnailUrl,
+          makerName: users.name,
+          repoUrl: projects.repoUrl,
+        })
+        .from(projects)
+        .innerJoin(users, eq(projects.userSub, users.sub))
+        .where(and(eq(projects.decision, "approved"), isNotNull(projects.thumbnailUrl), isNotNull(projects.repoUrl)))
+        .orderBy(desc(projects.decidedAt))
+        .limit(12);
+
+      exploreProjects = recentShips.filter((project) => {
+        try { return new URL(project.repoUrl!).hostname === "github.com"; }
+        catch { return false; }
+      }).slice(0, 6).map((project) => ({
+        ...project,
+        thumbnailUrl: project.thumbnailUrl!,
+        repoUrl: project.repoUrl!,
+      }));
     } catch {
       // Keep the public homepage available if the database is temporarily unavailable.
     }
@@ -72,6 +94,21 @@ export default async function HomePage() {
         </div>
         <span className={styles.note}>made possible by questionable sleep schedules</span>
       </section>
+      {exploreProjects.length > 0 && (
+        <Section id="explore" label="Explore">
+          <div className={styles.exploreGrid}>
+            {exploreProjects.map((project) => (
+              <article className={styles.exploreCard} key={project.id}>
+                <Image src={project.thumbnailUrl} alt="Project screenshot" width={720} height={405} className={styles.exploreScreenshot} unoptimized />
+                <div className={styles.exploreMeta}>
+                  <span className={styles.exploreMaker}>{project.makerName}</span>
+                  <a href={project.repoUrl} target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+                </div>
+              </article>
+            ))}
+          </div>
+        </Section>
+      )}
       <Section id="how-it-works" label="how it works"><Steps /></Section>
       <Section id="faq" label="questions"><Faq /></Section>
     </>
