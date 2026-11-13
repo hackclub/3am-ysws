@@ -1,10 +1,11 @@
 import type { User } from "@/lib/db/schema";
 
-const EXTRA_ORGANIZER_EMAILS = [
-  "khanalaastha88@gmail.com",
-  "study.hridhaan@gmail.com",
-  "hi@hridhaan.me",
-];
+function organizerEmails(): string[] {
+  return (process.env.ORGANIZER_EMAILS ?? "")
+    .split(",")
+    .map((entry) => entry.trim().toLowerCase())
+    .filter(Boolean);
+}
 
 export function organizerSlackIds(): string[] {
   return (process.env.ORGANIZER_SLACK_IDS ?? "")
@@ -21,7 +22,7 @@ export function isOrganizer(user: Pick<User, "slackId" | "email"> | null | undef
 
   return (
     organizerSlackIds().includes(slackId) ||
-    EXTRA_ORGANIZER_EMAILS.includes(email)
+    organizerEmails().includes(email)
   );
 }
 
