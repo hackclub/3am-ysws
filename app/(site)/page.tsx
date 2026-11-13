@@ -48,7 +48,7 @@ export default async function HomePage() {
             <span className={styles.challengeBadge}>Weekend challenge</span>
             <span className={styles.challengeDeadline}>ENDS on 17th November</span>
           </div>
-          <h2 className={styles.challengeTitle}>Three days. Three hours. One custom cap.</h2>
+          <h2 className={styles.challengeTitle}>Three days. Three hours.</h2>
           <p className={styles.challengeText}>Ship on at least 3 days and earn 3 or more approved hours each day to receive a custom Hack Club × 3AM cap.</p>
           <p className={styles.challengeReward}>You still earn <strong>5 Beans per approved hour</strong> to spend in the Shop.</p>
         </aside>
