@@ -337,3 +337,68 @@
     max-height: 190px;
   }
 }
+
+.exploreGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.exploreCard {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  background: rgba(16, 16, 20, 0.48);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.exploreScreenshot {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  object-fit: cover;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.exploreMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  font-family: var(--display);
+  font-size: 13px;
+}
+
+.exploreMaker {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--soft);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.exploreMeta a {
+  flex: 0 0 auto;
+  color: var(--lamp);
+  text-decoration: none;
+}
+
+.exploreMeta a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 700px) {
+  .exploreGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .exploreGrid {
+    grid-template-columns: 1fr;
+  }
+}
