@@ -43,12 +43,12 @@ export default async function HomePage() {
         .innerJoin(users, eq(projects.userSub, users.sub))
         .where(and(eq(projects.decision, "approved"), isNotNull(projects.thumbnailUrl), isNotNull(projects.repoUrl)))
         .orderBy(desc(projects.decidedAt))
-        .limit(12);
+        .limit(40);
 
       exploreProjects = recentShips.filter((project) => {
         try { return new URL(project.repoUrl!).hostname === "github.com"; }
         catch { return false; }
-      }).slice(0, 6).map((project) => ({
+      }).slice(0, 40).map((project) => ({
         ...project,
         thumbnailUrl: project.thumbnailUrl!,
         repoUrl: project.repoUrl!,
