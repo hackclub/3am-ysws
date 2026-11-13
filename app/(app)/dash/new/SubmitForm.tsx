@@ -176,7 +176,7 @@ export function SubmitForm({ projects, initial }: { projects: PickerProject[]; i
         <Field
           id={`${ids}-description`}
           label="what is it?"
-          help="One or two sentences describing your build and how it fits the dark, spooky Spooktober theme."
+          help="One or two sentences describing your build and how it fits the dark theme."
           error={errorFor("description")}
         >
           <Textarea value={description} onChange={(event) => setDescription(event.target.value)} />
