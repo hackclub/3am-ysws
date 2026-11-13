@@ -11,9 +11,17 @@ export function parseOAuthState(state: string | null): { nonce: string | null; r
   if (!state) return { nonce: null };
   const dot = state.indexOf(".");
   if (dot === -1) return { nonce: state };
+
+  let decoded: string | undefined;
+  try {
+    decoded = decodeURIComponent(state.slice(dot + 1));
+  } catch {
+    return { nonce: state.slice(0, dot) };
+  }
+
   return {
     nonce: state.slice(0, dot),
-    returnTo: safeReturnTo(decodeURIComponent(state.slice(dot + 1))),
+    returnTo: safeReturnTo(decoded),
   };
 }
 
