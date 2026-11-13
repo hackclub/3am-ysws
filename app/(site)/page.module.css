@@ -319,16 +319,12 @@
 }
 
 
-.challengeArtwork {
+.challengeBadgeArtwork {
   display: block;
-  width: 100%;
-  height: auto;
-  max-height: 260px;
-  margin: 0 0 17px;
+  width: 36px;
+  height: 28px;
+  flex: 0 0 36px;
   object-fit: contain;
-  object-position: left center;
-  border: 1px solid var(--rule);
-  background: rgba(0, 0, 0, 0.18);
 }
 
 .challengeBadge::before {
