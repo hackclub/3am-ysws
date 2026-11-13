@@ -41,7 +41,7 @@ export default async function HomePage() {
       <section className={styles.hero}>
         <h1 className={styles.wordmark}>3am</h1>
         <p className={styles.credit}>YSWS by SEBA and Hridhaan, Hack Club</p>
-        <p className={styles.lead}>Make something dark themed like Website, tool, a game or anything that suits your interest, and get some amazing prizes from the #3AM Shop this <span className={styles.spooktober}>Spooktober!!</span></p>
+        <p className={styles.lead}>Make something dark themed like Website, tool, a game or anything that suits your interest, and get some amazing prizes from the #3AM Shop</p>
         <div className={styles.owlRow}>
           <Image src="/assets/owl.png" alt="" width={52} height={52} className="pixel" unoptimized priority />
           <p className={styles.lead}>Finish it, ship it, and get rewarded for the hours you put in.</p>
