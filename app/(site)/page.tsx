@@ -43,7 +43,7 @@ export default async function HomePage() {
         <p className={styles.credit}>YSWS by SEBA and Hridhaan, Hack Club</p>
         <p className={styles.lead}>Make something dark themed like Website, tool, a game or anything that suits your interest, and get some amazing prizes from the #3AM Shop</p>
         <aside className={styles.weekendChallenge} aria-label="Weekend challenge">
-          <Image src="https://user-cdn.hackclub-assets.com/01a1d4fc-d60b-7887-b977-988490df8e48/image.png" alt="Weekend challenge artwork" width={1200} height={675} className={styles.challengeArtwork} unoptimized />
+          <Image src="https://cdn.hackclub.com/01a1d501-9044-7923-b674-430bebfce3ec/red_beige_minimal_simple_typographic_chic_logo__1_.png" alt="Weekend challenge artwork" width={1200} height={675} className={styles.challengeArtwork} unoptimized />
           <div className={styles.challengeMeta}>
             <span className={styles.challengeBadge}>Weekend challenge</span>
             <span className={styles.challengeDeadline}>ENDS on 17th November</span>
