@@ -12,7 +12,7 @@ export const runtime = "nodejs";
 const MAX_CLOCK_SKEW_SECONDS = 60 * 5;
 
 function validSignature(rawBody: string, timestamp: string | null, signature: string | null, secret: string) {
-  if (!timestamp || !signature || !/^\\d+$/.test(timestamp)) return false;
+  if (!timestamp || !signature || !/^\d+$/.test(timestamp)) return false;
   const seconds = Number(timestamp);
   if (!Number.isSafeInteger(seconds) || Math.abs(Math.floor(Date.now() / 1000) - seconds) > MAX_CLOCK_SKEW_SECONDS) return false;
   const expected = `v0=${createHmac("sha256", secret).update(`v0:${timestamp}:${rawBody}`).digest("hex")}`;
