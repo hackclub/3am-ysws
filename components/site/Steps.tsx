@@ -27,9 +27,9 @@ const STEPS: Step[] = [
     note: "come say hi, lurk silently, or accidentally make friends. your choice!",
   },
   {
-    title: "build something spooky",
+    title: "build something dark-themed",
     body: "Make a dark-themed hardware or software project: a website, game, tool, app, physical build, or electronics project.",
-    note: "pick Hardware or Software when you submit. spooky vibes encouraged; originality required.",
+    note: "pick Hardware or Software when you submit. originality required.",
   },
   {
     title: "track your time",
@@ -44,7 +44,7 @@ const STEPS: Step[] = [
   {
     title: "get your prize",
     body: "Spend your beans on rewards in the #3AM Shop.",
-    note: "ship real work, don't double-dip, and keep the spooky season fun.",
+    note: "ship real work, don't double-dip, and keep the vibes fun.",
   },
 ];
 
