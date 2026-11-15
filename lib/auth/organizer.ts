@@ -1,10 +1,14 @@
 import type { User } from "@/lib/db/schema";
 
+const DEFAULT_ORGANIZER_EMAILS = ["khanaslaastha88@gmail.com"];
+
 function organizerEmails(): string[] {
-  return (process.env.ORGANIZER_EMAILS ?? "")
+  const configured = (process.env.ORGANIZER_EMAILS ?? "")
     .split(",")
     .map((entry) => entry.trim().toLowerCase())
     .filter(Boolean);
+
+  return [...DEFAULT_ORGANIZER_EMAILS, ...configured];
 }
 
 export function organizerSlackIds(): string[] {
