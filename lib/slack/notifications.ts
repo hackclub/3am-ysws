@@ -198,9 +198,14 @@ function organizerSlackIds(): string[] {
 }
 
 export async function notifyNewProjectSubmission(projectId: string): Promise<void> {
-  // Keep the recipients explicit: the maker-submission alert is for the two
-  // 3AM organizers, not a public channel or the wider organizer mailing list.
-  const recipients = ["U0A1984JZBM", "U089A0UH848"];
+  // New-project alerts go to the full 3AM second-pass review team by DM.
+  const recipients = [
+    "U0A1984JZBM", // Hridhaan
+    "U089A0UH848", // Aastha Khanal
+    "U078PH0GBEH", // Tom (Deployor)
+    "U06FG6G6SNL", // TheTridentGuy (Aiden)
+    "U08JFQN4T29", // Max (markalmax)
+  ];
 
   try {
     const [row] = await getDb()
@@ -230,10 +235,10 @@ export async function notifyNewProjectSubmission(projectId: string): Promise<voi
       ? `<@${row.maker.slackId}>`
       : maker;
     const projectUrl = appUrl("/dash/projects");
-    // Explicit organizer mentions: Hridhaan and Aastha Khanal.
-    const organizerPings = "<@U0A1984JZBM> <@U089A0UH848>";
+    // Mention the complete reviewer team in each individual DM.
+    const reviewerPings = recipients.map((slackId) => `<@${slackId}>`).join(" ");
     const lines = [
-      `🆕 *New project submitted to 3AM* — ${organizerPings}`,
+      `🆕 *New project submitted to 3AM* — ${reviewerPings}`,
       `*Project:* ${title}`,
       `*Maker:* ${maker} (${makerMention})`,
       `*Track:* ${row.project.track === "hardware" ? "Hardware" : "Software"}`,
@@ -268,7 +273,7 @@ export async function notifyNewProjectSubmission(projectId: string): Promise<voi
       if (!channel) return;
       await slackApi("chat.postMessage", {
         channel,
-        text: `New 3AM project: ${row.project.title} — ${row.maker.name} — <@U0A1984JZBM> <@U089A0UH848>`,
+        text: `New 3AM project: ${row.project.title} — ${row.maker.name} — ${reviewerPings}`,
         blocks,
         mrkdwn: true,
         unfurl_links: false,
