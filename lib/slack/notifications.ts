@@ -229,8 +229,10 @@ export async function notifyNewProjectSubmission(projectId: string): Promise<voi
       ? `<@${row.maker.slackId}>`
       : maker;
     const projectUrl = appUrl("/dash/projects");
+    // Explicit organizer mentions: Hridhaan and Aastha Khanal.
+    const organizerPings = "<@U0A1984JZBM> <@U089A0UH848>";
     const lines = [
-      "🆕 *New project submitted to 3AM*",
+      `🆕 *New project submitted to 3AM* — ${organizerPings}`,
       `*Project:* ${title}`,
       `*Maker:* ${maker} (${makerMention})`,
       `*Track:* ${row.project.track === "hardware" ? "Hardware" : "Software"}`,
