@@ -260,60 +260,6 @@ export default async function DashboardPage() {
   );
   const waiting = mine.filter(isOpen);
 
-  // Weekend cap challenge: 13–17 November 2026, India time.
-  // A day qualifies when the maker shipped at least one project that day
-  // and those projects have at least 180 approved minutes in total.
-  const challengeStart = new Date("2026-11-13T00:00:00+05:30");
-  const challengeDays = 5;
-  const challengeDayKey = (date: Date) => new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Kolkata",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(date);
-  const challengeToday = challengeDayKey(new Date());
-  const challengeRows = Array.from({ length: challengeDays }, (_, index) => {
-    const date = new Date(Date.UTC(2026, 10, 13 + index));
-    const key = date.toISOString().slice(0, 10);
-    const minutes = mine.reduce((total, project) => {
-      if (
-        project.decision === "approved" &&
-        project.submittedAt &&
-        challengeDayKey(project.submittedAt) === key
-      ) {
-        return total + (project.approvedMinutes ?? 0);
-      }
-      return total;
-    }, 0);
-    return {
-      key,
-      date,
-      minutes,
-      qualifies: minutes >= 180,
-      isToday: key === challengeToday,
-      isFuture: key > challengeToday,
-    };
-  });
-  const qualifyingDays = challengeRows.filter((day) => day.qualifies).length;
-  const longestStreak = challengeRows.reduce(
-    (state, day) => {
-      const current = day.qualifies ? state.current + 1 : 0;
-      return { current, best: Math.max(state.best, current) };
-    },
-    { current: 0, best: 0 },
-  ).best;
-  const todayIndex = challengeRows.findIndex((day) => day.isToday);
-  const lastElapsedIndex = todayIndex >= 0 ? todayIndex : challengeRows.findIndex((day) => day.isFuture) - 1;
-  let currentStreak = 0;
-  for (let index = lastElapsedIndex; index >= 0 && challengeRows[index]?.qualifies; index -= 1) {
-    currentStreak += 1;
-  }
-  const challengeDateLabel = new Intl.DateTimeFormat("en-IN", {
-    day: "numeric",
-    month: "short",
-    timeZone: "Asia/Kolkata",
-  });
-
   return (
     <AppShell title="tonight" action={<ButtonLink href="/dash/new">send in a project</ButtonLink>}>
       <div className={styles.cards}>
@@ -330,44 +276,6 @@ export default async function DashboardPage() {
           sub={waiting.length === 0 ? "nothing in the queue" : "we will message you on Slack"}
         />
       </div>
-      <Panel>
-        <div className={styles.challengeHead}>
-          <div>
-            <PanelLabel>weekend cap challenge · 13–17 nov</PanelLabel>
-            <p className={styles.challengeSummary}>
-              {qualifyingDays >= 3
-                ? "Cap challenge completed — you qualified."
-                : `${qualifyingDays}/3 qualifying days · earn 3 approved hours on a day you ship`}
-            </p>
-          </div>
-          <div className={styles.challengeStreak}>
-            <strong>{currentStreak}</strong>
-            <span>day streak</span>
-          </div>
-        </div>
-        <div className={styles.challengeProgress} role="progressbar" aria-label="Qualifying days" aria-valuemin={0} aria-valuemax={3} aria-valuenow={Math.min(qualifyingDays, 3)}>
-          <span style={{ width: `${Math.min(qualifyingDays, 3) / 3 * 100}%` }} />
-        </div>
-        <div className={styles.challengeDays}>
-          {challengeRows.map((day) => (
-            <div className={styles.challengeDay} key={day.key}>
-              <span className={styles.challengeDayDate}>
-                {challengeDateLabel.format(day.date)}
-                {day.isToday ? " · today" : ""}
-              </span>
-              <span className={styles.challengeDayHours}>
-                {hoursLabel(day.minutes)} / 3h
-              </span>
-              <span className={day.qualifies ? styles.challengeQualified : styles.challengePending}>
-                {day.qualifies ? "qualified" : day.isFuture ? "upcoming" : "in progress"}
-              </span>
-            </div>
-          ))}
-        </div>
-        <p className={styles.challengeFoot}>
-          Best run: {longestStreak} {longestStreak === 1 ? "day" : "days"}. Hours count on the India-time date you submitted the project, once approved. Your projects below remain unaffected.
-        </p>
-      </Panel>
       <Panel>
         <div className={styles.head}>
           <PanelLabel>your projects</PanelLabel>
