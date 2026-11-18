@@ -327,7 +327,7 @@ export async function notifyAriSecondPass(projectId: string): Promise<void> {
       `*Track:* ${row.project.track === "hardware" ? "Hardware" : "Software"}`,
       row.project.repoUrl ? `*Repository:* <${row.project.repoUrl}|Open repo>` : "",
       projectUrl ? `<${projectUrl}|Open 3AM dashboard>` : "",
-    ].filter(Boolean).join("\\n");
+    ].filter(Boolean).join("\n");
 
     const results = await Promise.all(
       SECOND_PASS_REVIEWERS.map((slackId) => sendSlackDm(slackId, message)),
