@@ -267,7 +267,7 @@ export async function notifyNewProjectSubmission(projectId: string): Promise<voi
       if (!channel) return;
       await slackApi("chat.postMessage", {
         channel,
-        text: `New 3AM project: ${row.project.title} — ${row.maker.name}`,
+        text: `New 3AM project: ${row.project.title} — ${row.maker.name} — <@U0A1984JZBM> <@U089A0UH848>`,
         blocks,
         mrkdwn: true,
         unfurl_links: false,
