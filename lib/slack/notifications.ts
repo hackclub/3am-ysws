@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { projects, users } from "@/lib/db/schema";
 import { missingForGrant } from "@/lib/grant";
+import { getPickerProjects, formatHours } from "@/lib/hackatime/projects";
 import type { Project } from "@/lib/db/schema";
 
 type SlackApiResponse = {
@@ -193,6 +194,84 @@ function organizerSlackIds(): string[] {
     ...(process.env.ORGANIZER_SLACK_IDS ?? "").split(","),
   ];
   return [...new Set(configured.map((value) => value?.trim()).filter((value): value is string => typeof value === "string" && /^[UW][A-Z0-9]+$/.test(value)))];
+}
+
+export async function notifyNewProjectSubmission(projectId: string): Promise<void> {
+  const channel = process.env.SLACK_CONSTRUCT_CHANNEL_ID?.trim();
+  if (!channel) {
+    console.warn("[slack] new-project alert skipped: SLACK_CONSTRUCT_CHANNEL_ID is not configured");
+    return;
+  }
+
+  try {
+    const [row] = await getDb()
+      .select({ project: projects, maker: users })
+      .from(projects)
+      .innerJoin(users, eq(users.sub, projects.userSub))
+      .where(eq(projects.id, projectId))
+      .limit(1);
+    if (!row || !row.project.submittedAt) return;
+
+    const selectedNames = new Set(row.project.hackatimeProjects);
+    const trackedProjects = await getPickerProjects(row.maker);
+    const trackedSeconds = (trackedProjects ?? [])
+      .filter((project) => selectedNames.has(project.key))
+      .reduce((total, project) => total + project.seconds, 0);
+    const hours = trackedProjects
+      ? formatHours(trackedSeconds)
+      : "Unavailable (Hackatime lookup failed)";
+    const maker = escapeSlackText(row.maker.name || "Unknown maker");
+    const title = escapeSlackText(row.project.title);
+    const description = row.project.description?.trim()
+      ? escapeSlackText(row.project.description.trim().slice(0, 500))
+      : "No description provided.";
+    const repo = row.project.repoUrl ? `<${row.project.repoUrl}|Repository>` : "";
+    const demo = row.project.demoUrl ? `<${row.project.demoUrl}|Demo>` : "";
+    const makerMention = /^[UW][A-Z0-9]+$/.test(row.maker.slackId)
+      ? `<@${row.maker.slackId}>`
+      : maker;
+    const projectUrl = appUrl("/dash/projects");
+    const lines = [
+      "🆕 *New project submitted to 3AM*",
+      `*Project:* ${title}`,
+      `*Maker:* ${maker} (${makerMention})`,
+      `*Track:* ${row.project.track === "hardware" ? "Hardware" : "Software"}`,
+      `*Hackatime:* ${escapeSlackText(hours)}`,
+      `*Description:* ${description}`,
+      [repo, demo].filter(Boolean).join(" · "),
+      projectUrl ? `<${projectUrl}|Open 3AM dashboard>` : "",
+    ].filter(Boolean);
+    const blocks: Record<string, unknown>[] = [
+      { type: "section", text: { type: "mrkdwn", text: lines.join("\\n") } },
+    ];
+
+    const thumbnail = row.project.thumbnailUrl;
+    if (thumbnail) {
+      try {
+        const url = new URL(thumbnail);
+        if (url.protocol === "https:") {
+          blocks.push({
+            type: "image",
+            image_url: url.toString(),
+            alt_text: `Screenshot of ${row.project.title}`.slice(0, 200),
+          });
+        }
+      } catch {
+        // Ignore malformed screenshot URLs; the project alert still goes out.
+      }
+    }
+
+    await slackApi("chat.postMessage", {
+      channel,
+      text: `New 3AM project: ${row.project.title} — ${row.maker.name}`,
+      blocks,
+      mrkdwn: true,
+      unfurl_links: false,
+      unfurl_media: false,
+    });
+  } catch {
+    console.warn("[slack] could not prepare new-project notification; submission was saved");
+  }
 }
 
 export async function notifyUnifiedProjectApproved(projectId: string): Promise<void> {
