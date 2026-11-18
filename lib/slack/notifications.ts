@@ -1,9 +1,10 @@
 import { eq } from "drizzle-orm";
 
 import { getDb } from "@/lib/db";
-import { projects, users } from "@/lib/db/schema";
+import { projects, users, webhookEvents } from "@/lib/db/schema";
 import { missingForGrant } from "@/lib/grant";
 import { getPickerProjects, formatHours } from "@/lib/hackatime/projects";
+import { fetchAriStatus } from "@/lib/ari/status";
 import type { Project } from "@/lib/db/schema";
 
 type SlackApiResponse = {
@@ -276,6 +277,66 @@ export async function notifyNewProjectSubmission(projectId: string): Promise<voi
     }));
   } catch {
     console.warn("[slack] could not prepare new-project DM; submission was saved");
+  }
+}
+
+const SECOND_PASS_REVIEWERS = [
+  "U0A1984JZBM", // Hridhaan
+  "U089A0UH848", // Aastha Khanal
+  "U078PH0GBEH", // Tom (Deployor)
+  "U06FG6G6SNL", // TheTridentGuy (Aiden)
+  "U08JFQN4T29", // Max (markalmax)
+];
+
+export async function notifyAriSecondPass(projectId: string): Promise<void> {
+  try {
+    const status = await fetchAriStatus(projectId);
+    if (status?.phase !== "second_pass") return;
+
+    // Record a deterministic notification event so duplicate ARI webhooks do
+    // not repeatedly alert the same reviewers for the same ARI version.
+    const deliveryId = `notification:second-pass:${projectId}:${status.version ?? 1}`;
+    const [claimed] = await getDb()
+      .insert(webhookEvents)
+      .values({
+        deliveryId,
+        projectId,
+        event: "notification.second_pass",
+        payload: { phase: "second_pass", version: status.version ?? null },
+      })
+      .onConflictDoNothing({ target: webhookEvents.deliveryId })
+      .returning({ deliveryId: webhookEvents.deliveryId });
+    if (!claimed) return;
+
+    const [row] = await getDb()
+      .select({ project: projects, maker: users })
+      .from(projects)
+      .innerJoin(users, eq(users.sub, projects.userSub))
+      .where(eq(projects.id, projectId))
+      .limit(1);
+    if (!row) return;
+
+    const projectName = escapeSlackText(row.project.title);
+    const makerName = escapeSlackText(row.maker.name || "Unknown maker");
+    const projectUrl = appUrl("/dash/projects");
+    const message = [
+      "🚨 *New project entered 3AM second pass*",
+      "*Please check the ARI fraud queue — a new project is waiting.*",
+      `*Project:* ${projectName}`,
+      `*Maker:* ${makerName}`,
+      `*Track:* ${row.project.track === "hardware" ? "Hardware" : "Software"}`,
+      row.project.repoUrl ? `*Repository:* <${row.project.repoUrl}|Open repo>` : "",
+      projectUrl ? `<${projectUrl}|Open 3AM dashboard>` : "",
+    ].filter(Boolean).join("\\n");
+
+    const results = await Promise.all(
+      SECOND_PASS_REVIEWERS.map((slackId) => sendSlackDm(slackId, message)),
+    );
+    if (results.some((sent) => !sent)) {
+      console.warn("[slack] one or more second-pass reviewer DMs could not be delivered");
+    }
+  } catch {
+    console.warn("[slack] could not prepare ARI second-pass notification");
   }
 }
 
