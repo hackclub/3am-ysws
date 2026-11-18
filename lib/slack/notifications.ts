@@ -242,7 +242,7 @@ export async function notifyNewProjectSubmission(projectId: string): Promise<voi
       projectUrl ? `<${projectUrl}|Open 3AM dashboard>` : "",
     ].filter(Boolean);
     const blocks: Record<string, unknown>[] = [
-      { type: "section", text: { type: "mrkdwn", text: lines.join("\\n") } },
+      { type: "section", text: { type: "mrkdwn", text: lines.join("\n") } },
     ];
 
     const thumbnail = row.project.thumbnailUrl;
