@@ -182,5 +182,10 @@ export async function POST(request: Request) {
     .set({ submittedAt: new Date(), decision: null, noteToMaker: null, decidedAt: null })
     .where(and(eq(projects.id, row.id), isNull(projects.decidedAt)));
 
+  // This is an independent organizer-channel alert; failures must never undo a
+  // successful submission or affect the existing maker/organizer notifications.
+  const { notifyNewProjectSubmission } = await import("@/lib/slack/notifications");
+  await notifyNewProjectSubmission(row.id);
+
   return NextResponse.json({ ok: true, id: row.id, status: "queued" });
 }
