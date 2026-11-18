@@ -9,7 +9,7 @@ import { getDb } from "@/lib/db";
 import { projects, webhookEvents } from "@/lib/db/schema";
 import { applyDecision, clearDecision } from "@/lib/review/decisions";
 import { syncReviewerLedgerSafely } from "@/lib/reviewers";
-import { notifyUnifiedProjectApproved } from "@/lib/slack/notifications";
+import { notifyAriSecondPass, notifyUnifiedProjectApproved } from "@/lib/slack/notifications";
 
 export const dynamic = "force-dynamic";
 
@@ -71,6 +71,10 @@ export async function POST(request: Request) {
   if (!recorded) {
     return NextResponse.json({ ok: true, duplicate: true });
   }
+
+  // ARI can move a project into second pass as a phase transition independent
+  // of its final review decision. Check the live phase on each unique delivery.
+  if (projectId) await notifyAriSecondPass(projectId);
 
   if (body.event === "review.reverted" || body.event === "review.requeued") {
     if (!projectId) return NextResponse.json({ ok: true });
