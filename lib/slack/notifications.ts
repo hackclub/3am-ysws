@@ -197,11 +197,9 @@ function organizerSlackIds(): string[] {
 }
 
 export async function notifyNewProjectSubmission(projectId: string): Promise<void> {
-  const channel = process.env.SLACK_CONSTRUCT_CHANNEL_ID?.trim();
-  if (!channel) {
-    console.warn("[slack] new-project alert skipped: SLACK_CONSTRUCT_CHANNEL_ID is not configured");
-    return;
-  }
+  // Keep the recipients explicit: the maker-submission alert is for the two
+  // 3AM organizers, not a public channel or the wider organizer mailing list.
+  const recipients = ["U0A1984JZBM", "U089A0UH848"];
 
   try {
     const [row] = await getDb()
@@ -257,20 +255,25 @@ export async function notifyNewProjectSubmission(projectId: string): Promise<voi
           });
         }
       } catch {
-        // Ignore malformed screenshot URLs; the project alert still goes out.
+        // Ignore malformed screenshot URLs; the DM still goes out.
       }
     }
 
-    await slackApi("chat.postMessage", {
-      channel,
-      text: `New 3AM project: ${row.project.title} — ${row.maker.name}`,
-      blocks,
-      mrkdwn: true,
-      unfurl_links: false,
-      unfurl_media: false,
-    });
+    await Promise.all(recipients.map(async (slackId) => {
+      const opened = await slackApi("conversations.open", { users: slackId });
+      const channel = opened?.channel?.id;
+      if (!channel) return;
+      await slackApi("chat.postMessage", {
+        channel,
+        text: `New 3AM project: ${row.project.title} — ${row.maker.name}`,
+        blocks,
+        mrkdwn: true,
+        unfurl_links: false,
+        unfurl_media: false,
+      });
+    }));
   } catch {
-    console.warn("[slack] could not prepare new-project notification; submission was saved");
+    console.warn("[slack] could not prepare new-project DM; submission was saved");
   }
 }
 
