@@ -202,9 +202,6 @@ export async function notifyNewProjectSubmission(projectId: string): Promise<voi
   const recipients = [
     "U0A1984JZBM", // Hridhaan
     "U089A0UH848", // Aastha Khanal
-    "U078PH0GBEH", // Tom (Deployor)
-    "U06FG6G6SNL", // TheTridentGuy (Aiden)
-    "U08JFQN4T29", // Max (markalmax)
   ];
 
   try {
@@ -288,9 +285,6 @@ export async function notifyNewProjectSubmission(projectId: string): Promise<voi
 const SECOND_PASS_REVIEWERS = [
   "U0A1984JZBM", // Hridhaan
   "U089A0UH848", // Aastha Khanal
-  "U078PH0GBEH", // Tom (Deployor)
-  "U06FG6G6SNL", // TheTridentGuy (Aiden)
-  "U08JFQN4T29", // Max (markalmax)
 ];
 
 export async function notifyAriSecondPass(projectId: string): Promise<void> {
