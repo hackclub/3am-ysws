@@ -21,6 +21,7 @@ import { reviewIsExternal } from "@/lib/review";
 import { beansForMinutes, hoursLabel } from "@/lib/beans";
 import { getYswsConfig, resubmissionsAreOpen } from "@/lib/yswsConfig";
 
+import { DeleteDraftButton } from "./DeleteDraftButton";
 import { ResendForm } from "./ResendForm";
 import { WithdrawButton } from "./WithdrawButton";
 
@@ -148,6 +149,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
             {stored === "draft" ? (
               <div className={styles.links}>
                 <ButtonLink href={`/dash/p/${project.id}/edit`}>edit draft</ButtonLink>
+                <DeleteDraftButton id={project.id} />
               </div>
             ) : null}
             {project.noteToMaker ? <p className={styles.note}>{project.noteToMaker}</p> : null}
