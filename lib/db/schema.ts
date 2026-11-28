@@ -261,11 +261,18 @@ export const manualShipments = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     dispatchedAt: timestamp("dispatched_at", { withTimezone: true }),
     deliveredAt: timestamp("delivered_at", { withTimezone: true }),
+    // Bumped on every change; clients send it back so concurrent edits are refused instead of overwritten.
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    // Dispatch DM state: null (never tried), "sending" (claimed), "sent" or "failed".
+    notifyStatus: text("notify_status").$type<"sending" | "sent" | "failed">(),
+    notifyAttemptedAt: timestamp("notify_attempted_at", { withTimezone: true }),
+    notifiedAt: timestamp("notified_at", { withTimezone: true }),
   },
   (table) => [
     index("manual_shipments_status_created_at_idx").on(table.status, table.createdAt),
     index("manual_shipments_created_at_idx").on(table.createdAt),
     check("manual_shipments_item_name_check", sql`${table.itemName} in ('Stickers', '3AM Swag Kit')`),
+    check("manual_shipments_notify_status_check", sql`${table.notifyStatus} is null or ${table.notifyStatus} in ('sending', 'sent', 'failed')`),
   ],
 );
 

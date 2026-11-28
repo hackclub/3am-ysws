@@ -4,47 +4,51 @@ import { getCurrentUser } from "@/lib/auth/users";
 import { isOrganizer } from "@/lib/auth/organizer";
 import { getDb } from "@/lib/db";
 import { manualShipments } from "@/lib/db/schema";
+import { parseShipmentInput, toShipmentView } from "@/lib/fulfilment/manual-shipments";
 
 export const dynamic = "force-dynamic";
 
-const ITEMS = ["Stickers", "3AM Swag Kit"] as const;
-const clean = (value: unknown, max = 500) => typeof value === "string" ? value.trim().slice(0, max) : "";
-
+// Creates a manual shipment. Independent of shop orders: no beans, payments or order rows are touched.
 export async function POST(request: Request) {
   const organizer = await getCurrentUser();
-  if (!isOrganizer(organizer)) return NextResponse.json({ error: "not found" }, { status: 404 });
+  if (!organizer || !isOrganizer(organizer)) return NextResponse.json({ error: "not found" }, { status: 404 });
 
   let body: Record<string, unknown>;
-  try { body = await request.json() as Record<string, unknown>; }
-  catch { return NextResponse.json({ error: "unreadable" }, { status: 400 }); }
-
-  const recipientName = clean(body.recipientName, 160);
-  const recipientEmail = clean(body.recipientEmail, 254).toLowerCase();
-  const itemName = clean(body.itemName, 80);
-  const addressLine1 = clean(body.addressLine1, 300);
-  const city = clean(body.city, 120);
-  const postcode = clean(body.postcode, 40);
-  const country = clean(body.country, 100);
-  const slackId = clean(body.slackId, 30).toUpperCase();
-
-  if (!recipientName || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipientEmail) ||
-      !ITEMS.includes(itemName as typeof ITEMS[number]) || !addressLine1 || !city || !postcode || !country) {
-    return NextResponse.json({ error: "validation", message: "Add a valid name, email, item and complete shipping address." }, { status: 422 });
-  }
-  if (slackId && !/^[UW][A-Z0-9]+$/.test(slackId)) {
-    return NextResponse.json({ error: "validation", message: "Slack member ID must look like U… or W…." }, { status: 422 });
+  try {
+    const parsed: unknown = await request.json();
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("shape");
+    body = parsed as Record<string, unknown>;
+  } catch {
+    return NextResponse.json({ error: "unreadable", message: "The request could not be read." }, { status: 400 });
   }
 
-  const [shipment] = await getDb().insert(manualShipments).values({
-    recipientName, recipientEmail, itemName, addressLine1,
-    addressLine2: clean(body.addressLine2, 300) || null,
-    city, stateProvince: clean(body.stateProvince, 120) || null,
-    postcode, country, slackId: slackId || null,
-    courier: clean(body.courier, 120) || null,
-    tracking: clean(body.tracking, 200) || null,
-    notes: clean(body.notes, 2000) || null,
-    createdBy: organizer.email,
-  }).returning();
+  const input = parseShipmentInput({ country: "India", ...body }, false);
+  if (!input.ok) return NextResponse.json({ error: "validation", field: input.field, message: input.message }, { status: 422 });
+  const v = input.values;
 
-  return NextResponse.json({ ok: true, shipment }, { status: 201 });
+  try {
+    const [shipment] = await getDb()
+      .insert(manualShipments)
+      .values({
+        recipientName: v.recipientName!,
+        recipientEmail: v.recipientEmail!,
+        itemName: v.itemName!,
+        addressLine1: v.addressLine1!,
+        city: v.city!,
+        postcode: v.postcode!,
+        country: v.country!,
+        addressLine2: v.addressLine2 ?? null,
+        stateProvince: v.stateProvince ?? null,
+        slackId: v.slackId ?? null,
+        courier: v.courier ?? null,
+        tracking: v.tracking ?? null,
+        notes: v.notes ?? null,
+        createdBy: organizer.email,
+      })
+      .returning();
+    return NextResponse.json({ ok: true, shipment: toShipmentView(shipment) }, { status: 201 });
+  } catch {
+    console.error("[manual-shipments] create failed");
+    return NextResponse.json({ error: "server", message: "The shipment could not be saved. Try again." }, { status: 500 });
+  }
 }

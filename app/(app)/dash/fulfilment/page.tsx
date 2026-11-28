@@ -9,6 +9,7 @@ import { requireOrganizer } from "@/lib/auth/organizer";
 import { getDb } from "@/lib/db";
 import { orders, users } from "@/lib/db/schema";
 
+import { FulfilmentOverview } from "./Overview";
 import { Queue } from "./Queue";
 import styles from "./Queue.module.css";
 
@@ -51,6 +52,13 @@ export default async function FulfilmentPage({
 
   return (
     <AppShell title="fulfilment">
+      <FulfilmentOverview />
+
+      <nav className={styles.filters} aria-label="fulfilment dashboards">
+        <Link href="/dash/fulfilment" className={[styles.filter, styles.on].join(" ")} aria-current="page">shop orders</Link>
+        <Link href="/dash/fulfilment/stickers" className={styles.filter}>stickers, swag & manual shipments</Link>
+      </nav>
+
       <nav className={styles.filters} aria-label="filter orders">
         {Object.entries(FILTERS).map(([id, option]) => (
           <Link
@@ -62,11 +70,6 @@ export default async function FulfilmentPage({
             {option.label}
           </Link>
         ))}
-      </nav>
-
-      <nav className={styles.filters} aria-label="fulfilment dashboards">
-        <Link href="/dash/fulfilment" className={[styles.filter, key !== "stickers" ? styles.on : null].filter(Boolean).join(" ")}>all fulfilment</Link>
-        <Link href="/dash/fulfilment/stickers" className={styles.filter}>stickers & swag</Link>
       </nav>
 
       <Panel>
