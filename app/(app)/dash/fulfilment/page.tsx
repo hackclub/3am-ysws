@@ -64,6 +64,11 @@ export default async function FulfilmentPage({
         ))}
       </nav>
 
+      <nav className={styles.filters} aria-label="fulfilment dashboards">
+        <Link href="/dash/fulfilment" className={[styles.filter, key !== "stickers" ? styles.on : null].filter(Boolean).join(" ")}>all fulfilment</Link>
+        <Link href="/dash/fulfilment/stickers" className={styles.filter}>stickers & swag</Link>
+      </nav>
+
       <Panel>
         <PanelLabel>{rows.length === 1 ? "1 order" : `${rows.length} orders`}</PanelLabel>
         <Queue rows={rows} />
