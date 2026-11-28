@@ -35,3 +35,31 @@ export function trackingGuideLines(tracking: string, courier: string | null | un
     `2. Track it on ${escape(name)}'s official website.`,
   ];
 }
+
+export const TRACK_PAGE_ACTION = "open_tracking_page";
+export const SHOW_TRACKING_ACTION = "show_tracking_id";
+const TRACKING_ID = /^[A-Za-z0-9][A-Za-z0-9 ._/-]{0,79}$/;
+export const isTrackingId = (value: string) => TRACKING_ID.test(value.trim());
+
+/**
+ * Block Kit for a dispatch DM: the message itself, then buttons to open the courier's
+ * tracking page and to have the bot post the tracking ID on its own (easy to copy on a phone).
+ * Slack buttons cannot write to the clipboard, so that reply is the closest thing to a copy button.
+ */
+export function dispatchBlocks(text: string, tracking: string | null | undefined, courier: string | null | undefined) {
+  const blocks: Record<string, unknown>[] = [{ type: "section", text: { type: "mrkdwn", text: text.slice(0, 2900) } }];
+  const id = tracking?.trim() ?? "";
+  if (!id) return blocks;
+  const url = courierTrackingUrl(courier);
+  const elements: Record<string, unknown>[] = [];
+  if (url) elements.push({ type: "button", action_id: TRACK_PAGE_ACTION, text: { type: "plain_text", text: "Track on DTDC" }, url, style: "primary" });
+  if (isTrackingId(id)) elements.push({ type: "button", action_id: SHOW_TRACKING_ACTION, text: { type: "plain_text", text: "Copy tracking ID" }, value: id });
+  if (elements.length) blocks.push({ type: "actions", elements });
+  return blocks;
+}
+
+// What recipients see in Slack. Stored item names stay as they are.
+const SWAG_KIT = /^\s*(?:the\s+)?3am\s+swag\s+(?:kit|pack)\s*$/i;
+export function displayItemName(itemName: string): string {
+  return SWAG_KIT.test(itemName) ? "Elite Deluxe #3AM SWAG PACK" : itemName;
+}
