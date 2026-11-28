@@ -16,7 +16,7 @@ export const metadata: Metadata = { title: "sticker & swag fulfilment" };
 export const dynamic = "force-dynamic";
 
 // Match current and legacy product labels without pulling in unrelated apparel.
-const STICKER_OR_SWAG = /sticker|swag[\\s-]*kit|3am[\\s-]*(?:swag|kit)/i;
+const STICKER_OR_SWAG = /sticker|swag[\s-]*kit|3am[\s-]*(?:swag|kit)/i;
 
 export default async function StickerFulfilmentPage() {
   if (!(await requireOrganizer())) notFound();
