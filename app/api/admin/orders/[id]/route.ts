@@ -136,7 +136,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   if (result.notification) {
     await Promise.all([
-      notifyOrderFulfilled(result.notification),
+      notifyOrderFulfilled({ ...result.notification, tracking: result.notification.tracking }),
       notifyOrderEventInstant({
         event: "shipped",
         orderId: result.notification.orderId,
