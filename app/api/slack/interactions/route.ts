@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 
 import { getDb } from "@/lib/db";
 import { projects, users } from "@/lib/db/schema";
+import { SHOW_TRACKING_ACTION, TRACK_PAGE_ACTION, isTrackingId } from "@/lib/fulfilment/tracking";
 import { notifyMissingDetailsAcknowledged } from "@/lib/slack/notifications";
 
 export const dynamic = "force-dynamic";
@@ -33,6 +34,7 @@ export async function POST(request: Request) {
   let payload: {
     type?: string;
     user?: { id?: string };
+    response_url?: string;
     actions?: { action_id?: string; value?: string }[];
   };
   try {
@@ -44,6 +46,32 @@ export async function POST(request: Request) {
 
   const action = payload.actions?.[0];
   const slackId = payload.user?.id;
+
+  // Dispatch DM buttons. "Track on DTDC" is a link button: Slack opens the page itself and
+  // only needs an acknowledgement. "Copy tracking ID" posts the ID as its own message in the
+  // same DM so it can be long-pressed and copied; the ID comes from the button the bot sent.
+  if (payload.type === "block_actions" && action?.action_id === TRACK_PAGE_ACTION) {
+    return new NextResponse(null, { status: 200 });
+  }
+  if (payload.type === "block_actions" && action?.action_id === SHOW_TRACKING_ACTION) {
+    const tracking = action.value?.trim() ?? "";
+    let responseUrl: URL | null = null;
+    try { responseUrl = payload.response_url ? new URL(payload.response_url) : null; } catch { responseUrl = null; }
+    if (isTrackingId(tracking) && responseUrl && responseUrl.protocol === "https:" && responseUrl.hostname === "hooks.slack.com") {
+      try {
+        await fetch(responseUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json; charset=utf-8" },
+          body: JSON.stringify({ response_type: "in_channel", replace_original: false, text: tracking }),
+          signal: AbortSignal.timeout(5_000),
+        });
+      } catch {
+        console.warn("[slack] could not post tracking ID reply");
+      }
+    }
+    return new NextResponse(null, { status: 200 });
+  }
+
   const projectId = action?.value;
   if (payload.type !== "block_actions" || action?.action_id !== "missing_details_done" || !slackId || !projectId) {
     return NextResponse.json({ response_type: "ephemeral", text: "This action is not supported." });

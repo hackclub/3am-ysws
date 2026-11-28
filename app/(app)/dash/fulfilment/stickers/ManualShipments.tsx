@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { StatusWord } from "@/components/ui/StatusWord";
 import type { Tone } from "@/lib/status";
 import type { ManualShipmentView } from "@/lib/fulfilment/manual-shipments";
+import { DEFAULT_COURIER, courierTrackingUrl } from "@/lib/fulfilment/tracking";
 
 import styles from "./ManualShipments.module.css";
 
@@ -23,7 +24,7 @@ const STATUS: Record<Status, { word: string; tone: Tone }> = {
 const EMPTY = {
   recipientName: "", recipientEmail: "", slackId: "", itemName: "Stickers",
   addressLine1: "", addressLine2: "", city: "", stateProvince: "", postcode: "", country: "India",
-  courier: "", tracking: "", notes: "",
+  courier: DEFAULT_COURIER, tracking: "", notes: "",
 };
 type FormState = typeof EMPTY;
 type Draft = { courier: string; tracking: string; notes: string };
@@ -96,7 +97,7 @@ function Fields({ form, set, idPrefix, withShipping }: { form: FormState; set: (
       {field("country", "Country", { required: true, maxLength: 100 })}
       {withShipping ? (
         <>
-          {field("courier", "Courier", { maxLength: 120, placeholder: "India Post, Delhivery…" })}
+          {field("courier", "Courier", { maxLength: 120, placeholder: "DTDC" })}
           {field("tracking", "Tracking ID", { maxLength: 200, spellCheck: false })}
           <label className={styles.wide} htmlFor={`${idPrefix}-notes`}>
             <span>Internal notes</span>
@@ -335,6 +336,9 @@ export function ManualShipments({ shipments, limit }: { shipments: Shipment[]; l
                                 <span className={styles.withCopy}>
                                   <input id={`tracking-${s.id}`} value={d.tracking} maxLength={200} spellCheck={false} onChange={(e) => setDraft(s, { tracking: e.target.value })} disabled={busy} />
                                   {s.tracking ? <button type="button" onClick={() => copy(`${s.id}:trk`, s.tracking ?? "")}>{copyLabel(`${s.id}:trk`, "copy")}</button> : null}
+                                  {s.tracking && courierTrackingUrl(s.courier) ? (
+                                    <button type="button" title="Copies the tracking ID and opens DTDC's official tracking page" onClick={() => { void copy(`${s.id}:trk`, s.tracking ?? ""); window.open(courierTrackingUrl(s.courier) ?? "", "_blank", "noopener,noreferrer"); }}>track</button>
+                                  ) : null}
                                 </span>
                               </label>
                             </div>

@@ -1,4 +1,5 @@
 import type { ManualShipment } from "@/lib/db/schema";
+import { displayItemName, trackingGuideLines } from "@/lib/fulfilment/tracking";
 
 // Manual shipments are independent of shop orders: nothing here touches
 // orders, beans, payments or stock.
@@ -99,17 +100,17 @@ function mentions(envValue: string | undefined, fallback: string[]) {
 const isDomestic = (country: string) => /^\s*(india|in|bharat)\s*$/i.test(country);
 
 export function dispatchMessage(shipment: Pick<ManualShipment, "recipientName" | "itemName" | "courier" | "tracking" | "country">) {
+  const item = displayItemName(shipment.itemName);
   const sentBy = mentions(process.env.MANUAL_SHIPMENT_SENT_BY_SLACK_IDS, ["@hridhaan", "@agm"]);
   const packedBy = mentions(process.env.MANUAL_SHIPMENT_PACKED_BY_SLACK_ID, ["@agm"]);
   const lines = [
     "📦 *Your 3AM shipment has been dispatched!*",
-    `Hey ${escapeSlack(shipment.recipientName.split(" ")[0] || "there")}, your *${escapeSlack(shipment.itemName)}* is on its way.`,
+    `Hey ${escapeSlack(shipment.recipientName.split(" ")[0] || "there")}, your *${escapeSlack(item)}* ${/s$/i.test(item.trim()) ? "are on their way" : "is on its way"}.`,
     "",
     `Packed by ${packedBy}. Sent to you by ${sentBy}.`,
   ];
-  if (shipment.courier || shipment.tracking) lines.push("");
-  if (shipment.courier) lines.push(`*Courier:* ${escapeSlack(shipment.courier)}`);
-  if (shipment.tracking) lines.push(`*Tracking ID:* ${escapeSlack(shipment.tracking)}`);
+  if (shipment.courier) lines.push("", `*Courier:* ${escapeSlack(shipment.courier)}`);
+  if (shipment.tracking) lines.push("", ...trackingGuideLines(shipment.tracking, shipment.courier, escapeSlack));
   if (!isDomestic(shipment.country)) {
     lines.push(
       "",

@@ -6,6 +6,7 @@ import { missingForGrant } from "@/lib/grant";
 import { getPickerProjects, formatHours } from "@/lib/hackatime/projects";
 import { fetchAriStatus } from "@/lib/ari/status";
 import type { Project } from "@/lib/db/schema";
+import { dispatchBlocks, displayItemName, trackingGuideLines } from "@/lib/fulfilment/tracking";
 
 type SlackApiResponse = {
   ok?: boolean;
@@ -73,7 +74,7 @@ async function slackApi<T extends SlackApiResponse>(method: string, body: Record
   }
 }
 
-export async function sendSlackDm(slackId: string, message: string): Promise<boolean> {
+export async function sendSlackDm(slackId: string, message: string, blocks?: Record<string, unknown>[]): Promise<boolean> {
   if (!/^[UW][A-Z0-9]+$/.test(slackId)) {
     console.warn("[slack] notification skipped: stored Slack user ID is invalid");
     return false;
@@ -89,6 +90,7 @@ export async function sendSlackDm(slackId: string, message: string): Promise<boo
     mrkdwn: true,
     unfurl_links: false,
     unfurl_media: false,
+    ...(blocks?.length ? { blocks } : {}),
   });
   return Boolean(sent?.ts);
 }
@@ -164,14 +166,15 @@ export async function notifyOrderFulfilled(input: {
   tracking?: string | null;
 }): Promise<void> {
   const name = escapeSlackText(input.makerName || "there");
-  const item = escapeSlackText(input.itemName);
-  const tracking = input.tracking?.trim() ? `\n*Tracking ID:* ${escapeSlackText(input.tracking.trim())}` : "";
+  const item = escapeSlackText(displayItemName(input.itemName));
+  // Shop orders ship with DTDC, so the guide points to DTDC's tracking page.
+  const tracking = input.tracking?.trim() ? `\n\n${trackingGuideLines(input.tracking, null, escapeSlackText).join("\n")}` : "";
   const url = appUrl("/dash/orders");
   const link = url ? `\n\n<${url}|View your orders>` : "";
   const message = `📦 *Your 3AM order has been dispatched!*\nHey ${name} — *${item}* has been marked as posted.${tracking}${link}\n\nIf you have questions, DM the 3AM team in Hack Club Slack.`;
 
   try {
-    await sendSlackDm(input.slackId, message);
+    await sendSlackDm(input.slackId, message, dispatchBlocks(message, input.tracking, null));
   } catch {
     console.warn("[slack] could not prepare fulfilment notification; order was updated");
   }

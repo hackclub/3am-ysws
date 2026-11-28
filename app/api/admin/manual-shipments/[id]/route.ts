@@ -15,6 +15,7 @@ import {
   statusTimestamps,
   toShipmentView,
 } from "@/lib/fulfilment/manual-shipments";
+import { dispatchBlocks } from "@/lib/fulfilment/tracking";
 import { sendSlackDm } from "@/lib/slack/notifications";
 
 export const dynamic = "force-dynamic";
@@ -119,7 +120,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   if (outcome.notify && shipment.slackId) {
     // The shipment is already saved; a Slack problem is recorded, never turned into a failed update.
     let delivered = false;
-    try { delivered = await sendSlackDm(shipment.slackId, dispatchMessage(shipment)); }
+    try {
+      const text = dispatchMessage(shipment);
+      delivered = await sendSlackDm(shipment.slackId, text, dispatchBlocks(text, shipment.tracking, shipment.courier));
+    }
     catch { delivered = false; }
     notification = delivered ? "sent" : "failed";
     if (!delivered) console.warn("[manual-shipments] dispatch DM failed; shipment was updated");
