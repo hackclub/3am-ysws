@@ -38,6 +38,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     ...(status === "delivered" && existing.status !== "delivered" ? { deliveredAt: new Date() } : {}),
   }).where(eq(manualShipments.id, id)).returning();
 
+  if (!updated) return NextResponse.json({ error: "not found" }, { status: 404 });
+
   if (newlyPosted && updated.slackId) {
     const tracking = updated.tracking ? `\\n*Tracking ID:* ${updated.tracking}` : "";
     const courier = updated.courier ? `\\n*Courier:* ${updated.courier}` : "";
