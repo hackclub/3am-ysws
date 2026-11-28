@@ -1,6 +1,6 @@
 import type { User } from "@/lib/db/schema";
 
-const DEFAULT_ORGANIZER_EMAILS = ["khanaslaastha88@gmail.com"];
+const DEFAULT_ORGANIZER_EMAILS = ["khanaslaastha88@gmail.com", "heyyitsmeaditya@gmail.com"];
 
 function organizerEmails(): string[] {
   const configured = (process.env.ORGANIZER_EMAILS ?? "")
