@@ -161,12 +161,14 @@ export async function notifyOrderFulfilled(input: {
   slackId: string;
   makerName: string;
   itemName: string;
+  tracking?: string | null;
 }): Promise<void> {
   const name = escapeSlackText(input.makerName || "there");
   const item = escapeSlackText(input.itemName);
+  const tracking = input.tracking?.trim() ? `\\n*Tracking ID:* ${escapeSlackText(input.tracking.trim())}` : "";
   const url = appUrl("/dash/orders");
-  const link = url ? `\n\n<${url}|View your orders>` : "";
-  const message = `📦 *Your 3AM fulfilment is marked complete!*\nHey ${name} — *${item}* has been marked as fulfilled.${link}\n\nIf you have questions, DM the 3AM team in Hack Club Slack.`;
+  const link = url ? `\\n\\n<${url}|View your orders>` : "";
+  const message = `📦 *Your 3AM order has been dispatched!*\\nHey ${name} — *${item}* has been marked as posted.${tracking}${link}\\n\\nIf you have questions, DM the 3AM team in Hack Club Slack.`;
 
   try {
     await sendSlackDm(input.slackId, message);
