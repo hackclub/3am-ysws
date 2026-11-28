@@ -38,6 +38,7 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
   const [expandedMakers, setExpandedMakers] = useState<Record<string, boolean>>({});
   const [nuclearOpen, setNuclearOpen] = useState(false);
   const [nuclearPhrase, setNuclearPhrase] = useState("");
+  const [confirmPost, setConfirmPost] = useState<string | null>(null);
 
   async function patch(id: string, payload: Record<string, unknown>) {
     setBusy(id);
@@ -97,7 +98,7 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
   const groupedRows = useMemo(() => {
     const groups = new Map<string, { order: Order; maker: User; orders: Order[]; totalCents: number }>();
     for (const { order, maker } of visibleRows) {
-      const normalize = (value: unknown) => String(value ?? "").trim().replace(/\\s+/g, " ").toLocaleLowerCase();
+      const normalize = (value: unknown) => String(value ?? "").trim().replace(/\s+/g, " ").toLocaleLowerCase();
       const key = JSON.stringify([
         maker.sub,
         normalize(order.itemName),
@@ -485,6 +486,8 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
                   <Button variant="quiet" onClick={() => copyField(groupKey, order.email || maker.email || "", "Email")}>copy email</Button>
                   <Button variant="quiet" onClick={() => copyField(groupKey, order.itemName, "Purpose")}>copy purpose</Button>
                   <Button variant="quiet" onClick={() => copyField(groupKey, `${formatBeans(totalCents)} beans`, "Total price")}>copy total price</Button>
+                  {hasAddress ? <Button variant="quiet" onClick={() => copyField(groupKey, [order.fullName, order.addressLine1, order.addressLine2, `${order.city ?? ""} ${order.postcode ?? ""}`.trim(), order.country].filter(Boolean).join("\n"), "Address")}>copy address</Button> : null}
+                  {order.tracking ? <Button variant="quiet" onClick={() => copyField(groupKey, order.tracking ?? "", "Tracking ID")}>copy tracking</Button> : null}
                   {orderCopyMessages[groupKey] ? <span className={styles.copyMessage} role="status">{orderCopyMessages[groupKey]}</span> : null}
                 </div>
                 <div className={styles.actions}>
@@ -496,10 +499,20 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
                   />
                   <Button variant="quiet" loading={working} disabled={working} onClick={() => patchGroup(groupedOrders.map((entry) => entry.id), { status: "ready_to_fulfil", tracking: tracking[order.id] ?? order.tracking ?? "" })} className={styles.ready}>✓ ready to fulfil</Button>
                   <Button variant="quiet" loading={working} disabled={working} onClick={() => patchGroup(groupedOrders.map((entry) => entry.id), { status: "packing", tracking: tracking[order.id] ?? order.tracking ?? "" })}>packing</Button>
-                  <Button variant="quiet" loading={working} disabled={working} onClick={() => patchGroup(groupedOrders.map((entry) => entry.id), { status: "posted", tracking: tracking[order.id] ?? order.tracking ?? "" })}>mark posted</Button>
+                  <Button variant="quiet" loading={working} disabled={working} onClick={() => setConfirmPost(groupKey)}>mark posted</Button>
                   <Button variant="quiet" loading={working} disabled={working} onClick={() => patchGroup(groupedOrders.map((entry) => entry.id), { status: "needs_address" })}>needs address</Button>
                   <Button variant="danger" loading={working} disabled={working} onClick={() => { setProblem(null); setCanceling(groupKey); setCancelNote(""); }}>cancel</Button>
                 </div>
+                {confirmPost === groupKey ? (
+                  <div className={styles.cancelBox} role="group" aria-label="Confirm posting">
+                    <strong>Mark {groupedOrders.length === 1 ? "this order" : `these ${groupedOrders.length} orders`} as posted{(tracking[order.id] ?? order.tracking ?? "").trim() ? ` with tracking ${(tracking[order.id] ?? order.tracking ?? "").trim()}` : " without tracking"}?</strong>
+                    <p className={styles.summaryHint}>{maker.slackId ? "The maker gets a Slack DM saying it was dispatched." : "This maker has no Slack ID, so no DM goes out."} Bean balances do not change.</p>
+                    <div className={styles.actions}>
+                      <Button variant="quiet" disabled={working} onClick={() => setConfirmPost(null)}>back</Button>
+                      <Button loading={working} disabled={working} onClick={async () => { await patchGroup(groupedOrders.map((entry) => entry.id), { status: "posted", tracking: tracking[order.id] ?? order.tracking ?? "" }); setConfirmPost(null); }}>confirm posted</Button>
+                    </div>
+                  </div>
+                ) : null}
                 </>
               )}
             </div>

@@ -5,47 +5,135 @@ import { getCurrentUser } from "@/lib/auth/users";
 import { isOrganizer } from "@/lib/auth/organizer";
 import { getDb } from "@/lib/db";
 import { manualShipments } from "@/lib/db/schema";
+import type { ManualShipment } from "@/lib/db/schema";
+import {
+  STALE_SEND_MS,
+  dispatchMessage,
+  isShipmentId,
+  parseShipmentInput,
+  parseStatus,
+  statusTimestamps,
+  toShipmentView,
+} from "@/lib/fulfilment/manual-shipments";
 import { sendSlackDm } from "@/lib/slack/notifications";
 
 export const dynamic = "force-dynamic";
-const STATUSES = ["packing", "posted", "delivered"] as const;
-const clean = (value: unknown, max = 500) => typeof value === "string" ? value.trim().slice(0, max) : "";
 
+type Outcome =
+  | { kind: "not_found" }
+  | { kind: "conflict"; current: ManualShipment }
+  | { kind: "invalid"; message: string }
+  | { kind: "ok"; shipment: ManualShipment; notify: boolean };
+
+/**
+ * Updates a manual shipment.
+ * Body: any editable field, `status`, `expectedUpdatedAt` (required: the updatedAt the client last saw)
+ * and `resendNotification: true` to retry the dispatch DM.
+ * The dispatch DM is sent at most once automatically: only the request that moves the shipment to
+ * posted for the first time, under a row lock, claims it.
+ */
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const organizer = await getCurrentUser();
-  if (!isOrganizer(organizer)) return NextResponse.json({ error: "not found" }, { status: 404 });
+  if (!organizer || !isOrganizer(organizer)) return NextResponse.json({ error: "not found" }, { status: 404 });
 
   const { id } = await params;
+  if (!isShipmentId(id)) return NextResponse.json({ error: "not found" }, { status: 404 });
+
   let body: Record<string, unknown>;
-  try { body = await request.json() as Record<string, unknown>; }
-  catch { return NextResponse.json({ error: "unreadable" }, { status: 400 }); }
-
-  const status = typeof body.status === "string" ? body.status : undefined;
-  if (status && !STATUSES.includes(status as typeof STATUSES[number])) {
-    return NextResponse.json({ error: "invalid", field: "status" }, { status: 422 });
+  try {
+    const parsed: unknown = await request.json();
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("shape");
+    body = parsed as Record<string, unknown>;
+  } catch {
+    return NextResponse.json({ error: "unreadable", message: "The request could not be read." }, { status: 400 });
   }
 
-  const [existing] = await getDb().select().from(manualShipments).where(eq(manualShipments.id, id)).limit(1);
-  if (!existing) return NextResponse.json({ error: "not found" }, { status: 404 });
+  const status = parseStatus(body.status);
+  if (status === null) return NextResponse.json({ error: "validation", field: "status", message: "Status must be packing, posted or delivered." }, { status: 422 });
 
-  const newlyPosted = status === "posted" && existing.status !== "posted";
-  const [updated] = await getDb().update(manualShipments).set({
-    ...(status ? { status: status as typeof STATUSES[number] } : {}),
-    ...(body.courier !== undefined ? { courier: clean(body.courier, 120) || null } : {}),
-    ...(body.tracking !== undefined ? { tracking: clean(body.tracking, 200) || null } : {}),
-    ...(body.notes !== undefined ? { notes: clean(body.notes, 2000) || null } : {}),
-    ...(newlyPosted ? { dispatchedAt: new Date() } : {}),
-    ...(status === "delivered" && existing.status !== "delivered" ? { deliveredAt: new Date() } : {}),
-  }).where(eq(manualShipments.id, id)).returning();
+  const input = parseShipmentInput(body, true);
+  if (!input.ok) return NextResponse.json({ error: "validation", field: input.field, message: input.message }, { status: 422 });
 
-  if (!updated) return NextResponse.json({ error: "not found" }, { status: 404 });
+  const expected = typeof body.expectedUpdatedAt === "string" ? Date.parse(body.expectedUpdatedAt) : NaN;
+  if (!Number.isFinite(expected)) {
+    return NextResponse.json({ error: "validation", field: "expectedUpdatedAt", message: "Missing version. Refresh the page and try again." }, { status: 422 });
+  }
+  const resend = body.resendNotification === true;
 
-  if (newlyPosted && updated.slackId) {
-    const tracking = updated.tracking ? `\\n*Tracking ID:* ${updated.tracking}` : "";
-    const courier = updated.courier ? `\\n*Courier:* ${updated.courier}` : "";
-    await sendSlackDm(updated.slackId,
-      `📦 *Your 3AM shipment has been dispatched!*\\nHey ${updated.recipientName} — *${updated.itemName}* is on its way.${courier}${tracking}\\n\\nIf you have questions, DM the 3AM team in Hack Club Slack.`);
+  let outcome: Outcome;
+  try {
+    outcome = await getDb().transaction(async (tx): Promise<Outcome> => {
+      const [existing] = await tx.select().from(manualShipments).where(eq(manualShipments.id, id)).for("update").limit(1);
+      if (!existing) return { kind: "not_found" };
+      if (existing.updatedAt.getTime() !== expected) return { kind: "conflict", current: existing };
+
+      const now = new Date();
+      const nextStatus = status ?? existing.status;
+      const slackId = input.values.slackId !== undefined ? input.values.slackId : existing.slackId;
+      const sendingStale = existing.notifyStatus === "sending" &&
+        (!existing.notifyAttemptedAt || now.getTime() - existing.notifyAttemptedAt.getTime() > STALE_SEND_MS);
+      const claimable = existing.notifyStatus !== "sending" || sendingStale;
+
+      if (resend) {
+        if (nextStatus === "packing") return { kind: "invalid", message: "Mark the shipment posted before sending the dispatch DM." };
+        if (!slackId) return { kind: "invalid", message: "Add a Slack member ID first." };
+        if (!claimable) return { kind: "invalid", message: "A DM is being sent right now. Wait a moment and refresh." };
+      }
+
+      // First move into posted, never notified before: this request owns the DM.
+      const firstDispatch = nextStatus === "posted" && existing.status !== "posted" && !existing.notifiedAt &&
+        existing.notifyStatus !== "sent" && Boolean(slackId) && claimable;
+      const notify = resend || firstDispatch;
+
+      const [shipment] = await tx
+        .update(manualShipments)
+        .set({
+          // parseShipmentInput rejects empty required fields, so only optional ones can be null here.
+          ...(input.values as Partial<typeof manualShipments.$inferInsert>),
+          ...(status ? { status } : {}),
+          ...(status ? statusTimestamps(existing, status, now) : {}),
+          ...(notify ? { notifyStatus: "sending" as const, notifyAttemptedAt: now } : {}),
+          updatedAt: now,
+        })
+        .where(eq(manualShipments.id, id))
+        .returning();
+      if (!shipment) return { kind: "not_found" };
+      return { kind: "ok", shipment, notify };
+    });
+  } catch {
+    console.error("[manual-shipments] update failed");
+    return NextResponse.json({ error: "server", message: "The shipment could not be saved. Try again." }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true, shipment: updated });
+  if (outcome.kind === "not_found") return NextResponse.json({ error: "not found", message: "That shipment no longer exists." }, { status: 404 });
+  if (outcome.kind === "invalid") return NextResponse.json({ error: "invalid", message: outcome.message }, { status: 409 });
+  if (outcome.kind === "conflict") {
+    return NextResponse.json(
+      { error: "conflict", message: "Someone else changed this shipment. The latest version is shown; check it and try again.", shipment: toShipmentView(outcome.current) },
+      { status: 409 },
+    );
+  }
+
+  let shipment = outcome.shipment;
+  let notification: "sent" | "failed" | null = null;
+  if (outcome.notify && shipment.slackId) {
+    // The shipment is already saved; a Slack problem is recorded, never turned into a failed update.
+    let delivered = false;
+    try { delivered = await sendSlackDm(shipment.slackId, dispatchMessage(shipment)); }
+    catch { delivered = false; }
+    notification = delivered ? "sent" : "failed";
+    if (!delivered) console.warn("[manual-shipments] dispatch DM failed; shipment was updated");
+    try {
+      const [recorded] = await getDb()
+        .update(manualShipments)
+        .set({ notifyStatus: notification, ...(delivered ? { notifiedAt: new Date() } : {}) })
+        .where(eq(manualShipments.id, shipment.id))
+        .returning();
+      if (recorded) shipment = recorded;
+    } catch {
+      console.error("[manual-shipments] could not record DM result");
+    }
+  }
+
+  return NextResponse.json({ ok: true, shipment: toShipmentView(shipment), notification });
 }

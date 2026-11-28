@@ -155,6 +155,13 @@
       "when": 1795824000000,
       "tag": "0021_manual_shipments",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1795910400000,
+      "tag": "0022_manual_shipment_notifications",
+      "breakpoints": true
     }
   ]
 }
