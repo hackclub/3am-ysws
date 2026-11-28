@@ -1,4 +1,5 @@
 import type { ManualShipment } from "@/lib/db/schema";
+import { trackingGuideLines } from "@/lib/fulfilment/tracking";
 
 // Manual shipments are independent of shop orders: nothing here touches
 // orders, beans, payments or stock.
@@ -103,13 +104,12 @@ export function dispatchMessage(shipment: Pick<ManualShipment, "recipientName" |
   const packedBy = mentions(process.env.MANUAL_SHIPMENT_PACKED_BY_SLACK_ID, ["@agm"]);
   const lines = [
     "📦 *Your 3AM shipment has been dispatched!*",
-    `Hey ${escapeSlack(shipment.recipientName.split(" ")[0] || "there")}, your *${escapeSlack(shipment.itemName)}* is on its way.`,
+    `Hey ${escapeSlack(shipment.recipientName.split(" ")[0] || "there")}, your *${escapeSlack(shipment.itemName)}* ${/s$/i.test(shipment.itemName.trim()) ? "are on their way" : "is on its way"}.`,
     "",
     `Packed by ${packedBy}. Sent to you by ${sentBy}.`,
   ];
-  if (shipment.courier || shipment.tracking) lines.push("");
-  if (shipment.courier) lines.push(`*Courier:* ${escapeSlack(shipment.courier)}`);
-  if (shipment.tracking) lines.push(`*Tracking ID:* ${escapeSlack(shipment.tracking)}`);
+  if (shipment.courier) lines.push("", `*Courier:* ${escapeSlack(shipment.courier)}`);
+  if (shipment.tracking) lines.push("", ...trackingGuideLines(shipment.tracking, shipment.courier, escapeSlack));
   if (!isDomestic(shipment.country)) {
     lines.push(
       "",

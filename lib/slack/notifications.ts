@@ -6,6 +6,7 @@ import { missingForGrant } from "@/lib/grant";
 import { getPickerProjects, formatHours } from "@/lib/hackatime/projects";
 import { fetchAriStatus } from "@/lib/ari/status";
 import type { Project } from "@/lib/db/schema";
+import { trackingGuideLines } from "@/lib/fulfilment/tracking";
 
 type SlackApiResponse = {
   ok?: boolean;
@@ -165,7 +166,8 @@ export async function notifyOrderFulfilled(input: {
 }): Promise<void> {
   const name = escapeSlackText(input.makerName || "there");
   const item = escapeSlackText(input.itemName);
-  const tracking = input.tracking?.trim() ? `\n*Tracking ID:* ${escapeSlackText(input.tracking.trim())}` : "";
+  // Shop orders ship with DTDC, so the guide points to DTDC's tracking page.
+  const tracking = input.tracking?.trim() ? `\n\n${trackingGuideLines(input.tracking, null, escapeSlackText).join("\n")}` : "";
   const url = appUrl("/dash/orders");
   const link = url ? `\n\n<${url}|View your orders>` : "";
   const message = `📦 *Your 3AM order has been dispatched!*\nHey ${name} — *${item}* has been marked as posted.${tracking}${link}\n\nIf you have questions, DM the 3AM team in Hack Club Slack.`;

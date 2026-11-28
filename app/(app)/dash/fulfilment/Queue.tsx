@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { OrderStatusWord } from "@/components/ui/StatusWord";
 import type { Order, User } from "@/lib/db/schema";
 import { orderStatusOf } from "@/lib/projects/status";
+import { DTDC_TRACKING_URL } from "@/lib/fulfilment/tracking";
 
 import styles from "./Queue.module.css";
 
@@ -488,6 +489,7 @@ export function Queue({ rows }: { rows: QueueRow[] }) {
                   <Button variant="quiet" onClick={() => copyField(groupKey, `${formatBeans(totalCents)} beans`, "Total price")}>copy total price</Button>
                   {hasAddress ? <Button variant="quiet" onClick={() => copyField(groupKey, [order.fullName, order.addressLine1, order.addressLine2, `${order.city ?? ""} ${order.postcode ?? ""}`.trim(), order.country].filter(Boolean).join("\n"), "Address")}>copy address</Button> : null}
                   {order.tracking ? <Button variant="quiet" onClick={() => copyField(groupKey, order.tracking ?? "", "Tracking ID")}>copy tracking</Button> : null}
+                  {order.tracking ? <Button variant="quiet" title="Copies the tracking ID and opens DTDC's official tracking page" onClick={() => { void copyField(groupKey, order.tracking ?? "", "Tracking ID"); window.open(DTDC_TRACKING_URL, "_blank", "noopener,noreferrer"); }}>track on DTDC</Button> : null}
                   {orderCopyMessages[groupKey] ? <span className={styles.copyMessage} role="status">{orderCopyMessages[groupKey]}</span> : null}
                 </div>
                 <div className={styles.actions}>
