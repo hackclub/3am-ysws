@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import type { ManualShipment } from "@/lib/db/schema";
 
@@ -23,7 +23,7 @@ export function ManualShipments({ shipments }: Props) {
     setForm((current) => ({ ...current, [key]: value }));
   }
 
-  async function createShipment(event: React.FormEvent<HTMLFormElement>) {
+  async function createShipment(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
     setProblem("");
