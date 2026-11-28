@@ -236,6 +236,39 @@ export const slackOrderDigestEvents = pgTable(
 
 
 
+
+export const manualShipmentStatus = pgEnum("manual_shipment_status", ["packing", "posted", "delivered"]);
+
+export const manualShipments = pgTable(
+  "manual_shipments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    recipientName: text("recipient_name").notNull(),
+    recipientEmail: text("recipient_email").notNull(),
+    slackId: text("slack_id"),
+    itemName: text("item_name").notNull(),
+    addressLine1: text("address_line1").notNull(),
+    addressLine2: text("address_line2"),
+    city: text("city").notNull(),
+    stateProvince: text("state_province"),
+    postcode: text("postcode").notNull(),
+    country: text("country").notNull(),
+    courier: text("courier"),
+    tracking: text("tracking"),
+    status: manualShipmentStatus("status").notNull().default("packing"),
+    notes: text("notes"),
+    createdBy: text("created_by"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    dispatchedAt: timestamp("dispatched_at", { withTimezone: true }),
+    deliveredAt: timestamp("delivered_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("manual_shipments_status_created_at_idx").on(table.status, table.createdAt),
+    index("manual_shipments_created_at_idx").on(table.createdAt),
+    check("manual_shipments_item_name_check", sql`${table.itemName} in ('Stickers', '3AM Swag Kit')`),
+  ],
+);
+
 export const reviewerEntryKind = pgEnum("reviewer_entry_kind", ["review", "adjustment", "payout"]);
 
 // People who review 3am ships in Ari and get paid per review. Never hard-deleted:
