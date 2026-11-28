@@ -368,6 +368,7 @@ export type NewBeansEntry = typeof beansLedger.$inferInsert;
 export type Item = typeof items.$inferSelect;
 export type NewItem = typeof items.$inferInsert;
 export type Order = typeof orders.$inferSelect;
+export type ManualShipment = typeof manualShipments.$inferSelect;
 export type NewOrder = typeof orders.$inferInsert;
 export type Reviewer = typeof reviewers.$inferSelect;
 export type ReviewerEntry = typeof reviewerLedger.$inferSelect;
